@@ -1,14 +1,16 @@
 import { defineConfig } from "vite";
 import { viteStaticCopy } from "vite-plugin-static-copy";
 import { resolve } from "path";
+import mkcert from "vite-plugin-mkcert";
 
 
 
 export default defineConfig({
   plugins: [
+    mkcert(),
     viteStaticCopy({
       targets: [
-        { src: "manifest.xml", dest: "" },
+        // { src: "manifest.xml", dest: "" },
         { src: "public/icons/**/*", dest: "icons" },
       ],
     }),
