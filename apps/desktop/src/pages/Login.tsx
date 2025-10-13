@@ -25,9 +25,18 @@ export const Login = () => {
   const [ loggedIn, setLoggedIn ] = useState<boolean | undefined>(undefined);
 
   useEffect(() => {
-    window.auth.list().then((accounts) => {
+    const getUser = () => window.auth.list().then((accounts) => {
       console.log(accounts);
       setLoggedIn(accounts.length !== 0);
+    });
+
+    // get user for first time on mount
+    getUser();
+
+    // handle user updates
+    return window.api.on("auth:update", (data) => {
+      console.log("Received 'auth:update' event", data);
+      getUser();
     });
   }, []);
 
@@ -41,7 +50,7 @@ export const Login = () => {
     const url = new URL(`protocol://${values.serverURL}`);
 
     // fix protocol
-    console.log(url)
+    console.log(url);
     if (url.hostname === "localhost" || url.hostname === "127.0.0.1") {
       url.protocol = "http";
     } else {

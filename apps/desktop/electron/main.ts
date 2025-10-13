@@ -102,7 +102,11 @@ ipcMain.handle("app:open", async (_, url: string) => shell.openExternal(url));
 
 ipcMain.handle("app:hide", async () => getTrayWindow()?.hide());
 
-const setSecret = async (account: string, secret: string) => await keytar.setPassword("com.projdocs.desktop", account, secret);
+const setSecret = async (account: string, secret: string) => {
+  await keytar.setPassword("com.projdocs.desktop", account, secret);
+  getTrayWindow()?.webContents.send("auth:update"); // broadcast an update event
+}
+
 ipcMain.handle("auth:setSecret", async (_e, account: string, secret: string) => {
   await setSecret(account, secret);
   return true;
