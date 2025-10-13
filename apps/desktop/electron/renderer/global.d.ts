@@ -5,6 +5,7 @@ declare global {
     app: {
       quit: () => Promise<void>;
       open: (url: string) => Promise<void>;
+      hide: () => Promise<void>;
     };
     api: {
       invoke<T = any>(channel: string, ...args: any[]): Promise<T>;
