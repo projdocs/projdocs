@@ -1,0 +1,10 @@
+@import "../../../../packages/ui/src/styles/globals.css";
+@source "../../../../packages/ui/**/*.{ts,tsx}";
+@source "../../src/**/*.{ts,tsx}";
+
+html, body, #root {
+    height: 100%;
+    width: 100%;
+    margin: 0;
+    background: transparent; /* for transparent BrowserWindow */
+}
