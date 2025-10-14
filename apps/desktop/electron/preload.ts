@@ -30,7 +30,7 @@ contextBridge.exposeInMainWorld("app", {
 
 contextBridge.exposeInMainWorld("auth", {
   setSecret: (account: string, secret: string) =>
-    ipcRenderer.invoke("auth:setSecret", account, secret) as Promise<boolean>,
+    ipcRenderer.invoke("auth:setSecret", account, secret) as Promise<void>,
   getSecret: (account: string) =>
     ipcRenderer.invoke("auth:getSecret", account) as Promise<string | null>,
   deleteSecret: (account: string) =>

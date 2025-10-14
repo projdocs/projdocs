@@ -24,7 +24,7 @@ declare global {
       ping(): Promise<string>;
     };
     auth: {
-      setSecret(account: string, secret: string): Promise<boolean>;
+      setSecret(account: string, secret: string): Promise<void>;
       getSecret(account: string): Promise<string | null>;
       deleteSecret(account: string): Promise<boolean>;
       list(): Promise<Array<{account: string; password: string}>>;

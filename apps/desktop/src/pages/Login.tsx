@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -7,6 +7,7 @@ import { H4 } from "@workspace/ui/components/text";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@workspace/ui/components/form";
+import { AuthStatus, useAuthStore } from "@workspace/desktop/src/lib/auth/store";
 
 // --- Zod Schema ---
 const LoginSchema = z.object({
@@ -22,23 +23,8 @@ type LoginSchemaType = z.infer<typeof LoginSchema>;
 
 // --- Component ---
 export const Login = () => {
-  const [ loggedIn, setLoggedIn ] = useState<boolean | undefined>(undefined);
 
-  useEffect(() => {
-    const getUser = () => window.auth.list().then((accounts) => {
-      console.log(accounts);
-      setLoggedIn(accounts.length !== 0);
-    });
-
-    // get user for first time on mount
-    getUser();
-
-    // handle user updates
-    return window.api.on("auth:update", (data) => {
-      console.log("Received 'auth:update' event", data);
-      getUser();
-    });
-  }, []);
+  const auth = useAuthStore();
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
@@ -67,62 +53,59 @@ export const Login = () => {
     await window.app.hide();
   };
 
-  if (loggedIn === undefined) {
-    return (
-      <div className="p-4 flex flex-col items-center justify-center">
-        <Spinner className="size-8 text-secondary"/>
-      </div>
-    );
-  }
-
-  if (loggedIn) {
-    return (
-      <div className="p-4 flex flex-col items-center justify-center">
-        <H4>You’re already logged in 🎉</H4>
-        <Button
-          variant="destructive"
-          className="mt-4"
-          onClick={async () => {
-            const accounts = await window.auth.list();
-            await Promise.all(accounts.map((a) => window.auth.deleteSecret(a.account)));
-            setLoggedIn(false);
-          }}
-        >
-          Log out
-        </Button>
-      </div>
-    );
-  }
-
-  // --- Not logged in ---
-  return (
-    <div className="p-4 flex flex-col items-center justify-center h-full w-full max-w-sm">
-      <H4 className="m-10">{"Sign In to Continue"}</H4>
-
-      <Form {...form}>
-        <form
-          onSubmit={form.handleSubmit(onSubmit)}
-          className="space-y-4 w-full"
-        >
-          <FormField
-            control={form.control}
-            name="serverURL"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Server URL</FormLabel>
-                <FormControl>
-                  <Input placeholder="api.projdocs.com" {...field} />
-                </FormControl>
-                <FormMessage/>
-              </FormItem>
-            )}
-          />
-
-          <Button type="submit" className="w-full">
-            Log In
+  switch (auth.state.state) {
+    case AuthStatus.LOADING:
+      return (
+        <div className="p-4 flex flex-col items-center justify-center">
+          <Spinner className="size-8 text-secondary"/>
+        </div>
+      );
+    case AuthStatus.LOGGED_IN:
+      return (
+        <div className="p-4 flex flex-col items-center justify-between w-full h-full">
+          <H4>{"Welcome Back!"}</H4>
+          <Button
+            variant="destructive"
+            className="mt-4"
+            onClick={async () => {
+              const accounts = await window.auth.list();
+              await Promise.all(accounts.map((a) => window.auth.deleteSecret(a.account)));
+            }}
+          >
+            Log out
           </Button>
-        </form>
-      </Form>
-    </div>
-  );
+        </div>
+      );
+    case AuthStatus.LOGGED_OUT:
+      return (
+        <div className="p-4 flex flex-col items-center justify-center h-full w-full max-w-sm">
+          <H4 className="m-10">{"Sign In to Continue"}</H4>
+
+          <Form {...form}>
+            <form
+              onSubmit={form.handleSubmit(onSubmit)}
+              className="space-y-4 w-full"
+            >
+              <FormField
+                control={form.control}
+                name="serverURL"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Server URL</FormLabel>
+                    <FormControl>
+                      <Input placeholder="api.projdocs.com" {...field} />
+                    </FormControl>
+                    <FormMessage/>
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" className="w-full">
+                Log In
+              </Button>
+            </form>
+          </Form>
+        </div>
+      );
+  }
 };

@@ -5,6 +5,7 @@
     "paths": {
       "@workspace/web/*": ["./*"],
       "@workspace/ui/*": ["../../packages/ui/src/*"],
+      "@workspace/consts/*": ["../../packages/consts/src/*"],
       "@workspace/supabase/*": ["../../packages/supabase/*"]
     },
     "module": "esnext",

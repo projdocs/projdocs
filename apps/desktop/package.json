@@ -71,6 +71,7 @@
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "@workspace/ui": "^0.0.0",
+    "@workspace/consts": "^0.0.0",
     "keytar": "^7.9.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

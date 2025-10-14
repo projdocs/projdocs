@@ -12,6 +12,15 @@ export type AuthToken = {
   weak_password: string | null;
 }
 
+export type AuthSettings = {
+  token: AuthToken;
+  url: string;
+  supabase: {
+    url: string;
+    key: string;
+  };
+}
+
 export enum AuthStatus {
   LOADING = "loading",
   LOGGED_OUT = "logged_out",
@@ -20,18 +29,18 @@ export enum AuthStatus {
 
 export const LOADING: {
   state: AuthStatus.LOADING;
-  user: undefined;
+  settings: undefined;
 } = {
   state: AuthStatus.LOADING,
-  user: undefined
+  settings: undefined
 };
 
 export const LOGGED_OUT: {
   state: AuthStatus.LOGGED_OUT;
-  user: null;
+  settings: null;
 } = {
   state: AuthStatus.LOGGED_OUT,
-  user: null,
+  settings: null,
 };
 
 export const Auth: {
@@ -45,12 +54,12 @@ export const Auth: {
 export type AuthState =
   | typeof LOADING
   | typeof LOGGED_OUT
-  | { state: AuthStatus.LOGGED_IN; user: AuthToken; };
+  | { state: AuthStatus.LOGGED_IN; settings: AuthSettings; };
 
 type AuthStore = {
   state: AuthState;
   set: (auth: AuthState) => void;
-  login: (user: AuthToken | string) => void;
+  login: (settings: AuthSettings | string) => void;
   logout: () => void;
 };
 
@@ -59,25 +68,25 @@ export const useAuthStore = create<AuthStore>((set) => ({
 
   set: (state) => set({ state }),
 
-  login: (user) => {
-    if (typeof user === "object") set({ state: { state: AuthStatus.LOGGED_IN, user: user } });
+  login: (settings) => {
+    if (typeof settings === "object") set({ state: { state: AuthStatus.LOGGED_IN, settings: settings } });
     else {
-      const token = parseAuthToken(user);
+      const token = parseAuthToken(settings);
       if (token === null) set({ state: Auth.LOGGED_OUT });
-      else set({ state: { state: AuthStatus.LOGGED_IN, user: token } });
+      else set({ state: { state: AuthStatus.LOGGED_IN, settings: token } });
     }
   },
 
   logout: () => set({ state: Auth.LOGGED_OUT }),
 }));
 
-const parseAuthToken = (raw: string): AuthToken | null => {
+const parseAuthToken = (raw: string): AuthSettings | null => {
 
-  type Checker<K extends string & keyof AuthToken> = {
-    key: K,
+  type Checker<T> = {
+    key: string & keyof T,
     typ: TypeofResult,
   }
-  const check = (v: any, fields: Checker<string & keyof AuthToken>[]): boolean => {
+  const check = <T>(v: any, fields: Checker<T>[]): boolean => {
     if (typeof v !== "object" || v === null) return false;
     return fields
       .map(({ key, typ }) => key in v && typeof v[key] === typ && v[key])
@@ -86,18 +95,43 @@ const parseAuthToken = (raw: string): AuthToken | null => {
 
   try {
     const parsed = JSON.parse(raw);
-    if (check(parsed, [
+    if (check<AuthSettings>(parsed, [
       {
-        key: "access_token",
+        key: "url",
         typ: "string",
       },
+      {
+        key: "supabase",
+        typ: "object",
+      },
+      {
+        key: "token",
+        typ: "object",
+      },
+    ]) && check<{
+      key: string;
+      url: string;
+    }>(parsed.supabase, [
+      {
+        key: "key",
+        typ: "string",
+      },
+      {
+        key: "url",
+        typ: "string",
+      }
+    ]) && check<AuthToken>(parsed.token, [
       {
         key: "refresh_token",
         typ: "string",
       },
       {
+        key: "access_token",
+        typ: "string",
+      },
+      {
         key: "token_type",
-        typ: "string"
+        typ: "string",
       },
       {
         key: "expires_in",
@@ -106,10 +140,11 @@ const parseAuthToken = (raw: string): AuthToken | null => {
       {
         key: "expires_at",
         typ: "number",
-      },
+      }
     ])) {
-      return parsed as AuthToken;
+      return parsed as AuthSettings;
     } else {
+      console.log(parsed);
       console.warn("Malformed auth token object");
       return null;
     }

@@ -1,9 +1,11 @@
-import { useEffect } from "react";
+import { ReactNode, useEffect } from "react";
 import { useAuthStore } from "./store";
 
 
 
-export const AuthProvider = () => {
+export const AuthProvider = ({children}: {
+  children: ReactNode
+}) => {
 
   const auth = useAuthStore();
 
@@ -23,4 +25,6 @@ export const AuthProvider = () => {
       (async () => await getUser())();
     });
   }, []);
+
+  return children;
 }

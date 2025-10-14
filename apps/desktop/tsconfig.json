@@ -21,7 +21,7 @@
     "incremental": false,
     "plugins": [],
     "paths": {
-      "@workspace/desktop": ["../"]
+      "@workspace/desktop/*": ["../*"],
     },
     "noUncheckedIndexedAccess": true
   },

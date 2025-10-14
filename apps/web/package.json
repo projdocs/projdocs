@@ -15,6 +15,7 @@
     "@supabase/ssr": "^0.6.1",
     "@supabase/supabase-js": "^2.54.0",
     "@uidotdev/usehooks": "^2.4.1",
+    "@workspace/consts": "^0.0.0",
     "@workspace/supabase": "*",
     "@workspace/ui": "*",
     "axios": "^1.11.0",

@@ -9,7 +9,6 @@ import { Label } from "@workspace/ui/components/label";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { ComponentPropsWithoutRef, FormEvent, useState } from "react";
-import { _request, _sessionResponsePassword } from "@supabase/auth-js/src/lib/fetch";
 
 
 
@@ -56,23 +55,22 @@ export function LoginForm({ className, ...props }: ComponentPropsWithoutRef<"div
           });
 
           if (res.status === 200) {
-            const data = await res.json();
-
-            const user = data.user;
-            const session = data;
+            const session = await res.json();
             delete session.user;
 
             const path = query.get("redirect-to");
-            if(path === null) throw new Error("Redirect query param is missing!");
+            if (path === null) throw new Error("Redirect query param is missing!");
 
             const url = new URL("projdocs://");
             url.pathname = path;
-            url.searchParams.set("user", JSON.stringify(user));
             url.searchParams.set("session", JSON.stringify(session));
+            url.searchParams.set("public-key", anonKey);
+            url.searchParams.set("url", window.location.origin);
+            url.searchParams.set("supabase-url", base);
 
             // execute callback
             open(url.toString());
-            router.push("/")
+            router.push("/");
           } else {
             throw new Error(res.statusText);
           }
