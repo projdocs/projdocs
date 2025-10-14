@@ -69,11 +69,10 @@ export function LoginForm({ className, ...props }: ComponentPropsWithoutRef<"div
             url.pathname = path;
             url.searchParams.set("user", JSON.stringify(user));
             url.searchParams.set("session", JSON.stringify(session));
-            console.log(url.toString());
 
+            // execute callback
             open(url.toString());
             router.push("/")
-            // setTimeout(() => router.push("/"), 5000);
           } else {
             throw new Error(res.statusText);
           }

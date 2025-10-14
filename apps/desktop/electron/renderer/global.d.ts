@@ -1,5 +1,15 @@
 export {};
 
+export type TypeofResult =
+  | "undefined"
+  | "boolean"
+  | "number"
+  | "bigint"
+  | "string"
+  | "symbol"
+  | "function"
+  | "object";
+
 declare global {
   interface Window {
     app: {

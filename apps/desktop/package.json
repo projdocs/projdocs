@@ -6,7 +6,6 @@
   "license": "ISC",
   "main": "dist/main.js",
   "type": "commonjs",
-
   "scripts": {
     "dev:main": "tsup --watch",
     "dev:renderer": "vite dev --config electron/renderer/vite.config.ts",
@@ -17,7 +16,6 @@
     "start": "cross-env NODE_ENV=production electron .",
     "dist": "npm run build && electron-builder"
   },
-
   "build": {
     "appId": "com.projdocs.desktop",
     "productName": "ProjDocs",
@@ -31,46 +29,54 @@
     ],
     "extraResources": [
       {
-        "from": "public/",
-        "to": "public"
+        "from": "electron/renderer/public",
+        "to": "assets"
       }
     ],
     "protocols": [
       {
         "name": "ProjDocs Protocol",
-        "schemes": ["projdocs"]
+        "schemes": [
+          "projdocs"
+        ]
       }
     ],
     "mac": {
       "category": "public.app-category.productivity",
-      "target": ["dmg", "zip"],
+      "target": [
+        "dmg",
+        "zip"
+      ],
       "icon": "public/icons/icon.icns",
       "extendInfo": {
         "LSUIElement": "1"
       }
     },
     "win": {
-      "target": ["nsis", "zip"]
+      "target": [
+        "nsis",
+        "zip"
+      ]
     },
     "linux": {
-      "target": ["AppImage"],
+      "target": [
+        "AppImage"
+      ],
       "category": "Utility",
       "icon": "public/icons",
       "maintainer": "Train360 Corp."
     },
-
     "electronVersion": "37.2.4"
   },
-
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
     "@workspace/ui": "^0.0.0",
     "keytar": "^7.9.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",
-    "react-hook-form": "^7.65.0"
+    "react-hook-form": "^7.65.0",
+    "zustand": "^5.0.8"
   },
-
   "devDependencies": {
     "@types/electron": "^1.4.38",
     "@types/node": "^22.17.0",
