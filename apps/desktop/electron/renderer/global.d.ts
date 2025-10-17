@@ -1,4 +1,4 @@
-import { IPCHandlers } from "@workspace/desktop/electron/src/ipc/types";
+import { Events, IPCHandlers } from "@workspace/desktop/electron/src/ipc/types";
 
 
 
@@ -16,5 +16,8 @@ export type TypeofResult =
 
 declare global {
   interface Window extends IPCHandlers {
+    app: {
+      on: (event: Events, handler: () => unknown) => (() => void);
+    }
   }
 }

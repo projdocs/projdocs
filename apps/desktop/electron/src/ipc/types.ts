@@ -1,6 +1,10 @@
 import type { Secrets } from "@workspace/desktop/electron/src/secrets/types";
 
 
+export enum Events {
+  AUTH_UPDATE = "auth:update",
+}
+
 
 export type IPCHandlers = {
   app: {

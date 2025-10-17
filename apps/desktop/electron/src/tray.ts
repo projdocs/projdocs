@@ -1,4 +1,4 @@
-import { BrowserWindow, nativeImage, screen, Tray } from "electron";
+import { app, BrowserWindow, nativeImage, screen, Tray } from "electron";
 import path from "node:path";
 import { getAssetPath } from "./paths";
 
@@ -31,16 +31,16 @@ export async function createTrayWindow() {
     }
   });
 
-  if (process.env.NODE_ENV === "development") {
+  if (app.isPackaged) {
+    await win.loadFile(path.join(__dirname, "renderer", "index.html"));
+  } else {
     await win.loadURL("http://localhost:5173");
     win.webContents.openDevTools({ mode: "detach" });
-  } else {
-    await win.loadFile(path.join(__dirname, "renderer", "index.html"));
   }
 
   // Hide when focus leaves
   win.on("blur", () => {
-    if (!win?.webContents.isDevToolsOpened() && process.env.NODE_ENV !== "development") win?.hide();
+    if (!win?.webContents.isDevToolsOpened() && app.isPackaged) win?.hide();
   });
 
   return win;

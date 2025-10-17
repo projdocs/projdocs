@@ -1,7 +1,6 @@
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { channelsMap } from "@workspace/desktop/electron/src/ipc";
-import { ChannelToHandler } from "@workspace/desktop/electron/src/ipc/types";
-import IpcRendererEvent = Electron.IpcRendererEvent;
+import { ChannelToHandler, Events } from "@workspace/desktop/electron/src/ipc/types";
 
 
 
@@ -34,10 +33,11 @@ for (const ns of Object.keys(handlers) as Array<keyof typeof handlers>) {
   if (ns === "app") {
     space = {
       ...space,
-      on: (channel, listener: () => void) => {
+      // @ts-ignore custom patch for app event listener
+      on: (event: Events, listener: () => void) => {
         const sub = (_e: IpcRendererEvent) => listener();
-        ipcRenderer.on(channel as string, sub);
-        return () => ipcRenderer.removeListener(channel as string, sub);
+        ipcRenderer.on(event as string, sub);
+        return () => ipcRenderer.removeListener(event as string, sub);
       }
     };
   }

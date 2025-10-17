@@ -49,31 +49,13 @@ export async function handleDeepLink(link: string) {
 }
 
 export function registerProtocol(): void {
-  let registered = false;
-
   if (process.platform === "win32") {
-    // Required before registration on Windows
-    app.setAppUserModelId(SERVICE_ID);
-    if (process.defaultApp) {
-      // DEV: pass electron.exe + your main script as arg
-      registered = app.setAsDefaultProtocolClient(
-        "projdocs",
-        process.execPath,
-        [ path.resolve(process.argv[1]!) ]
-      );
-    } else {
-      registered = app.setAsDefaultProtocolClient("projdocs");
-    }
-  } else {
-    // macOS / Linux: NO args
-    registered = app.setAsDefaultProtocolClient("projdocs");
-  }
-
-  console.log("[protocol] defaultApp:", !!process.defaultApp,
-    "| platform:", process.platform,
-    "| argv[1]:", process.argv[1],
-    "| registered:", registered);
-
-  // If registered=false, another app may already own the scheme,
-  // or the call happened before ready on some environments.
+    app.setAppUserModelId(SERVICE_ID); // Required before registration on Windows
+    if (process.defaultApp) app.setAsDefaultProtocolClient(
+      "projdocs",
+      process.execPath,
+      [ path.resolve(process.argv[1]!) ]
+    );
+    else app.setAsDefaultProtocolClient("projdocs");
+  } else app.setAsDefaultProtocolClient("projdocs");
 }

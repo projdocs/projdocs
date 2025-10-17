@@ -40,6 +40,18 @@ app.whenReady().then(async () => {
   // Register AFTER ready (more reliable on some setups)
   registerProtocol();
 
+  // always start
+  if (app.isPackaged) app.setLoginItemSettings({
+    openAtLogin: true,
+    openAsHidden: true,
+    ...(process.platform === "win32"
+      ? {
+        path: process.execPath,
+        args: [ "--hidden", "--autostart" ],
+      }
+      : {}),
+  });
+
   if (process.platform === "darwin") {
     app.dock?.hide();
     app.setActivationPolicy?.("accessory");

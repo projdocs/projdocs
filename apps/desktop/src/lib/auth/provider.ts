@@ -1,6 +1,6 @@
 import { ReactNode, useEffect } from "react";
 import { useAuthStore } from "./store";
-import { AUTH_UPDATE_EVENT } from "@workspace/desktop/electron/src/secrets/consts";
+import { Events } from "@workspace/desktop/electron/src/ipc/types";
 
 
 
@@ -20,8 +20,8 @@ export const AuthProvider = ({ children }: {
     (async () => await getUser())();
 
     // handle user updates
-    window.app.on(AUTH_UPDATE_EVENT, () => {
-      console.log("Received 'auth:update' event");
+    return window.app.on(Events.AUTH_UPDATE, () => {
+      console.log(`Received '${Events.AUTH_UPDATE}' event`);
       (async () => await getUser())();
     });
   }, []);
