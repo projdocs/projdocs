@@ -16,6 +16,7 @@ export const Toolbar = () => {
 
   return (
     <div className={"flex flex-row justify-between items-center align-middle w-full p-2"}>
+
       {auth.state.state === AuthStatus.LOGGED_IN && (
         <div className={"align-middle justify-center"}>
           <P
@@ -31,6 +32,7 @@ export const Toolbar = () => {
           </P>
         </div>
       )}
+
       <div className={"ml-auto"}>
         <Tooltip onOpenChange={setQuitButtonHovered}>
           <TooltipTrigger asChild>
