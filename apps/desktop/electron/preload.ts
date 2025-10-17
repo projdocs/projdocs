@@ -1,39 +1,45 @@
 import { contextBridge, ipcRenderer } from "electron";
+import { channelsMap } from "@workspace/desktop/electron/src/ipc";
+import { ChannelToHandler } from "@workspace/desktop/electron/src/ipc/types";
+import IpcRendererEvent = Electron.IpcRendererEvent;
 
 
 
-contextBridge.exposeInMainWorld("api", {
+function handler<C extends keyof ChannelToHandler & string>(channel: C) {
+  type Fn = ChannelToHandler[C];
+  return ((...args: Parameters<Fn>) => ipcRenderer.invoke(channel, ...args)) as Fn;
+}
 
-  // Request/response IPC (returns a Promise)
-  invoke: <T = any>(channel: string, ...args: any[]) =>
-    ipcRenderer.invoke(channel, ...args) as Promise<T>,
+// build `handlers` from channelsMap with types preserved
+export const handlers = (() => {
+  const built: any = {};
+  for (const [ namespace, methods ] of Object.entries(channelsMap)) {
+    const bucket: any = {};
+    for (const [ method, channel ] of Object.entries(methods)) {
+      bucket[method] = handler(channel as keyof ChannelToHandler & string);
+    }
+    built[namespace] = bucket;
+  }
+  return built as {
+    [K in keyof typeof channelsMap]: {
+      [C in keyof typeof channelsMap[K]]:
+      ChannelToHandler[(typeof channelsMap[K])[C] & keyof ChannelToHandler & string];
+    };
+  };
+})();
 
-  // Fire-and-forget
-  send: (channel: string, data?: unknown) => ipcRenderer.send(channel, data),
-
-  // Subscribe to push events from main (returns unsubscribe fn)
-  on: (channel: string, listener: (...args: any[]) => void) => {
-    const sub = (_e: Electron.IpcRendererEvent, ...args: any[]) => listener(...args);
-    ipcRenderer.on(channel, sub);
-    return () => ipcRenderer.removeListener(channel, sub);
-  },
-
-  // Example helper
-  ping: () => ipcRenderer.invoke("ping"),
-});
-
-contextBridge.exposeInMainWorld("app", {
-  quit: () => ipcRenderer.invoke("app:quit") as Promise<void>,
-  open: (url: string) => ipcRenderer.invoke("app:open", url) as Promise<void>,
-  hide: () => ipcRenderer.invoke("app:hide") as Promise<void>,
-});
-
-contextBridge.exposeInMainWorld("auth", {
-  setSecret: (account: string, secret: string) =>
-    ipcRenderer.invoke("auth:setSecret", account, secret) as Promise<void>,
-  getSecret: (account: string) =>
-    ipcRenderer.invoke("auth:getSecret", account) as Promise<string | null>,
-  deleteSecret: (account: string) =>
-    ipcRenderer.invoke("auth:deleteSecret", account) as Promise<boolean>,
-  list: () => ipcRenderer.invoke("auth:list") as Promise<Array<{account: string; password: string}>>,
-});
+// expose to window (one namespace per key)
+for (const ns of Object.keys(handlers) as Array<keyof typeof handlers>) {
+  let space = handlers[ns];
+  if (ns === "app") {
+    space = {
+      ...space,
+      on: (channel, listener: () => void) => {
+        const sub = (_e: IpcRendererEvent) => listener();
+        ipcRenderer.on(channel as string, sub);
+        return () => ipcRenderer.removeListener(channel as string, sub);
+      }
+    };
+  }
+  contextBridge.exposeInMainWorld(ns, space);
+}

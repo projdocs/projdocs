@@ -1,3 +1,7 @@
+import { IPCHandlers } from "@workspace/desktop/electron/src/ipc/types";
+
+
+
 export {};
 
 export type TypeofResult =
@@ -11,23 +15,6 @@ export type TypeofResult =
   | "object";
 
 declare global {
-  interface Window {
-    app: {
-      quit: () => Promise<void>;
-      open: (url: string) => Promise<void>;
-      hide: () => Promise<void>;
-    };
-    api: {
-      invoke<T = any>(channel: string, ...args: any[]): Promise<T>;
-      send(channel: string, data?: unknown): void;
-      on(channel: string, listener: (...args: any[]) => void): () => void;
-      ping(): Promise<string>;
-    };
-    auth: {
-      setSecret(account: string, secret: string): Promise<void>;
-      getSecret(account: string): Promise<string | null>;
-      deleteSecret(account: string): Promise<boolean>;
-      list(): Promise<Array<{account: string; password: string}>>;
-    };
+  interface Window extends IPCHandlers {
   }
 }

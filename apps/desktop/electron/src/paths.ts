@@ -1,5 +1,5 @@
 import { app } from "electron";
-import path from "path";
+import path from "node:path";
 
 export function getAssetPath(...p: string[]) {
   return app.isPackaged

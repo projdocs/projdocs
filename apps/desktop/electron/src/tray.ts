@@ -24,6 +24,7 @@ export async function createTrayWindow() {
     skipTaskbar: true,
     transparent: true, // nice popover feel
     webPreferences: {
+      sandbox: false,
       contextIsolation: true,
       nodeIntegration: false,
       preload: path.join(__dirname, "preload.js")

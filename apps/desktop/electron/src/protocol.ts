@@ -1,8 +1,9 @@
 import { app } from "electron";
-import { SERVICE_ID, set } from "@workspace/desktop/electron/secrets";
+import { Secrets } from "@workspace/desktop/electron/src/secrets";
+import { SERVICE_ID } from "@workspace/desktop/electron/src/secrets/consts";
 import path from "node:path";
-import { getTrayWindow } from "@workspace/desktop/electron/tray";
-import { queryParamsToRequest } from "../../../packages/consts/src/auth";
+import { getTrayWindow } from "@workspace/desktop/electron/src/tray";
+import { queryParamsToRequest } from "@workspace/packages/consts/auth";
 import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
 
 // ---- deep link handler ----
@@ -12,14 +13,14 @@ export async function handleDeepLink(link: string) {
     if (url.protocol !== "projdocs:") return;
     switch (url.pathname) {
       case "/v1/auth/callback":
-        const request = queryParamsToRequest(url.searchParams)
+        const request = queryParamsToRequest(url.searchParams);
         if (
           !request.publicKey ||
           !request.supabaseUrl ||
           !request.session ||
           !request.url
         ) {
-          console.warn("[DEEP LINK] invalid token received")
+          console.warn("[DEEP LINK] invalid token received");
         } else {
           const authSettings: AuthSettings = {
             token: JSON.parse(request.session),
@@ -28,8 +29,8 @@ export async function handleDeepLink(link: string) {
               url: request.supabaseUrl,
               key: request.publicKey
             },
-          }
-          await set(JSON.stringify(authSettings))
+          };
+          await Secrets.set(JSON.stringify(authSettings));
         }
 
         break;

@@ -11,10 +11,7 @@ export const Main = () => {
       <Button
         variant="destructive"
         className="mt-4"
-        onClick={async () => {
-          const accounts = await window.auth.list();
-          await Promise.all(accounts.map((a) => window.auth.deleteSecret(a.account)));
-        }}
+        onClick={async () => await window.secrets.delete()}
       >
         {"Log out"}
       </Button>

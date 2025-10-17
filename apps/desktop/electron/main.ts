@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
-import { createTray, createTrayWindow, getTrayWindow } from "./tray";
-import { setupIpcMain } from "@workspace/desktop/electron/ipcs";
-import { handleDeepLink, registerProtocol } from "@workspace/desktop/electron/projdocs-protocol";
+import { createTray, createTrayWindow, getTrayWindow } from "@workspace/desktop/electron/src/tray";
+import { handleDeepLink, registerProtocol } from "@workspace/desktop/electron/src/protocol";
+import { registerIpcHandlers } from "@workspace/desktop/electron/src/ipc/funcs";
 
 // single-instance
 const gotLock = app.requestSingleInstanceLock();
@@ -64,5 +64,5 @@ app.on("window-all-closed", () => {
 });
 
 // ---- IPCs ----
-setupIpcMain(ipcMain);
+registerIpcHandlers(ipcMain);
 

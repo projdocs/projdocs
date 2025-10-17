@@ -37,7 +37,7 @@ export const Toolbar = () => {
             <Button
               variant={"ghost"}
               size={"sm"}
-              onClick={window.app.quit}
+              onClick={async () => await window.app.quit()}
             >
               <OctagonX className={quitButtonHovered ? "text-primary" : "text-secondary"} size={5}/>
             </Button>

@@ -1,18 +1,18 @@
 import { ReactNode, useEffect } from "react";
 import { useAuthStore } from "./store";
+import { AUTH_UPDATE_EVENT } from "@workspace/desktop/electron/src/secrets/consts";
 
 
 
-export const AuthProvider = ({children}: {
+export const AuthProvider = ({ children }: {
   children: ReactNode
 }) => {
 
   const auth = useAuthStore();
 
   useEffect(() => {
-    const getUser = () => window.auth.list().then((accounts) => {
-      const account = accounts.find(({ account }) => account === "00000000-0000-0000-0000-000000000000");
-      if (account !== undefined) auth.login(account.password);
+    const getUser = () => window.secrets.get().then((secret) => {
+      if (typeof secret === "string") auth.login(secret);
       else auth.logout();
     });
 
@@ -20,11 +20,11 @@ export const AuthProvider = ({children}: {
     (async () => await getUser())();
 
     // handle user updates
-    return window.api.on("auth:update", (data) => {
-      console.log("Received 'auth:update' event", data);
+    window.app.on(AUTH_UPDATE_EVENT, () => {
+      console.log("Received 'auth:update' event");
       (async () => await getUser())();
     });
   }, []);
 
   return children;
-}
+};
