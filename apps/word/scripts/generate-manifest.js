@@ -17,7 +17,7 @@ switch (env) {
     throw new Error(`Unknown env: ${env}`);
 }
 
-const manifestTemplatePath = path.resolve(__dirname, "../manifest.template.xml");
+const manifestTemplatePath = path.resolve(__dirname, "manifest.template.xml");
 const manifestOutPath = env === "dev"
   ? path.resolve(__dirname, "../manifest-local.xml")
   : path.resolve(__dirname, "../manifest.xml");
