@@ -1,7 +1,7 @@
 import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { createTray, createTrayWindow, getTrayWindow } from "./tray";
-import { setupIpcMain } from "@workspace/desktop/desktop/electron/ipcs";
-import { handleDeepLink, registerProtocol } from "@workspace/desktop/desktop/electron/projdocs-protocol";
+import { setupIpcMain } from "@workspace/desktop/electron/ipcs";
+import { handleDeepLink, registerProtocol } from "@workspace/desktop/electron/projdocs-protocol";
 
 // single-instance
 const gotLock = app.requestSingleInstanceLock();

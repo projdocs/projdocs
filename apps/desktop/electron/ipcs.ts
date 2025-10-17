@@ -1,6 +1,6 @@
 import { app, IpcMain, shell } from "electron";
-import { getTrayWindow } from "@workspace/desktop/desktop/electron/tray";
-import * as Secrets from "@workspace/desktop/desktop/electron/secrets";
+import { getTrayWindow } from "@workspace/desktop/electron/tray";
+import * as Secrets from "@workspace/desktop/electron/secrets";
 
 
 

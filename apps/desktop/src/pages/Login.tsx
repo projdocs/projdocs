@@ -1,4 +1,4 @@
-import React from "react";
+import React, { ReactNode } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -21,14 +21,16 @@ const LoginSchema = z.object({
 
 type LoginSchemaType = z.infer<typeof LoginSchema>;
 
-// --- Component ---
-export const Login = () => {
+
+export const Login = ({ children }: {
+  children: ReactNode
+}) => {
 
   const auth = useAuthStore();
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: { serverURL: "" },
+    defaultValues: { serverURL: process.env.NODE_ENV === "development" ? "localhost:3000" : "" },
   });
 
   const onSubmit = async (values: LoginSchemaType) => {
@@ -54,32 +56,27 @@ export const Login = () => {
   };
 
   switch (auth.state.state) {
+    case AuthStatus.LOGGED_IN:
+      return (children);
     case AuthStatus.LOADING:
       return (
         <div className="p-4 flex flex-col items-center justify-center">
           <Spinner className="size-8 text-secondary"/>
         </div>
       );
-    case AuthStatus.LOGGED_IN:
-      return (
-        <div className="p-4 flex flex-col items-center justify-between w-full h-full">
-          <H4>{"Welcome Back!"}</H4>
-          <Button
-            variant="destructive"
-            className="mt-4"
-            onClick={async () => {
-              const accounts = await window.auth.list();
-              await Promise.all(accounts.map((a) => window.auth.deleteSecret(a.account)));
-            }}
-          >
-            Log out
-          </Button>
-        </div>
-      );
     case AuthStatus.LOGGED_OUT:
       return (
-        <div className="p-4 flex flex-col items-center justify-center h-full w-full max-w-sm">
-          <H4 className="m-10">{"Sign In to Continue"}</H4>
+        <div className="p-4 flex flex-col items-center justify-center h-full w-full max-w-sm gap-14">
+
+          <div className={"flex flex-col items-center justify-center gap-14 w-full"}>
+            <img
+              src={"ProjDocs-Logo.png"}
+              alt="Example"
+              className="rounded-xl shadow-md h-14 w-full object-cover"
+            />
+
+            <H4>{"Sign In to Continue"}</H4>
+          </div>
 
           <Form {...form}>
             <form

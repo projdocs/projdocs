@@ -1,9 +1,9 @@
 import { app } from "electron";
-import { SERVICE_ID, set } from "@workspace/desktop/desktop/electron/secrets";
+import { SERVICE_ID, set } from "@workspace/desktop/electron/secrets";
 import path from "node:path";
-import { getTrayWindow } from "@workspace/desktop/desktop/electron/tray";
+import { getTrayWindow } from "@workspace/desktop/electron/tray";
 import { queryParamsToRequest } from "../../../packages/consts/src/auth";
-import { AuthSettings } from "@workspace/desktop/desktop/src/lib/auth/store";
+import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
 
 // ---- deep link handler ----
 export async function handleDeepLink(link: string) {

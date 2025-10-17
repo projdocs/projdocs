@@ -1,5 +1,5 @@
 import keytar from "keytar";
-import { getTrayWindow } from "@workspace/desktop/desktop/electron/tray";
+import { getTrayWindow } from "@workspace/desktop/electron/tray";
 
 
 
