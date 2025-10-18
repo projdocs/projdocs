@@ -19,8 +19,8 @@ switch (env) {
 
 const manifestTemplatePath = path.resolve(__dirname, "manifest.template.xml");
 const manifestOutPath = env === "dev"
-  ? path.resolve(__dirname, "../manifest-local.xml")
-  : path.resolve(__dirname, "../manifest.xml");
+  ? path.resolve(__dirname, "manifest-local.xml")
+  : path.resolve(__dirname, "manifest.xml");
 
 
 const xml = fs.readFileSync(manifestTemplatePath, "utf8");
