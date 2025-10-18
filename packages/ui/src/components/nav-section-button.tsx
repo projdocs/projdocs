@@ -3,16 +3,14 @@
 import { usePathname, useRouter } from "next/navigation";
 import { Badge } from "@workspace/ui/components/badge";
 import { SidebarMenuButton } from "@workspace/ui/components/sidebar";
-import { sections } from "@workspace/ui/components/nav-items";
+import { NavSectionItem } from "@workspace/ui/components/nav-section";
 
 
 
-export function NavSectionButton({ sectionNumber, itemNumber }: {
-  sectionNumber: number;
-  itemNumber: number;
+export function NavSectionButton({ item }: {
+  item: NavSectionItem;
 }) {
 
-  const item = sections[sectionNumber]!.items[itemNumber]!;
   const router = useRouter();
   const path = usePathname();
 

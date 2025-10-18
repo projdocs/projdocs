@@ -1,57 +1,96 @@
-export const saveAsNewFile: Action = async (event) => {
+import { baseUrl } from "@workspace/word/lib/utils";
+import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
+
+
+
+const saveToDisk = async (docId: number) => {
+  const props = await new Promise<Office.FileProperties>((resolve, reject) => {
+    Office.context.document.getFilePropertiesAsync((res) => {
+      if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
+      else reject(res.error);
+    });
+  }).catch(() => ({
+    url: ""
+  } satisfies Office.FileProperties));
+
+  await Word.run(async ctx => {
+    if (props.url.trim().length === 0) ctx.document.save(Word.SaveBehavior.save, `${docId}`);
+    else ctx.document.save(Word.SaveBehavior.save);
+    await ctx.sync();
+  });
+};
+
+
+export const saveAsNewFile: Action = async () => {
   console.log("✅ saveAsNewFile() was called");
-  try {
 
-    // get the file
-    const file = await new Promise<Office.File>((resolve, reject) => {
-      Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
-        if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
-        else reject(res.error || new Error("getFileAsync failed"));
-      });
-    });
 
-    const bytes = await readAllSlices(file);
-    const docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
-
-    await new Promise(() => Office.context.ui.displayDialogAsync(
-      "https://localhost:3000/dialog.html",
-      { height: 50, width: 50 },              // size in % of window
-      (result) => {
-        if (result.status === Office.AsyncResultStatus.Succeeded) {
-          const dialog = result.value;
-
-          dialog.addEventHandler(Office.EventType.DialogMessageReceived, (arg: any) => {
-            console.log("Message from dialog:", arg.message);
-            if (arg.message === "close") {
-              dialog.close();
-            }
-          });
-        } else {
-          console.error("Failed to open dialog:", result.error);
-        }
-      }
-    ));
-
-    const form = new FormData();
-    form.append("file", docxBlob, "name" in Office.context.document && typeof Office.context.document.name === "string" && Office.context.document.name.trim().length > 0 ? Office.context.document.name : "document.docx");
-    const res = await fetch("", { // TODO: FIX
-      method: "POST",
-      headers: { Authorization: `Bearer ${""}` }, // TODO: FIX
-      body: form,
-    });
-
-    if (!res.ok) {
-      const text = await res.text().catch(() => "");
-      throw new Error(`Upload failed: ${res.status} ${res.statusText} ${text}`);
+  const auth = await fetch("https://localhost:9305/user").then<AuthSettings | null>(async (resp) => {
+    if (resp.status === 400) {
+      throw new Error("not logged in");
+    } else if (resp.status === 200) {
+      return await resp.json();
+    } else {
+      throw new Error(`unexpected server response: ${resp.status}`);
     }
+  }).catch((e) => {
+    console.error(e);
+    return null;
+  });
 
-    return await res.json().catch(() => ({}));
+  if (auth === null) return;
 
-  } catch (e) {
-    console.error("saveAsNewFile error:", e);
-  } finally {
-    event.completed();
-  }
+
+
+  Office.context.ui.displayDialogAsync(
+    `${baseUrl}/src/surfaces/folder-picker/index.html?supabase-url=${encodeURIComponent(auth.supabase.url)}&token=${encodeURIComponent(auth.token.access_token)}&supabase-key=${encodeURIComponent(auth.supabase.key)}`,
+    { height: 75, width: 75 },              // size in % of window
+    (result) => {
+      if (result.status === Office.AsyncResultStatus.Succeeded) result.value.addEventHandler(Office.EventType.DialogMessageReceived, async (arg) => {
+        if ("message" in arg) {
+          switch (arg.message) {
+            case "save":
+
+              const file = await new Promise<Office.File>((resolve, reject) => {
+                Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
+                  if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
+                  else reject(res.error || new Error("getFileAsync failed"));
+                });
+              });
+
+              const bytes = await readAllSlices(file);
+              const docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
+
+              return;
+            case "close":
+              result.value.close();
+              return;
+            default:
+              console.warn(`dialog message type "${arg.message}" is unhandled`);
+          }
+        } else console.error(arg.error);
+      });
+      else {
+        console.error("Failed to open dialog:", result.error);
+      }
+    }
+  );
+
+  // const form = new FormData();
+  // form.append("file", docxBlob, "name" in Office.context.document && typeof Office.context.document.name === "string" && Office.context.document.name.trim().length > 0 ? Office.context.document.name : "document.docx");
+  // const res = await fetch("", { // TODO: FIX
+  //   method: "POST",
+  //   headers: { Authorization: `Bearer ${""}` }, // TODO: FIX
+  //   body: form,
+  // });
+  //
+  // if (!res.ok) {
+  //   const text = await res.text().catch(() => "");
+  //   throw new Error(`Upload failed: ${res.status} ${res.statusText} ${text}`);
+  // }
+  //
+  // return await res.json().catch(() => ({}));
+
 };
 
 

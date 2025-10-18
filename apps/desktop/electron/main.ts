@@ -2,6 +2,9 @@ import { app, BrowserWindow, ipcMain, Menu } from "electron";
 import { createTray, createTrayWindow, getTrayWindow } from "@workspace/desktop/electron/src/tray";
 import { handleDeepLink, registerProtocol } from "@workspace/desktop/electron/src/protocol";
 import { registerIpcHandlers } from "@workspace/desktop/electron/src/ipc/funcs";
+import { HttpServer } from "@workspace/desktop/electron/src/http";
+
+app.setName("ProjDocs");
 
 // single-instance
 const gotLock = app.requestSingleInstanceLock();
@@ -37,6 +40,17 @@ app.on("open-url", async (event, url) => {
 
 // ---- app lifecycle ----
 app.whenReady().then(async () => {
+
+  // start http server
+  const started = await HttpServer.start().then(() => true).catch((e) => {
+    console.error(e);
+    return false;
+  });
+  if (!started) {
+    console.warn("failed to start http server (shutting down)");
+    app.quit();
+  }
+
   // Register AFTER ready (more reliable on some setups)
   registerProtocol();
 
@@ -73,6 +87,10 @@ app.on("activate", async () => {
 
 app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
+});
+
+app.on("before-quit", () => {
+  HttpServer.stop().catch((e) => console.error(e));
 });
 
 // ---- IPCs ----

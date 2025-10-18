@@ -1,9 +1,3 @@
-export const save: Action = async (event) => {
+export const save: Action = async () => {
   console.log("✅ save() was called");
-  try {
-  } catch (e) {
-    console.error("save error:", e);
-  } finally {
-    event.completed();
-  }
 };

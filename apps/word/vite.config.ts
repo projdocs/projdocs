@@ -34,7 +34,8 @@ export default defineConfig({
     rollupOptions: {
       input: {
         main: path.resolve(__dirname, "index.html"),
-        commands: path.resolve(__dirname, "src/surfaces/ribbon/index.html"),
+        ribbon: path.resolve(__dirname, "src/surfaces/ribbon/index.html"),
+        filePicker: path.resolve(__dirname, "src/surfaces/folder-picker/index.html"),
       }
     }
   },

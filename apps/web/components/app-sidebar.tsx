@@ -38,7 +38,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <NavQuickCreate/>
         {sections.map((section, index) => (
-          <NavSection sectionNumber={index} section={section} key={index}/>
+          <NavSection section={section} key={index}/>
         ))}
         {/*<NavSecondary items={data.navSecondary} className="mt-auto"/>*/}
       </SidebarContent>

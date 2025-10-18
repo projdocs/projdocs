@@ -2,15 +2,25 @@ import { setButtons } from "@workspace/word/lib/utils";
 import { Actions } from "@workspace/word/lib/actions";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 
+type EventHandler = (event: Office.AddinCommands.Event) => Promise<void>;
 
+const safely = (action: Action): EventHandler => async (event) => {
+  try {
+    await action();
+  } catch (e) {
+    console.error(e);
+  } finally {
+    event.completed();
+  }
+}
 
 export const Ribbon = {
 
   setup: async () => {
-    Office.actions.associate("launchProjDocs", Actions.launch);
-    Office.actions.associate("save", Actions.save);
-    Office.actions.associate("saveAsNewVersion", Actions.saveAsNewVersion);
-    Office.actions.associate("saveAsNewFile", Actions.saveAsNewFile);
+    Office.actions.associate("launchProjDocs", safely(Actions.launch));
+    Office.actions.associate("save", safely(Actions.save));
+    Office.actions.associate("saveAsNewVersion", safely(Actions.saveAsNewVersion));
+    Office.actions.associate("saveAsNewFile",safely(Actions.saveAsNewFile));
 
     // wait for ribbon to initialize
     await waitForRibbon();

@@ -1,9 +1,3 @@
-export const saveAsNewVersion: Action = async (event) => {
+export const saveAsNewVersion: Action = async () => {
   console.log("✅ saveAsNewVersion() was called");
-  try {
-  } catch (e) {
-    console.error("saveAsNewVersion error:", e);
-  } finally {
-    event.completed();
-  }
 };

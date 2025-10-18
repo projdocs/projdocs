@@ -1,3 +1,10 @@
+// @ts-ignore
+export const isDev = import.meta.env.MODE === "development";
+export const baseUrl = isDev
+  ? "https://localhost:3000"
+  : "https://word.projdocs.com";
+
+
 export function saveSettings(): Promise<void> {
   return new Promise((resolve, reject) => {
     Office.context.document.settings.saveAsync((res) => {

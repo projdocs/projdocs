@@ -1,15 +1,11 @@
 import { type Icon, } from "@tabler/icons-react";
-import {
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuItem,
-} from "@workspace/ui/components/sidebar";
+import { SidebarGroup, SidebarGroupLabel, SidebarMenu, SidebarMenuItem, } from "@workspace/ui/components/sidebar";
 import { NavSectionButton } from "@workspace/ui/components/nav-section-button";
+import { ReactNode } from "react";
 
 
 
-type NavSectionItem = {
+export type NavSectionItem = {
   name: string;
   url: string;
   icon: Icon;
@@ -21,9 +17,11 @@ export type NavSection = {
   items: readonly NavSectionItem[];
 }
 
-export function NavSection({ section, sectionNumber }: {
+export function NavSection({ section, Button }: {
   section: NavSection;
-  sectionNumber: number;
+  Button?: (props: {
+    item: NavSectionItem;
+  }) => ReactNode;
 }) {
 
   return (
@@ -34,9 +32,7 @@ export function NavSection({ section, sectionNumber }: {
       <SidebarMenu>
         {section.items.map((item, index) => (
           <SidebarMenuItem key={item.name}>
-
-            <NavSectionButton sectionNumber={sectionNumber} itemNumber={index}/>
-
+            {Button ? <Button item={item}/> : (<NavSectionButton item={item}/>)}
             {/*<DropdownMenu>*/}
             {/*  <DropdownMenuTrigger asChild>*/}
             {/*    <SidebarMenuAction*/}
