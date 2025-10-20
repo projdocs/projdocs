@@ -5,17 +5,24 @@ import { app } from "electron";
 import { Secrets } from "@workspace/desktop/electron/src/secrets";
 import https from "https";
 import { trustRootCert } from "@workspace/desktop/electron/src/certs";
+import { createProxyMiddleware } from "http-proxy-middleware";
+import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
 
 
 
 const HOST = "127.0.0.1" as const; // loopback only
 const PORT = 9305 as const;
+let auth: AuthSettings | null = null;
 
 let server: Server | null = null;
 const isDev = !app.isPackaged;
 
 function buildApp() {
+
   const app = express();
+
+  // update auth token
+  Secrets.get().then(a => auth = typeof a === "string" && a.length > 0 ? JSON.parse(a) : null);
 
   // cors
   app.use(cors());
@@ -32,6 +39,22 @@ function buildApp() {
       next();
     });
   }
+
+  app.use("/supabase", createProxyMiddleware({
+    changeOrigin: true,
+    ws: true,
+    secure: false,
+    pathRewrite: { "^/supabase": "" },
+    router: () => auth ? auth.supabase.url : undefined,
+    on: {
+      proxyReq: (proxyReq, req, res) => {
+        if (auth) {
+          proxyReq.setHeader("Authorization", `Bearer ${auth.token.access_token}`);
+          proxyReq.setHeader("apikey", auth.supabase.key);
+        }
+      },
+    },
+  }));
 
   // routes
   app.get("/healthz", (_req, res) => res.status(200).json({ ok: true }));
@@ -120,4 +143,9 @@ function appVersion() {
 export const HttpServer = {
   start: startHttpServer,
   stop: stopHttpServer,
+  auth: {
+    set: (a: AuthSettings | null) => {
+      auth = a
+    }
+  }
 };

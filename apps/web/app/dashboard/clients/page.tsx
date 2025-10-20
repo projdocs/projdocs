@@ -1,15 +1,25 @@
-import { createClient } from "@workspace/web/lib/supabase/server";
-import * as React from "react";
+"use client";
+
+import { createClient } from "@workspace/web/lib/supabase/client";
 import { H1 } from "@workspace/ui/components/text";
 import ClientsTable from "@workspace/ui/components/clients-table";
+import { useEffect, useState } from "react";
+import { Tables } from "@workspace/supabase/types";
 
 
 
-export default async function Page() {
+export default function Page() {
 
-  const supabase = await createClient();
+  console.log(window.env)
 
-  const { data } = await supabase.from("clients").select();
+  const [ clients, setClients ] = useState<readonly Tables<"clients">[] | undefined | null>();
+  const supabase = createClient();
+
+
+  useEffect(() => {
+    supabase.from("clients").select().then(({ data }) => setClients(data));
+  }, [ supabase ]);
+
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
@@ -17,7 +27,10 @@ export default async function Page() {
 
         <H1>{"Clients"}</H1>
 
-        <ClientsTable clients={data ?? []}/>
+        <ClientsTable
+          clients={clients}
+          onRowClick={() => {}}
+        />
 
       </div>
     </div>

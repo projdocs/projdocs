@@ -1,6 +1,85 @@
 import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "url";
+import {CONSTANTS} from "../src/lib/consts.ts";
+
+/**
+ * @type {(env: "dev" | "prod") => Promise<void>}
+ */
+const main = async (env) => {
+
+  const manifestTemplatePath = path.resolve(__dirname, "manifest.template.xml");
+  const manifestOutPath = env === "dev"
+    ? path.resolve(__dirname, "manifest-local.xml")
+    : path.resolve(__dirname, "manifest.xml");
+
+
+  let xml = fs.readFileSync(manifestTemplatePath, "utf8");
+
+  for (const replacement of replacements) {
+    const val = replacement.replace;
+    xml = xml.replace(replacement.find, typeof val === "string" ? val : val[env]);
+  }
+
+
+  fs.writeFileSync(manifestOutPath, xml, "utf8");
+  console.log(`✅ Generated manifest for ${env}: ${manifestOutPath}`);
+}
+
+/**
+ * @type {readonly {
+ *   "find": RegExp,
+ *   "replace": string | {
+ *     "dev": string,
+ *     "prod": string
+ *   }
+ * }[]}
+ */
+const replacements = [
+  {
+    find: /__GUID__/g,
+    replace: CONSTANTS.META.GUID,
+  },
+  {
+    find: /__DOMAIN__/g,
+    replace: {
+      dev: "https://localhost:8000",
+      prod: "https://projdocs.com",
+    }
+  },
+  {
+    find: /__LAUNCH_BUTTON_ID__/g,
+    replace: CONSTANTS.BUTTONS.LAUNCH.ID
+  },
+  {
+    find: /__LAUNCH_FUNC_ID__/g,
+    replace: CONSTANTS.BUTTONS.LAUNCH.FUNC_ID
+  },
+  {
+    find: /__SAVE_BUTTON_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE.ID
+  },
+  {
+    find: /__SAVE_FUNC_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE.FUNC_ID
+  },
+  {
+    find: /__SAVE_NEW_VERSION_BUTTON_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID
+  },
+  {
+    find: /__SAVE_NEW_VERSION_FUNC_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.FUNC_ID
+  },
+  {
+    find: /__SAVE_NEW_DOC_BUTTON_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID
+  },
+  {
+    find: /__SAVE_NEW_DOC_FUNC_ID__/g,
+    replace: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.FUNC_ID
+  }
+];
 
 // Determine this script's directory
 const __filename = fileURLToPath(import.meta.url);
@@ -17,24 +96,4 @@ switch (env) {
     throw new Error(`Unknown env: ${env}`);
 }
 
-const manifestTemplatePath = path.resolve(__dirname, "manifest.template.xml");
-const manifestOutPath = env === "dev"
-  ? path.resolve(__dirname, "manifest-local.xml")
-  : path.resolve(__dirname, "manifest.xml");
-
-
-const xml = fs.readFileSync(manifestTemplatePath, "utf8");
-
-const replacements = {
-  dev: "https://localhost:3000/src/surfaces/ribbon/index.html",
-  prod: "https://word.projdocs.com/src/surfaces/ribbon/index.html",
-};
-
-const updated = xml.replace(
-  // src/surfaces/ribbon/index.html
-  /https:\/\/word\.projdocs\.com\/src\/surfaces\/ribbon\/index\.html/g,
-  replacements[env] || replacements.prod
-);
-
-fs.writeFileSync(manifestOutPath, updated, "utf8");
-console.log(`✅ Generated manifest for ${env}: ${manifestOutPath}`);
+await main(env);

@@ -1,50 +1,11 @@
 import { baseUrl } from "@workspace/word/lib/utils";
-import { AuthSettings } from "@workspace/desktop/src/lib/auth/store";
-import { CONSTANTS } from "@workspace/word/lib/consts";
 
-
-
-const saveToDisk = async (docId: number) => {
-  const props = await new Promise<Office.FileProperties>((resolve, reject) => {
-    Office.context.document.getFilePropertiesAsync((res) => {
-      if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
-      else reject(res.error);
-    });
-  }).catch(() => ({
-    url: ""
-  } satisfies Office.FileProperties));
-
-  await Word.run(async ctx => {
-    if (props.url.trim().length === 0) ctx.document.save(Word.SaveBehavior.save, `${docId}`);
-    else ctx.document.save(Word.SaveBehavior.save);
-    await ctx.sync();
-  });
-};
 
 
 export const saveAsNewFile: Action = async () => {
   console.log("✅ saveAsNewFile() was called");
-
-
-  const auth = await fetch(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/user`).then<AuthSettings | null>(async (resp) => {
-    if (resp.status === 400) {
-      throw new Error("not logged in");
-    } else if (resp.status === 200) {
-      return await resp.json();
-    } else {
-      throw new Error(`unexpected server response: ${resp.status}`);
-    }
-  }).catch((e) => {
-    console.error(e);
-    return null;
-  });
-
-  if (auth === null) return;
-
-
-
   Office.context.ui.displayDialogAsync(
-    `${baseUrl}/src/surfaces/folder-picker/index.html?supabase-url=${encodeURIComponent(auth.supabase.url)}&token=${encodeURIComponent(auth.token.access_token)}&supabase-key=${encodeURIComponent(auth.supabase.key)}`,
+    `${baseUrl}/src/surfaces/folder-picker/index.html`,
     { height: 75, width: 75 },              // size in % of window
     (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded) result.value.addEventHandler(Office.EventType.DialogMessageReceived, async (arg) => {
@@ -141,3 +102,20 @@ function base64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i) & 0xff;
   return bytes;
 }
+
+const saveToDisk = async (docId: number) => {
+  const props = await new Promise<Office.FileProperties>((resolve, reject) => {
+    Office.context.document.getFilePropertiesAsync((res) => {
+      if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
+      else reject(res.error);
+    });
+  }).catch(() => ({
+    url: ""
+  } satisfies Office.FileProperties));
+
+  await Word.run(async ctx => {
+    if (props.url.trim().length === 0) ctx.document.save(Word.SaveBehavior.save, `${docId}`);
+    else ctx.document.save(Word.SaveBehavior.save);
+    await ctx.sync();
+  });
+};

@@ -18,8 +18,10 @@
   "dependencies": {
     "@microsoft/office-js": "^1.1.110",
     "@supabase/supabase-js": "^2.75.1",
+    "@workspace/supabase": "*",
     "@workspace/ui": "*",
     "cors": "^2.8.5",
+    "http-proxy-middleware": "^3.0.5",
     "react": "^19.2.0",
     "react-dom": "^19.1.0"
   },

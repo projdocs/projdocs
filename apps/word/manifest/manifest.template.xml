@@ -3,20 +3,18 @@
            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
            xmlns:bt="http://schemas.microsoft.com/office/officeappbasictypes/1.0"
            xsi:type="TaskPaneApp">
-  <Id>433E317B-E000-4504-A73C-8DEB03685452</Id>
+  <Id>__GUID__</Id>
   <Version>1.0.0.0</Version>
   <ProviderName>Train360, Corp.</ProviderName>
   <DefaultLocale>en-US</DefaultLocale>
   <DisplayName DefaultValue="ProjDocs"/>
   <Description DefaultValue="ProjDocs Connector"/>
-  <IconUrl DefaultValue="https://word.projdocs.com/icons/icon-32.png"/>
-  <HighResolutionIconUrl DefaultValue="https://word.projdocs.com/icons/64-icon.png"/>
+  <IconUrl DefaultValue="__DOMAIN__/icons/icon-32.png"/>
+  <HighResolutionIconUrl DefaultValue="__DOMAIN__/icons/64-icon.png"/>
   <SupportUrl DefaultValue="https://projdocs.com"/>
 
   <AppDomains>
-    <AppDomain>https://projdocs.com</AppDomain>
-    <AppDomain>https://word.projdocs.com</AppDomain>
-    <AppDomain>https://localhost:3000</AppDomain>
+    <AppDomain>__DOMAIN__</AppDomain>
   </AppDomains>
 
   <Hosts>
@@ -30,13 +28,15 @@
   </Requirements>
 
   <DefaultSettings>
-    <SourceLocation DefaultValue="https://word.projdocs.com/src/surfaces/ribbon/index.html"/>
+    <SourceLocation DefaultValue="__DOMAIN__/src/surfaces/ribbon/index.html"/>
   </DefaultSettings>
 
   <Permissions>ReadWriteDocument</Permissions>
 
-  <VersionOverrides xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
-                    xsi:type="VersionOverridesV1_0">
+  <VersionOverrides
+      xmlns="http://schemas.microsoft.com/office/taskpaneappversionoverrides"
+      xsi:type="VersionOverridesV1_0"
+  >
 
     <Hosts>
       <Host xsi:type="Document">
@@ -62,11 +62,11 @@
                   <bt:Image size="80" resid="Icon.80x80"/>
                 </Icon>
 
-                <Control xsi:type="Button" id="LaunchProjDocsButton">
-                  <Label resid="LaunchProjDocsButton.Label"/>
+                <Control xsi:type="Button" id="__LAUNCH_BUTTON_ID__">
+                  <Label resid="__LAUNCH_BUTTON_ID__.Label"/>
                   <Supertip>
-                    <Title resid="LaunchProjDocsButton.Label"/>
-                    <Description resid="LaunchProjDocsButton.Tooltip"/>
+                    <Title resid="__LAUNCH_BUTTON_ID__.Label"/>
+                    <Description resid="__LAUNCH_BUTTON_ID__.Tooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.16x16"/>
@@ -74,16 +74,16 @@
                     <bt:Image size="80" resid="Icon.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>launchProjDocs</FunctionName>
+                    <FunctionName>__LAUNCH_FUNC_ID__</FunctionName>
                   </Action>
                 </Control>
 
                 <!-- Button 1: Save -->
-                <Control xsi:type="Button" id="SaveButton">
-                  <Label resid="SaveButton.Label"/>
+                <Control xsi:type="Button" id="__SAVE_BUTTON_ID__">
+                  <Label resid="__SAVE_BUTTON_ID__.Label"/>
                   <Supertip>
-                    <Title resid="SaveButton.Label"/>
-                    <Description resid="SaveButton.Tooltip"/>
+                    <Title resid="__SAVE_BUTTON_ID__.Label"/>
+                    <Description resid="__SAVE_BUTTON_ID__.Tooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.Save.16x16"/>
@@ -91,17 +91,17 @@
                     <bt:Image size="80" resid="Icon.Save.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>save</FunctionName>
+                    <FunctionName>__SAVE_FUNC_ID__</FunctionName>
                   </Action>
                   <Enabled>false</Enabled>
                 </Control>
 
                 <!-- Button 2: Save As New Version -->
-                <Control xsi:type="Button" id="SaveAsNewVersionButton">
-                  <Label resid="SaveAsNewVersionButton.Label"/>
+                <Control xsi:type="Button" id="__SAVE_NEW_VERSION_BUTTON_ID__">
+                  <Label resid="__SAVE_NEW_VERSION_BUTTON_ID__.Label"/>
                   <Supertip>
-                    <Title resid="SaveAsNewVersionButton.Label"/>
-                    <Description resid="SaveAsNewVersionButton.Tooltip"/>
+                    <Title resid="__SAVE_NEW_VERSION_BUTTON_ID__.Label"/>
+                    <Description resid="__SAVE_NEW_VERSION_BUTTON_ID__.Tooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.SaveAsNewVersion.16x16"/>
@@ -109,17 +109,17 @@
                     <bt:Image size="80" resid="Icon.SaveAsNewVersion.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>saveAsNewVersion</FunctionName>
+                    <FunctionName>__SAVE_NEW_VERSION_FUNC_ID__</FunctionName>
                   </Action>
                   <Enabled>false</Enabled>
                 </Control>
 
                 <!-- Button 3: Save As New Document -->
-                <Control xsi:type="Button" id="SaveAsNewDocumentButton">
-                  <Label resid="SaveAsNewDocumentButton.Label"/>
+                <Control xsi:type="Button" id="__SAVE_NEW_DOC_BUTTON_ID__">
+                  <Label resid="__SAVE_NEW_DOC_BUTTON_ID__.Label"/>
                   <Supertip>
-                    <Title resid="SaveAsNewDocumentButton.Label"/>
-                    <Description resid="SaveAsNewDocumentButton.Tooltip"/>
+                    <Title resid="__SAVE_NEW_DOC_BUTTON_ID__.Label"/>
+                    <Description resid="__SAVE_NEW_DOC_BUTTON_ID__.Tooltip"/>
                   </Supertip>
                   <Icon>
                     <bt:Image size="16" resid="Icon.SaveAsNewDocument.16x16"/>
@@ -127,7 +127,7 @@
                     <bt:Image size="80" resid="Icon.SaveAsNewDocument.80x80"/>
                   </Icon>
                   <Action xsi:type="ExecuteFunction">
-                    <FunctionName>saveAsNewFile</FunctionName>
+                    <FunctionName>__SAVE_NEW_DOC_FUNC_ID__</FunctionName>
                   </Action>
                   <Enabled>false</Enabled>
                 </Control>
@@ -139,69 +139,86 @@
     </Hosts>
     <Resources>
       <bt:Images>
-        <bt:Image id="Icon.16x16" DefaultValue="https://word.projdocs.com/icons/16-icon.png"/>
-        <bt:Image id="Icon.32x32" DefaultValue="https://word.projdocs.com/icons/32-icon.png"/>
-        <bt:Image id="Icon.80x80" DefaultValue="https://word.projdocs.com/icons/80-icon.png"/>
+        <bt:Image id="Icon.16x16" DefaultValue="__DOMAIN__/icons/16-icon.png"/>
+        <bt:Image id="Icon.32x32" DefaultValue="__DOMAIN__/icons/32-icon.png"/>
+        <bt:Image id="Icon.80x80" DefaultValue="__DOMAIN__/icons/80-icon.png"/>
 
         <!-- Button 1: Save -->
-        <bt:Image id="Icon.Save.16x16" DefaultValue="https://word.projdocs.com/icons/16-save.png"/>
-        <bt:Image id="Icon.Save.32x32" DefaultValue="https://word.projdocs.com/icons/32-save.png"/>
-        <bt:Image id="Icon.Save.80x80" DefaultValue="https://word.projdocs.com/icons/80-save.png"/>
+        <bt:Image id="Icon.Save.16x16" DefaultValue="__DOMAIN__/icons/16-save.png"/>
+        <bt:Image id="Icon.Save.32x32" DefaultValue="__DOMAIN__/icons/32-save.png"/>
+        <bt:Image id="Icon.Save.80x80" DefaultValue="__DOMAIN__/icons/80-save.png"/>
 
         <!-- Button 2: Save As New Version -->
         <bt:Image id="Icon.SaveAsNewVersion.16x16"
-                  DefaultValue="https://word.projdocs.com/icons/16-save-as-new-version.png"/>
+                  DefaultValue="__DOMAIN__/icons/16-save-as-new-version.png"/>
         <bt:Image id="Icon.SaveAsNewVersion.32x32"
-                  DefaultValue="https://word.projdocs.com/icons/32-save-as-new-version.png"/>
+                  DefaultValue="__DOMAIN__/icons/32-save-as-new-version.png"/>
         <bt:Image id="Icon.SaveAsNewVersion.80x80"
-                  DefaultValue="https://word.projdocs.com/icons/80-save-as-new-version.png"/>
+                  DefaultValue="__DOMAIN__/icons/80-save-as-new-version.png"/>
 
         <!-- Button 3: Save As New Document -->
         <bt:Image id="Icon.SaveAsNewDocument.16x16"
-                  DefaultValue="https://word.projdocs.com/icons/16-save-as-new-document.png"/>
+                  DefaultValue="__DOMAIN__/icons/16-save-as-new-document.png"/>
         <bt:Image id="Icon.SaveAsNewDocument.32x32"
-                  DefaultValue="https://word.projdocs.com/icons/32-save-as-new-document.png"/>
+                  DefaultValue="__DOMAIN__/icons/32-save-as-new-document.png"/>
         <bt:Image id="Icon.SaveAsNewDocument.80x80"
-                  DefaultValue="https://word.projdocs.com/icons/80-save-as-new-document.png"/>
+                  DefaultValue="__DOMAIN__/icons/80-save-as-new-document.png"/>
 
       </bt:Images>
       <bt:Urls>
         <bt:Url id="GetStarted.LearnMoreUrl" DefaultValue="https://go.microsoft.com/fwlink/?LinkId=276812"/>
-        <bt:Url id="Commands.Url" DefaultValue="https://word.projdocs.com/src/surfaces/ribbon/index.html"/>
+        <bt:Url id="Commands.Url" DefaultValue="__DOMAIN__/src/surfaces/ribbon/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
         <bt:String id="GetStarted.Title" DefaultValue="ProjDocs loaded successfully!"/>
         <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
         <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
 
-        <bt:String id="LaunchProjDocsButton.Label" DefaultValue="Launch ProjDocs"/>
+        <bt:String id="__LAUNCH_BUTTON_ID__.Label" DefaultValue="Launch ProjDocs"/>
 
         <!-- Button 1: Save -->
-        <bt:String id="SaveButton.Label" DefaultValue="Save Document"/>
+        <bt:String id="__SAVE_BUTTON_ID__.Label" DefaultValue="Save Document"/>
 
         <!-- Button 2: Save As New Version -->
-        <bt:String id="SaveAsNewVersionButton.Label" DefaultValue="Save as New Version"/>
+        <bt:String id="__SAVE_NEW_VERSION_BUTTON_ID__.Label" DefaultValue="Save as New Version"/>
 
         <!-- Button 3: Save As New Document -->
-        <bt:String id="SaveAsNewDocumentButton.Label" DefaultValue="Save as New Document"/>
+        <bt:String id="__SAVE_NEW_DOC_BUTTON_ID__.Label" DefaultValue="Save as New Document"/>
 
       </bt:ShortStrings>
       <bt:LongStrings>
-        <bt:String id="GetStarted.Description"
-                   DefaultValue="The ProjDocs add-in loaded successfully. Go to the HOME tab to continue."/>
-        <bt:String id="TaskpaneButton.Tooltip" DefaultValue="Click to Show a Task Pane"/>
+        <bt:String
+            id="GetStarted.Description"
+            DefaultValue="The ProjDocs add-in loaded successfully. Go to the HOME tab to continue."
+        />
 
-        <bt:String id="LaunchProjDocsButton.Tooltip"
-                   DefaultValue="Start ProjDocs in this document and enable autoload on open."/>
+        <bt:String
+            id="TaskpaneButton.Tooltip"
+            DefaultValue="Click to Show a Task Pane"
+        />
+
+        <bt:String
+            id="__LAUNCH_BUTTON_ID__.Tooltip"
+            DefaultValue="Start ProjDocs in this document and enable autoload on open."
+        />
 
         <!-- Button 1: Save-->
-        <bt:String id="SaveButton.Tooltip" DefaultValue="Save the document, overwriting the current version."/>
+        <bt:String
+            id="__SAVE_BUTTON_ID__.Tooltip"
+            DefaultValue="Save the document, overwriting the current version."
+        />
 
         <!-- Button 2: Save As New Version -->
-        <bt:String id="SaveAsNewVersionButton.Tooltip" DefaultValue="Save the document as a new version."/>
+        <bt:String
+            id="__SAVE_NEW_VERSION_BUTTON_ID__.Tooltip"
+            DefaultValue="Save the document as a new version."
+        />
 
         <!-- Button 3: Save As New Document -->
-        <bt:String id="SaveAsNewDocumentButton.Tooltip" DefaultValue="Save the document as a new file."/>
+        <bt:String
+            id="__SAVE_NEW_DOC_BUTTON_ID__.Tooltip"
+            DefaultValue="Save the document as a new file."
+        />
 
       </bt:LongStrings>
     </Resources>

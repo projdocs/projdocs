@@ -1,49 +1,28 @@
-import { Geist, Geist_Mono } from "next/font/google";
-import "./index.css";
-import { ThemeProvider } from "@workspace/ui/components/theme-provider";
-import { Toaster } from "@workspace/ui/components/sonner";
 import { ReactNode } from "react";
-import EnvProvider from "@workspace/web/components/env-provider";
+import { unstable_noStore as noStore } from 'next/cache';
+import { EnvScript } from 'next-runtime-env';
 
+export const metadata = {
+  title: "ProjDocs",
+  description: "A project-oriented document management system!",
+};
 
+export default function RootLayout({ children }: { children: ReactNode }) {
 
-const fontSans = Geist({
-  subsets: [ "latin" ],
-  variable: "--font-sans",
-});
+  noStore(); // Opt into dynamic rendering
 
-const fontMono = Geist_Mono({
-  subsets: [ "latin" ],
-  variable: "--font-mono",
-});
-
-export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
-  children: ReactNode
-}>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-    <head title={"ProjDocs"}>
-      <meta name={"description"} content={"A project-oriented document management system!"}/>
-      <script src="/env.js"/>
+    <html lang="en">
+    <head>
+      <EnvScript
+        env={{
+          SUPABASE_PUBLIC_URL: process.env.SUPABASE_PUBLIC_URL ?? "",
+          SUPABASE_PUBLIC_KEY: process.env.SUPABASE_PUBLIC_KEY ?? "",
+          MODE: process.env.MODE ?? "standalone",
+        }}
+      />
     </head>
-    <body
-      className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
-    >
-    <Toaster/>
-    <ThemeProvider
-      attribute="class"
-      defaultTheme="system"
-      enableSystem
-      disableTransitionOnChange
-      enableColorScheme
-    >
-      <EnvProvider>
-        {children}
-      </EnvProvider>
-    </ThemeProvider>
-    </body>
+    <body>{children}</body>
     </html>
   );
 }

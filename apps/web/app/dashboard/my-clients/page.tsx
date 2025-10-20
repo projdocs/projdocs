@@ -31,7 +31,6 @@ export default function Page() {
         <ClientsTable
           clients={clients}
           noRowsText={"Looks like you haven't added a client yet! Add one to continue."}
-          loading={rows === undefined}
         />
 
       </div>

@@ -1,11 +1,9 @@
 "use client";
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
-import * as React from "react";
 import { columns } from "@workspace/ui/components/clients-table-columns";
 import { Tables } from "@workspace/supabase/types";
 import { ClientRow } from "@workspace/ui/components/clients-table-row";
-import { useDebounce } from "@uidotdev/usehooks";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { BuildingIcon } from "lucide-react";
 import { IconDotsVertical } from "@tabler/icons-react";
@@ -13,13 +11,11 @@ import { Button } from "@workspace/ui/components/button";
 
 
 
-export default function ClientsTable({ clients, noRowsText, loading }: {
-  clients: readonly Tables<"clients">[];
+export default function ClientsTable({ clients, noRowsText, onRowClick }: {
+  clients: readonly Tables<"clients">[] | null | undefined;
   noRowsText?: string;
-  loading?: boolean;
+  onRowClick: (client: Tables<"clients">) => void;
 }) {
-
-  const isLoading = useDebounce(loading ?? false, 500);
 
   return (
     <div className="flex flex-col gap-4 overflow-auto overflow-hidden rounded-lg border">
@@ -40,36 +36,53 @@ export default function ClientsTable({ clients, noRowsText, loading }: {
           </TableRow>
         </TableHeader>
         <TableBody className="**:data-[slot=table-cell]:first:w-8">
-          {isLoading ? (
-            <TableRow>
-              <TableCell>
-                <BuildingIcon className={"text-muted"}/>
-              </TableCell>
-              {columns.map((col, index) => (
-                <TableCell key={index} width={col.width}>
-                  <Skeleton className="h-4 w-[50px]"/>
-                </TableCell>
-              ))}
-              <TableCell align={"right"}>
-                <Button disabled variant={"ghost"} size="icon" className="size-8">
-                  <IconDotsVertical/>
-                </Button>
-              </TableCell>
-            </TableRow>
-          ) : (
-            (clients.length > 0) ? clients.map((client, index) => (
-              <ClientRow client={client} key={index}/>
-            )) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length + 2}
-                  className="h-24 text-center"
-                >
-                  {noRowsText ?? "Looks like you haven't created a client yet! Create one to get started."}
-                </TableCell>
-              </TableRow>
-            )
-          )}
+          {
+            clients === undefined ? (
+                <TableRow>
+                  <TableCell>
+                    <BuildingIcon className={"text-muted"}/>
+                  </TableCell>
+                  {columns.map((col, index) => (
+                    <TableCell key={index} width={col.width}>
+                      <Skeleton className="h-4 w-[50px]"/>
+                    </TableCell>
+                  ))}
+                  <TableCell align={"right"}>
+                    <Button disabled variant={"ghost"} size="icon" className="size-8">
+                      <IconDotsVertical/>
+                    </Button>
+                  </TableCell>
+                </TableRow>
+              ) :
+              clients === null ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length + 2}
+                      className="h-24 text-center"
+                    >
+                      {"An error occurred while loading clients."}
+                    </TableCell>
+                  </TableRow>
+                ) :
+                clients.length === 0 ? (
+                  <TableRow>
+                    <TableCell
+                      colSpan={columns.length + 2}
+                      className="h-24 text-center"
+                    >
+                      {noRowsText ?? "Looks like you haven't created a client yet! Create one to get started."}
+                    </TableCell>
+                  </TableRow>
+                ) : (
+                  clients.map((client, index) => (
+                    <ClientRow
+                      client={client}
+                      key={index}
+                      onClick={onRowClick}
+                    />
+                  ))
+                )
+          }
         </TableBody>
       </Table>
     </div>

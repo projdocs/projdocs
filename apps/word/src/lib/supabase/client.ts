@@ -1,6 +1,8 @@
 import { createClient } from "@supabase/supabase-js";
 import { useMemo } from "react";
 import { useAppStore } from "@workspace/word/store/app";
+import { Database } from "@workspace/supabase/types";
+import { CONSTANTS } from "@workspace/word/lib/consts";
 
 
 
@@ -10,13 +12,8 @@ export const useSupabase = () => {
 
   return useMemo(() => {
 
-    const url = new URL(window.location.toString());
-    const supabaseUrl = url.searchParams.get("supabase-url");
-    const supabaseKey = url.searchParams.get("supabase-key");
-    const token = url.searchParams.get("token");
-
-    return createClient(supabaseUrl!, supabaseKey!, {
-      accessToken: async () => token,
+    return createClient<Database>(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/supabase`, "-", {
+      accessToken: async () => "-",
       auth: {
         persistSession: false,
         autoRefreshToken: false,
@@ -24,6 +21,6 @@ export const useSupabase = () => {
         storage: storage,
       },
     });
-  }, []);
+  }, [ ]);
 
 };

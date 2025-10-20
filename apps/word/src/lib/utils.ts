@@ -1,7 +1,7 @@
 // @ts-ignore
 export const isDev = import.meta.env.MODE === "development";
 export const baseUrl = isDev
-  ? "https://localhost:3000"
+  ? "https://localhost:8000"
   : "https://word.projdocs.com";
 
 
