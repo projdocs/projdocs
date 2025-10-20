@@ -21,6 +21,7 @@ export const saveAsNewFile: Action = async () => {
               });
 
               const bytes = await readAllSlices(file);
+
               const docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
 
               return;
