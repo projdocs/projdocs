@@ -5,18 +5,21 @@ import { H1 } from "@workspace/ui/components/text";
 import ClientsTable from "@workspace/ui/components/clients-table";
 import { useEffect, useState } from "react";
 import { Tables } from "@workspace/supabase/types";
+import { useRouter } from "next/navigation";
 
 
 
 export default function Page() {
 
   const [ clients, setClients ] = useState<readonly Tables<"clients">[] | undefined | null>();
-  const supabase = createClient();
-
+  const router = useRouter();
 
   useEffect(() => {
-    supabase.from("clients").select().then(({ data }) => setClients(data));
-  }, [ supabase ]);
+    createClient()
+      .from("clients")
+      .select()
+      .then(({ data }) => setClients(data));
+  }, []);
 
 
   return (
@@ -27,7 +30,7 @@ export default function Page() {
 
         <ClientsTable
           clients={clients}
-          onRowClick={() => {}}
+          onRowClick={({ id }) => router.push(`/dashboard/clients/${id}`)}
         />
 
       </div>

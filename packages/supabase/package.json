@@ -4,6 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
+    "gen": "supabase gen types --local --lang=typescript --schema=public > ./types.ts",
     "lint": "eslint . --max-warnings 0"
   },
   "dependencies": {

@@ -1,26 +1,30 @@
 "use client";
 
 import * as React from "react";
+import { useEffect, useState } from "react";
 import { H1 } from "@workspace/ui/components/text";
-import ClientsTable from "@workspace/ui/components/clients-table";
-import { useRealtimeRows } from "@workspace/web/hooks/use-realtime-rows";
+import ClientsTable, { FavoriteClient } from "@workspace/ui/components/clients-table";
+import { useRouter } from "next/navigation";
+import { createClient } from "@workspace/web/lib/supabase/client";
+import { Tables } from "@workspace/supabase/types";
 
 
 
 export default function Page() {
 
-  const { rows: favorites } = useRealtimeRows({
-    table: "favorites"
-  });
-  const { rows } = useRealtimeRows({
-    table: "clients"
-  });
+  const [ clients, setClients ] = useState<readonly FavoriteClient[] | undefined | null>();
+  const router = useRouter();
 
-  const ids = (favorites ?? []).filter(c => c.client_id !== null).reduce((a, c) => {
-    if (a.includes(c.client_id as number)) return a;
-    return [ ...a, c.client_id as number ];
-  }, [] as number[]);
-  const clients = (rows ?? []).filter(row => ids.includes(row.id));
+  useEffect(() => {
+    createClient()
+      .from("favorites")
+      .select(`*, client:clients (*)`).not("client_id", "is", null)
+      .overrideTypes<Array<{ client: Tables<"clients"> }>>()
+      .then(({ data }) => setClients(!data ? data : data.map(r => ({
+        ...r.client,
+        isFavorite: true
+      }))));
+  }, []);
 
   return (
     <div className="@container/main flex flex-1 flex-col gap-2">
@@ -31,6 +35,7 @@ export default function Page() {
         <ClientsTable
           clients={clients}
           noRowsText={"Looks like you haven't added a client yet! Add one to continue."}
+          onRowClick={({ id }) => router.push(`/dashboard/clients/${id}`)}
         />
 
       </div>

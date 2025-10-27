@@ -5,7 +5,7 @@ import * as React from "react";
 import { columns } from "@workspace/ui/components/clients-table-columns";
 import { Tables } from "@workspace/supabase/types";
 import { BuildingIcon, FolderOpenIcon } from "lucide-react";
-import { IconDotsVertical } from "@tabler/icons-react";
+import { IconDatabaseMinus, IconDatabasePlus, IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
 import {
   DropdownMenu,
@@ -18,12 +18,13 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { createClient } from "@workspace/web/lib/supabase/client";
+import { FavoriteClient } from "@workspace/ui/components/clients-table";
 
 
 
 export const ClientRow = ({ client, onClick }: {
-  client: Tables<"clients">;
-  onClick: (row: Tables<"clients">) => void;
+  client: FavoriteClient;
+  onClick: (row: FavoriteClient) => void;
 }) => {
 
   return (
@@ -51,16 +52,16 @@ export const ClientRow = ({ client, onClick }: {
                   e.stopPropagation(); // don't trigger row click
                   const supabase = createClient();
                   const { data: { user } } = await supabase.auth.getUser();
-                  // if (favorite === null) await supabase.from("favorites").insert({
-                  //   user_id: user?.id ?? "",
-                  //   client_id: client.id
-                  // }).select().single();
-                  // else await supabase.from("favorites").delete().eq("client_id", client.id).eq("user_id", user?.id ?? "");
+                  if (client.isFavorite) await supabase.from("favorites").delete().eq("client_id", client.id).eq("user_id", user?.id ?? "");
+                  else await supabase.from("favorites").insert({
+                    user_id: user?.id ?? "",
+                    client_id: client.id
+                  }).select().single();
                 }}
               >
-                {/*{`${favorite ? "Remove from" : "Add to"} My Clients`}*/}
+                {`${client.isFavorite ? "Remove from" : "Add to"} My Clients`}
                 <DropdownMenuShortcut>
-                  {/*{favorite ? <IconDatabaseMinus/> : <IconDatabasePlus/>}*/}
+                  {client.isFavorite ? <IconDatabaseMinus/> : <IconDatabasePlus/>}
                 </DropdownMenuShortcut>
               </DropdownMenuItem>
             </DropdownMenuGroup>

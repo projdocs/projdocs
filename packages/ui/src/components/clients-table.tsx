@@ -9,12 +9,14 @@ import { BuildingIcon } from "lucide-react";
 import { IconDotsVertical } from "@tabler/icons-react";
 import { Button } from "@workspace/ui/components/button";
 
-
+export type FavoriteClient = Tables<"clients"> & {
+  isFavorite?: Tables<"clients">
+};
 
 export default function ClientsTable({ clients, noRowsText, onRowClick }: {
-  clients: readonly Tables<"clients">[] | null | undefined;
+  clients: readonly FavoriteClient[] | null | undefined;
   noRowsText?: string;
-  onRowClick: (client: Tables<"clients">) => void;
+  onRowClick: (client: FavoriteClient) => void;
 }) {
 
   return (

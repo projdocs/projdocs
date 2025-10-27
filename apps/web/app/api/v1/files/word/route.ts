@@ -1,65 +1,71 @@
-import { asConst, FromSchema } from "json-schema-to-ts";
 import { handle, withAuth } from "@workspace/web/lib/api";
-import * as unzipper from "unzipper";
-import { CentralDirectory } from "unzipper";
 import { createClient } from "@workspace/web/lib/supabase/server";
 import { json2xml, xml2json } from "xml-js";
-import * as process from "node:process";
 import { CONSTANTS } from "@workspace/word/src/lib/consts";
 import JSZip from "jszip";
 import { uploadFile } from "@workspace/web/lib/supabase/upload-file";
-import { v4 } from "uuid";
+import { JSONSchemaType } from "ajv";
+import { Tables } from "@workspace/supabase/types";
+import { DetailedError } from "tus-js-client";
 
 
 
-const schema = asConst({
+type RequestBody = {
+  file: {
+    name: string;
+    base64: string;
+  }
+  directory: Pick<Tables<"directories">, "id">;
+}
+
+const schema: JSONSchemaType<RequestBody> = ({
   type: "object",
-  required: [ "file", "project", "directory" ],
+  required: [ "file", "directory" ],
   properties: {
     file: {
-      type: "string"
+      type: "object",
+      required: [ "name", "base64" ],
+      properties: {
+        name: { type: "string", pattern: "^[^\\\\/:*?\"<>|]+\\.docx$" },
+        base64: { type: "string" }
+      }
     },
     directory: {
       type: "object",
       required: [ "id" ],
       properties: {
         id: {
-          type: "string"
+          type: "string",
+          format: "uuid"
         }
       }
     },
-    project: {
-      type: "object",
-      required: [ "id" ],
-      properties: {
-        id: {
-          type: "string"
-        }
-      }
-    }
   },
 });
 
 
-export const POST: RouteHandler = withAuth(handle<FromSchema<typeof schema>>(schema, async (data) => {
+export const POST: RouteHandler = withAuth(handle<RequestBody>(schema, async (data) => {
 
   // validate the file
-  const { ok, reason } = await validateWordBase64(data.file);
+  const { ok, reason } = await validateWordBase64(data.file.base64);
   if (!ok) return Response.json({
     error: `invalid file: ${reason}`,
   }, { status: 400 });
 
   const supabase = await createClient();
+  const zip = await JSZip.loadAsync(Buffer.from(data.file.base64, "base64"));
 
-
-  const buf = Buffer.from(data.file, "base64");
-  const docx = await unzipper.Open.buffer(buf);
-  const jszip = await JSZip.loadAsync(buf);
+  // load directory
+  const directory = await supabase.from("directories").select().eq("id", data.directory.id).maybeSingle();
+  if (directory.error !== null) return Response.json({
+    error: `unable to load directory (id=${data.directory.id}): ${directory.error}`,
+  });
+  if (directory.data === null) return Response.json({
+    error: `unable to load directory (id=${data.directory.id}): not found`,
+  }, { status: 400 });
 
   // load the file
-  let docID: string | null = null;
-  let verID: string | null = null;
-  const settings = await getWebExtensionFiles(docx);
+  const settings = await getWebExtensionFiles(zip);
   for (const f of settings) {
     const contents = JSON.parse(xml2json(f.xml));
     if (
@@ -72,26 +78,31 @@ export const POST: RouteHandler = withAuth(handle<FromSchema<typeof schema>>(sch
 
 
       // create doc
-      docID = contents.elements[0].elements[iProps].elements.find((e: any) => e.name === "we:property" && e.attributes.name === CONSTANTS.SETTINGS.FILE_REF)?.attributes?.value;
-      if (docID !== null && docID !== undefined) return Response.json({
-        error: `document already exists: ${docID}`,
+      const existingDocID = contents.elements[0].elements[iProps].elements.find((e: any) => e.name === "we:property" && e.attributes.name === CONSTANTS.SETTINGS.FILE_REF)?.attributes?.value;
+      if (existingDocID !== null && existingDocID !== undefined) return Response.json({
+        error: `document already exists: ${existingDocID}`,
         hint: "use PUT to create a new version"
       }, { status: 400 });
-      const doc = await supabase.from("files").insert({}).select().single();
+      const doc = await supabase
+        .from("files")
+        .insert({
+          project_id: directory.data.project_id
+        })
+        .select()
+        .single();
       if (doc.error) return Response.json({
         error: "unable to create file object-row",
         detail: doc.error
       }, { status: 500 });
-      docID = `${doc.data.number}`;
       contents.elements[0].elements[iProps].elements.push({
         type: "element",
         name: "we:property",
-        attributes: { name: CONSTANTS.SETTINGS.FILE_REF, value: docID }
+        attributes: { name: CONSTANTS.SETTINGS.FILE_REF, value: `${doc.data.number}` }
       });
 
       // create version
-      verID = contents.elements[0].elements[iProps].elements.find((e: any) => e.name === "we:property" && e.attributes.name === CONSTANTS.SETTINGS.VERSION_REF)?.attributes?.value;
-      if (verID !== null) return Response.json({
+      const verID = contents.elements[0].elements[iProps].elements.find((e: any) => e.name === "we:property" && e.attributes.name === CONSTANTS.SETTINGS.VERSION_REF)?.attributes?.value;
+      if (verID !== null && verID !== undefined) return Response.json({
         error: `document does not exist, but has a version ID: ${verID}`,
       }, { status: 400 });
       contents.elements[0].elements[iProps].elements.push({
@@ -101,24 +112,33 @@ export const POST: RouteHandler = withAuth(handle<FromSchema<typeof schema>>(sch
       });
 
       // upload file
-      jszip.file(f.path, json2xml(JSON.stringify(contents)));
-      const newFile = await jszip.generateAsync({
-        type: "blob"
+      zip.file(f.path, json2xml(JSON.stringify(contents)));
+      const newFile = await zip.generateAsync({
+        type: "nodebuffer"
       });
 
-      await uploadFile(supabase, {
+      const uploaded = await new Promise<null | Error | DetailedError>((res) => uploadFile(supabase, {
+        retry: false,
         directory: data.directory,
-        bucket: data.project.id,
+        bucket: directory.data!.project_id,
         file: {
-          object: { id: docID }, // new file
-          data: newFile
+          type: "buffer",
+          data: newFile,
+          name: data.file.name,
+          object: { id: doc.data.id }, // new file
+          mimeType: "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
         },
-      });
+        onSuccess: () => res(null),
+        onError: err => res(err)
+      }));
+      if (uploaded !== null) {
+        console.error(uploaded);
+        return Response.json({
+          error: "unable to upload file",
+        }, { status: 400 });
+      }
 
-      return Response.json({
-        file: newFile,
-      });
-
+      return Response.json(doc.data);
 
     }
   }
@@ -135,7 +155,7 @@ export const POST: RouteHandler = withAuth(handle<FromSchema<typeof schema>>(sch
  * - Detects required DOCX internal structure
  * - Never fully extracts files to memory
  */
-async function validateWordBase64(base64: string): Promise<{
+export async function validateWordBase64(base64: string): Promise<{
   ok: boolean;
   reason?: string;
 }> {
@@ -155,35 +175,39 @@ async function validateWordBase64(base64: string): Promise<{
       return { ok: false, reason: "Missing ZIP header (not PK\\x03\\x04)" };
     }
 
-    // ---- Step 3: Stream parse entries ----
-    const directory = await unzipper.Open.buffer(buf);
+    // ---- Step 3: Parse entries (JSZip)
+    const zip = await JSZip.loadAsync(buf);
     const required = new Set([
       "[Content_Types].xml",
       "_rels/.rels",
       "word/document.xml",
     ]);
 
-    let totalUncompressed = 0;
+    const entries = Object.values(zip.files);
     const MAX_ENTRIES = 2000;
-    const MAX_UNCOMPRESSED = 100 * 1024 * 1024; // 100MB cap
+    const MAX_TOTAL_PATH_LENGTH = 100_000; // crude sanity fallback for size
 
-    for (const entry of directory.files) {
-      // ZIP-bomb defenses
-      if (entry.path.includes("..") || entry.path.startsWith("/")) {
+    if (entries.length > MAX_ENTRIES) {
+      return { ok: false, reason: "Too many entries (potential ZIP bomb)" };
+    }
+
+    let totalPathChars = 0;
+
+    for (const entry of entries) {
+      const name = entry.name;
+
+      // Path traversal and sanity checks
+      if (name.includes("..") || name.startsWith("/")) {
         return { ok: false, reason: "Path traversal attempt detected" };
       }
 
-      if (directory.files.length > MAX_ENTRIES) {
-        return { ok: false, reason: "Too many entries (potential ZIP bomb)" };
+      totalPathChars += name.length;
+      if (totalPathChars > MAX_TOTAL_PATH_LENGTH) {
+        return { ok: false, reason: "Path metadata too large (possible bomb)" };
       }
 
-      totalUncompressed += entry.uncompressedSize ?? 0;
-      if (totalUncompressed > MAX_UNCOMPRESSED) {
-        return { ok: false, reason: "Uncompressed size too large (ZIP bomb risk)" };
-      }
-
-      if (required.has(entry.path)) {
-        required.delete(entry.path);
+      if (required.has(name)) {
+        required.delete(name);
       }
     }
 
@@ -197,14 +221,13 @@ async function validateWordBase64(base64: string): Promise<{
   }
 }
 
-async function getWebExtensionFiles(directory: CentralDirectory) {
-  const webExtensions: { path: string; xml: string }[] = [];
-  for (const entry of directory.files) {
-    if ((/^word\/webextensions\/webextension\d+\.xml$/).test(entry.path)) {
-      const xml = await entry.buffer().then((b) => b.toString("utf8"));
-      webExtensions.push({ path: entry.path, xml });
-    }
-  }
+async function getWebExtensionFiles(zip: JSZip) {
+  const entries = zip.file(/^word\/webextensions\/webextension\d+\.xml$/);
 
+  const webExtensions: { path: string; xml: string }[] = [];
+  for (const entry of entries) {
+    const xml = await entry.async("text");
+    webExtensions.push({ path: entry.name, xml });
+  }
   return webExtensions;
 }
