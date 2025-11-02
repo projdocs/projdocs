@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "SUPABASE_PUBLIC_URL=\"http://127.0.0.1:54321\" SUPABASE_PUBLIC_KEY=\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZS1kZW1vIiwicm9sZSI6ImFub24iLCJleHAiOjE5ODM4MTI5OTZ9.CRXP1A7WOeoJeXxjNni43kdQwgnWNReilDMblYTn_I0\" next dev --turbopack",
+    "dev": "next dev --hostname 127.0.0.1 --port 3030 --turbopack",
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
@@ -23,6 +23,7 @@
     "ajv": "^8.17.1",
     "ajv-formats": "^3.0.1",
     "axios": "^1.11.0",
+    "jsonwebtoken": "^9.0.2",
     "jszip": "^3.10.1",
     "lucide-react": "^0.475.0",
     "luxon": "^3.7.1",
@@ -40,6 +41,7 @@
     "zustand": "^5.0.8"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/luxon": "^3.7.1",
     "@types/node": "^20.19.9",
     "@types/react": "^19.1.9",

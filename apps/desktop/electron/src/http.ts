@@ -49,7 +49,7 @@ function buildApp() {
     on: {
       proxyReq: (proxyReq, req, res) => {
         if (auth) {
-          proxyReq.setHeader("Authorization", `Bearer ${auth.token.access_token}`);
+          proxyReq.setHeader("Authorization", `Bearer ${auth.token}`);
           proxyReq.setHeader("apikey", auth.supabase.key);
         }
       },
@@ -68,10 +68,8 @@ function buildApp() {
   app.post("/echo", (req, res) => res.status(200).json({ received: req.body ?? null }));
 
   app.get("/user", async (_req, res) => {
-
     const secret = await Secrets.get();
-    if (secret !== null && secret.trim().length > 0)
-      res.status(200).json(JSON.parse(secret));
+    if (secret !== null && secret.trim().length > 0) res.status(200).end();
     else res.status(400).end();
   });
 

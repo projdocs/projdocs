@@ -33,46 +33,36 @@ export function LoginForm({ className, ...props }: ComponentPropsWithoutRef<"div
       switch (redirectType) {
         case "desktop":
 
-          const base = window.env.SUPABASE_PUBLIC_URL;
-          const anonKey = window.env.SUPABASE_PUBLIC_KEY;
-          if (!base || !anonKey) {
-            throw new Error("Supabase environment variables not found in window.env");
-          }
-
-          // do login request manually, to avoid persistence
-          const res = await fetch(`${base}/auth/v1/token?grant_type=password`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-              "Accept": "application/json",
-              "Authorization": `Bearer ${anonKey}`,
-              "apikey": anonKey,
-            },
-            body: JSON.stringify({
-              email,
-              password,
-            }),
+          // get login and persist it
+          const r = await supabase.auth.signInWithPassword({
+            email,
+            password,
           });
+          if (r.error) throw r.error;
 
-          if (res.status === 200) {
-            const session = await res.json();
-            delete session.user;
+          const res = await fetch("/api/v1/auth/desktop")
+
+          if (res.status !== 200) {
+            throw new Error(res.statusText);
+          } else {
+            const jwt: string = await res.json();
+
 
             const path = query.get("redirect-to");
             if (path === null) throw new Error("Redirect query param is missing!");
 
             const url = new URL("projdocs://");
             url.pathname = path;
-            url.searchParams.set("session", JSON.stringify(session));
-            url.searchParams.set("public-key", anonKey);
+            url.searchParams.set("jwt", jwt);
             url.searchParams.set("url", window.location.origin);
-            url.searchParams.set("supabase-url", base);
+            // @ts-expect-error accessing protected property
+            url.searchParams.set("supabase-key", supabase.supabaseKey);
+            // @ts-expect-error accessing protected property
+            url.searchParams.set("supabase-url", supabase.supabaseUrl);
 
             // execute callback
             open(url.toString());
             router.push("/");
-          } else {
-            throw new Error(res.statusText);
           }
           break;
         case "web":

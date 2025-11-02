@@ -1,7 +1,7 @@
 export type AuthRequest = {
-  session: string;
+  jwt: string;
   url: string;
-  publicKey: string;
+  supabaseKey: string;
   supabaseUrl: string;
 }
 
@@ -10,8 +10,8 @@ type MakeNullable<T extends {}> = {
 }
 
 export const queryParamsToRequest = (value: URLSearchParams): MakeNullable<AuthRequest> => ({
-  session: value.get("session") ?? null,
-  publicKey: value.get("public-key"),
+  jwt: value.get("jwt") ?? null,
   url: value.get("url"),
+  supabaseKey: value.get("supabase-key"),
   supabaseUrl: value.get("supabase-url"),
 });

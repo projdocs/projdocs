@@ -9,7 +9,7 @@ export const handle = <T>(schema: JSONSchemaType<T>, handler: (data: T) => Promi
 
   // pre-process
   try {
-    const body = await request.json();
+    const body = request.body === null ? null : await request.json();
     if (validate(body)) data = body;
     else {
       return Response.json({

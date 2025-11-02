@@ -54,6 +54,8 @@
           <FunctionFile resid="Commands.Url"/>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
             <OfficeTab id="TabHome">
+
+              <!-- MAIN COMMAND GROUP -->
               <Group id="CommandsGroup">
                 <Label resid="CommandsGroup.Label"/>
                 <Icon>
@@ -132,6 +134,8 @@
                   <Enabled>false</Enabled>
                 </Control>
               </Group>
+
+
             </OfficeTab>
           </ExtensionPoint>
         </DesktopFormFactor>
@@ -170,10 +174,10 @@
         <bt:Url id="Commands.Url" DefaultValue="__DOMAIN__/src/surfaces/ribbon/index.html"/>
       </bt:Urls>
       <bt:ShortStrings>
+
         <bt:String id="GetStarted.Title" DefaultValue="ProjDocs loaded successfully!"/>
         <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
         <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
-
         <bt:String id="__LAUNCH_BUTTON_ID__.Label" DefaultValue="Launch ProjDocs"/>
 
         <!-- Button 1: Save -->

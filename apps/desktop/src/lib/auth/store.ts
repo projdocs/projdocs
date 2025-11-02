@@ -1,19 +1,8 @@
 import { create } from "zustand";
-import { TypeofResult } from "../../../electron/renderer/global";
 
-
-
-export type AuthToken = {
-  access_token: string;
-  token_type: "bearer";
-  expires_in: number;
-  expires_at: number;
-  refresh_token: string;
-  weak_password: string | null;
-}
 
 export type AuthSettings = {
-  token: AuthToken;
+  token: string;
   url: string;
   supabase: {
     url: string;
@@ -106,7 +95,7 @@ const parseAuthToken = (raw: string): AuthSettings | null => {
       },
       {
         key: "token",
-        typ: "object",
+        typ: "string",
       },
     ]) && check<{
       key: string;
@@ -120,31 +109,9 @@ const parseAuthToken = (raw: string): AuthSettings | null => {
         key: "url",
         typ: "string",
       }
-    ]) && check<AuthToken>(parsed.token, [
-      {
-        key: "refresh_token",
-        typ: "string",
-      },
-      {
-        key: "access_token",
-        typ: "string",
-      },
-      {
-        key: "token_type",
-        typ: "string",
-      },
-      {
-        key: "expires_in",
-        typ: "number",
-      },
-      {
-        key: "expires_at",
-        typ: "number",
-      }
     ])) {
       return parsed as AuthSettings;
     } else {
-      console.log(parsed);
       console.warn("Malformed auth token object");
       return null;
     }

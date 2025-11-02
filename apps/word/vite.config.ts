@@ -36,6 +36,7 @@ export default defineConfig({
         main: path.resolve(__dirname, "index.html"),
         ribbon: path.resolve(__dirname, "src/surfaces/ribbon/index.html"),
         filePicker: path.resolve(__dirname, "src/surfaces/folder-picker/index.html"),
+        dialog: path.resolve(__dirname, "src/surfaces/dialog/index.html"),
       }
     }
   },

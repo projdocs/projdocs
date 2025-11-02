@@ -247,9 +247,3 @@ s3_region = "env(S3_REGION)"
 s3_access_key = "env(S3_ACCESS_KEY)"
 # Configures AWS_SECRET_ACCESS_KEY for S3 bucket
 s3_secret_key = "env(S3_SECRET_KEY)"
-
-[functions.v1-upload-word-file]
-enabled = true
-verify_jwt = true
-import_map = "./functions/v1-upload-word-file/deno.json"
-entrypoint = "./functions/v1-upload-word-file/index.ts"

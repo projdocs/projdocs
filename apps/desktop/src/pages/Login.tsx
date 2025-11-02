@@ -30,7 +30,7 @@ export const Login = ({ children }: {
 
   const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
-    defaultValues: { serverURL: process.env.NODE_ENV === "development" ? "localhost:3000" : "" },
+    defaultValues: { serverURL: process.env.NODE_ENV === "development" ? "127.0.0.1:3030" : "" },
   });
 
   const onSubmit = async (values: LoginSchemaType) => {

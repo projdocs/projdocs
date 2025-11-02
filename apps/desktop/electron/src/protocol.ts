@@ -16,19 +16,20 @@ export async function handleDeepLink(link: string) {
       case "/v1/auth/callback":
         const request = queryParamsToRequest(url.searchParams);
         if (
-          !request.publicKey ||
+          !request.supabaseKey ||
           !request.supabaseUrl ||
-          !request.session ||
+          !request.jwt ||
           !request.url
         ) {
           console.warn("[DEEP LINK] invalid token received");
         } else {
+          console.log("[DEEP LINK] valid token received");
           const authSettings: AuthSettings = {
-            token: JSON.parse(request.session),
+            token: request.jwt,
             url: request.url,
             supabase: {
               url: request.supabaseUrl,
-              key: request.publicKey
+              key: request.supabaseKey
             },
           };
           await Secrets.set(JSON.stringify(authSettings));
