@@ -1,7 +1,6 @@
 import { SupabaseClient, Tables } from "@workspace/supabase/types";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
 import { columns } from "@workspace/web/components/file-browser-directory-columns";
-import { useDebounce } from "@uidotdev/usehooks";
 import { IconDotsVertical, IconFolder } from "@tabler/icons-react";
 import * as React from "react";
 import { useEffect, useState } from "react";
@@ -10,7 +9,6 @@ import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Button } from "@workspace/ui/components/button";
 import { DefaultExtensionType, defaultStyles, FileIcon } from "react-file-icon";
 import * as mime from "react-native-mime-types";
-import { NIL } from "uuid";
 import { useRealtimeListener } from "@workspace/supabase/realtime/subscriber";
 
 
@@ -87,8 +85,20 @@ const SymlinkRow = ({ symlink, project, navigate, supabase }: {
 
   useEffect(() => {
     (async () => {
-      const { data: file } = await supabase.from("files").select("*, current_version_id (*)").eq("id", symlink.file_id).single();
-      const { data: object } = await supabase.rpc("storage.objects.get_object_by_id", { object_id: file?.current_version_id?.object_id ?? NIL });
+      const {
+        data: file,
+        error
+      } = await supabase.from("files").select("*, version:current_version_id (*)").eq("id", symlink.file_id).single().overrideTypes<Tables<"files"> & {
+        version: Tables<"files_versions">
+      }>();
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      console.log(file, file.version.object_id);
+
+      const { data: object } = await supabase.rpc("public.get_storage_object_by_id", { object_id: file.version.object_id });
       setObject(object);
     })();
   }, [ symlink.id ]);
@@ -129,7 +139,6 @@ const WithOrWithoutSymlinks = ({ supabase, directories, symlinks, project, navig
   supabase: SupabaseClient;
 }) => {
 
-  const isLoading = useDebounce((directories === undefined || symlinks === undefined), 500);
   const items = (directories?.length ?? 0) + (symlinks?.length ?? 0);
 
   return (
@@ -147,9 +156,7 @@ const WithOrWithoutSymlinks = ({ supabase, directories, symlinks, project, navig
       </TableHeader>
       <TableBody className="**:data-[slot=table-cell]:first:w-8">
 
-        {isLoading ? (
-          <SkeletonRow/>
-        ) : items === 0 ? (
+        {items === 0 ? (
           <NoneRow/>
         ) : (
           <>
@@ -210,9 +217,12 @@ const WithSymlinks = (props: {
     props.supabase.from("symlinks").select()
       .eq("directory_id", props.directory.id)
       .then(({ data, error }) => {
-        if(error) console.error(error);
-        if(data) setRows(rows => data.reduce((previousValue, currentValue) => ({ ...previousValue, [currentValue.id]: currentValue }) , ({ ...rows })))
-      })
+        if (error) console.error(error);
+        if (data) setRows(rows => data.reduce((previousValue, currentValue) => ({
+          ...previousValue,
+          [currentValue.id]: currentValue
+        }), ({ ...rows })));
+      });
   }, []);
 
   useRealtimeListener("symlinks", ({ type, payload }) => {
@@ -254,14 +264,20 @@ export default function FileBrowserTable(props: {
   const [ rows, setRows ] = useState<{ [id: string]: Tables<"directories"> }>({});
 
   useEffect(() => {
-    props.supabase.from("directories").select()
-      .eq("project_id", props.project.id)
-      // @ts-expect-error reporting null as not possible value, but it is
-      .is("parent_id", props.directory?.id ?? null)
-      .then(({ data, error }) => {
-        if(error) console.error(error);
-        if(data) setRows(rows => data.reduce((previousValue, currentValue) => ({ ...previousValue, [currentValue.id]: currentValue }) , ({ ...rows })))
-      })
+
+    let query = props.supabase.from("directories").select()
+      .eq("project_id", props.project.id);
+
+    if (!props.directory?.id) query = query.is("parent_id", null);
+    else query = query.eq("parent_id", props.directory.id);
+
+    query.then(({ data, error }) => {
+      if (error) console.error(error);
+      if (data) setRows(rows => data.reduce((previousValue, currentValue) => ({
+        ...previousValue,
+        [currentValue.id]: currentValue
+      }), ({ ...rows })));
+    });
   }, []);
 
   useRealtimeListener("directories", ({ type, payload }) => {

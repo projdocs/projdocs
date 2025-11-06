@@ -62,7 +62,7 @@ export const SupabaseRealtimeListener = ({ children, supabase, channel, }: {
     }, [ supabase, channel ]);
 
     return subscribed ? children : (
-      <div className="flex flex-row items-center justify-center p-4 text-sm text-muted-foreground gap-2">
+      <div className="w-full h-full flex flex-row items-center justify-center p-4 text-sm text-muted-foreground gap-2">
         <svg
           className="animate-spin h-4 w-4 text-muted-foreground"
           xmlns="http://www.w3.org/2000/svg"

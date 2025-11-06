@@ -27,10 +27,6 @@ function buildApp() {
   app.use(cors());
   app.options(/.*/, cors()); // handle preflight requests
 
-  // body parsers
-  app.use(express.json({ limit: "32mb" })); // word internally sets this limit generally
-  app.use(express.urlencoded({ extended: false }));
-
   // routes
   app.get("/healthz", (_req, res) => res.status(200).json({ ok: true }));
 

@@ -153,7 +153,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
         href={href}
         onClick={onClick ? handleClick : undefined}
         className={cn(
-          "font-medium underline underline-offset-4 transition-colors text-primary hover:text-primary/80",
+          "cursor-pointer hover:text-primary text-secondary",
           className
         )}
         {...props}

@@ -1,23 +1,24 @@
-import { PageContent } from "@workspace/ui/components/page-content";
-import { FileBrowser } from "@workspace/web/components/file-browser";
 import * as React from "react";
+import { DirectoryPage } from "@workspace/ui/pages/directory";
+import { createClient } from "@workspace/supabase/client";
+import { useNavigate, useParams } from "react-router";
 
 
 
 export const Directory = () => {
 
+  const supabase = createClient();
+  const navigate = useNavigate();
+  const params = useParams();
+
   return (
-    <PageContent>
+    <DirectoryPage
+      navigate={navigate}
+      supabase={supabase}
+      clientID={params.clientID ?? ""}
+      projectID={params.projectID ?? ""}
+      directoryID={params.directoryID ?? ""}
+    />
+  );
 
-      <FileBrowser
-        navigate={props.navigate}
-        client={state.client}
-        project={state.project}
-        directoryID={undefined}
-        supabase={props.supabase}
-      />
-
-    </PageContent>
-  )
-
-}
+};

@@ -13,7 +13,7 @@ type PermissionsTable = Tables<"permissions"> & {
   user: Tables<"users">;
 }
 
-type ClientPageState = undefined | null | {
+type ProjectPageState = undefined | null | {
   client: Tables<"clients">;
   project: Tables<"projects">;
   permissions: readonly PermissionsTable[];
@@ -26,7 +26,7 @@ export const ProjectPage = (props: {
   navigate: (url: string) => void;
 }) => {
 
-  const [ state, setState ] = useState<ClientPageState | undefined | null>(undefined);
+  const [ state, setState ] = useState<ProjectPageState | undefined | null>(undefined);
 
   useEffect(() => {
     (async () => {
@@ -66,7 +66,7 @@ export const ProjectPage = (props: {
       });
 
     })();
-  }, []);
+  }, [ props.clientID, props.projectID ]);
 
   return (
     <PageContent>
@@ -81,7 +81,7 @@ export const ProjectPage = (props: {
               href={`/dashboard/clients/${state.client.id}`}
               onClick={() => props.navigate(`/dashboard/clients/${state.client.id}`)}
             >
-              <P className="cursor-pointer hover:underline">{state.client.name}</P>
+              {state.client.name}
             </Link>
             <H1>{state.project.name}</H1>
           </div>
