@@ -57,8 +57,7 @@ const getType: (upload: Uploadable) => string = (upload) => {
 
 export const uploadFile = async (supabase: SupabaseClient, options: {
   file: Uploadable,
-  directory: Pick<Tables<"directories">, "id">;
-  bucket: string,
+  directory: Pick<Tables<"directories">, "id" | "project_id">;
   onError?: (error: Error | DetailedError) => void,
   onProgress?: (progress: number) => void,
   onSuccess?: (response: OnSuccessPayload) => void,
@@ -83,7 +82,7 @@ export const uploadFile = async (supabase: SupabaseClient, options: {
     removeFingerprintOnSuccess: true, // Remove fingerprint after successful upload
     chunkSize: 6 * 1024 * 1024, // Chunk size for TUS uploads (6MB)
     metadata: {
-      bucketName: options.bucket,
+      bucketName: options.directory.project_id,
       objectName: v4(),
       contentType: getType(options.file),
       cacheControl: "3600",

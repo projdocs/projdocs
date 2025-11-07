@@ -48,8 +48,22 @@ const replacements = [
     }
   },
   {
+    find: /__TAB_ID__/g,
+    replace: CONSTANTS.WORD.TAB.ID
+  },
+  // GROUP A
+  {
+    find: /__GROUP_A_ID__/g,
+    replace: CONSTANTS.WORD.TAB.GROUPS.A.ID,
+  },
+  {
     find: /__LAUNCH_BUTTON_ID__/g,
     replace: CONSTANTS.BUTTONS.LAUNCH.ID
+  },
+  // GROUP B
+  {
+    find: /__GROUP_B_ID__/g,
+    replace: CONSTANTS.WORD.TAB.GROUPS.B.ID,
   },
   {
     find: /__LAUNCH_FUNC_ID__/g,
@@ -78,6 +92,19 @@ const replacements = [
   {
     find: /__SAVE_NEW_DOC_FUNC_ID__/g,
     replace: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.FUNC_ID
+  },
+  // Tab C
+  {
+    find: /__GROUP_C_ID__/g,
+    replace: CONSTANTS.WORD.TAB.GROUPS.C.ID
+  },
+  {
+    find: /__INSERT_DOC_ID_BUTTON_ID__/g,
+    replace: CONSTANTS.BUTTONS.INSERT.ID
+  },
+  {
+    find: /__INSERT_DOC_ID_FUNC__/g,
+    replace: CONSTANTS.BUTTONS.INSERT.FUNC_ID
   }
 ];
 

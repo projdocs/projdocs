@@ -1,4 +1,8 @@
-// @ts-ignore
+import { CONSTANTS } from "@workspace/word/lib/consts";
+import Group = Office.Group;
+
+
+// @ts-expect-error meta.env.MODE
 export const isDev = import.meta.env.MODE === "development";
 export const baseUrl = isDev
   ? "https://localhost:8000"
@@ -14,20 +18,18 @@ export function saveSettings(): Promise<void> {
   });
 }
 
-export const setButtons = async (map: Record<string, Omit<Office.Control, "id">>) =>
+export const setButtons = async (map: Array<[ string, Array<Office.Control> ]>) =>
   await Office.ribbon.requestUpdate({
     tabs: [
       {
-        id: "TabHome",
-        groups: [
-          {
-            id: "CommandsGroup",
-            controls: Object.entries(map).map(([ id, control ]) => ({
-              id,
-              enabled: control.enabled,
-            }) as Office.Control),
-          },
-        ],
+        id: CONSTANTS.WORD.TAB.ID,
+        groups: map.map(([ item, record ]) => (
+            {
+              id: item,
+              controls: record,
+            } satisfies Group
+          )
+        ),
       },
     ],
   });

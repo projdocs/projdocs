@@ -7,11 +7,32 @@ export const CONSTANTS = {
     VERSION_REF: "ProjDocsVersionRef",
     AUTOLOAD: "ProjDocsAutoLoad",
   },
+  WORD: {
+    TAB: {
+      ID: "PD.CT",
+      GROUPS: {
+        A: {
+          ID: "PD.CT.GA"
+        },
+        B: {
+          ID: "PD.CT.GB"
+        },
+        C: {
+          ID: "PD.CT.GC"
+        }
+      } satisfies {
+       [key: string]: {
+         ID: `PD.CT.G${string}`,
+       }
+      },
+    }
+  },
   BUTTONS: {
     LAUNCH: { ID: "LaunchProjDocsButton", FUNC_ID: "launch" },
     SAVE: { ID: "SaveButton", FUNC_ID: "save" },
     SAVE_AS_NEW_VERSION: { ID: "SaveAsNewVersionButton", FUNC_ID: "saveAsNewVersion" },
     SAVE_AS_NEW_DOCUMENT: { ID: "SaveAsNewDocumentButton", FUNC_ID: "saveAsNewDoc" },
+    INSERT: { ID: "InsertDocID", FUNC_ID: "insertDocID" },
   },
   DESKTOP: {
     HTTP_SERVER: {

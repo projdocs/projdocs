@@ -1,6 +1,22 @@
-import { baseUrl } from "@workspace/word/lib/utils";
+import { baseUrl, saveSettings } from "@workspace/word/lib/utils";
+import { Tables } from "@workspace/supabase/types.gen";
+import { createClient } from "@workspace/supabase/client";
+import { uploadFile } from "@workspace/web/lib/supabase/upload-file";
+import { v4 } from "uuid";
+import { displayDialog } from "@workspace/word/surfaces/dialog/display";
+import { CONSTANTS } from "@workspace/word/lib/consts";
+import { launch } from "@workspace/word/lib/actions/launch";
 
 
+
+export enum FileSelectorParentMessageTypes {
+  CLOSE = "office:file-selector:close",
+  SAVE = "office:file-selector:save",
+}
+
+export type FileSelectorParentMessage =
+  | { type: FileSelectorParentMessageTypes.CLOSE; body: {} }
+  | { type: FileSelectorParentMessageTypes.SAVE; body: { directory: Tables<"directories"> } };
 
 export const saveAsNewFile: Action = async () => {
   console.log("✅ saveAsNewFile() was called");
@@ -12,8 +28,20 @@ export const saveAsNewFile: Action = async () => {
     (result) => {
       if (result.status === Office.AsyncResultStatus.Succeeded) result.value.addEventHandler(Office.EventType.DialogMessageReceived, async (arg) => {
         if ("message" in arg) {
-          switch (arg.message) {
-            case "save":
+
+          let msg: FileSelectorParentMessage;
+          try {
+            msg = JSON.parse(arg.message);
+          } catch (e) {
+            console.error(e);
+            return;
+          }
+
+          switch (msg.type) {
+
+            case FileSelectorParentMessageTypes.SAVE:
+
+              result.value.close();
 
               const file = await new Promise<Office.File>((resolve, reject) => {
                 Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
@@ -21,15 +49,54 @@ export const saveAsNewFile: Action = async () => {
                   else reject(res.error || new Error("getFileAsync failed"));
                 });
               });
-
               const bytes = await readAllSlices(file);
-
               const docxBlob = new Blob([ bytes ], { type: "application/vnd.openxmlformats-officedocument.wordprocessingml.document", });
 
+
+              const supabase = createClient();
+
+              const fileRow = await supabase.from("files").insert({
+                project_id: msg.body.directory.project_id,
+              }).select().single();
+              if(fileRow.error) {
+                await displayDialog({
+                  title: "Unable to Save",
+                  description: "An error occurred while saving file",
+                });
+                console.error(fileRow.error);
+                return
+              }
+
+              const filename = `${fileRow.data.number}-1.docx`
+              const res = await supabase.storage.from(msg.body.directory.project_id).upload(filename, docxBlob, {
+                metadata: {
+                  file_id: null,
+                  directory_id: msg.body.directory.id,
+                  filename: filename,
+                }
+              });
+
+              if(res.error) {
+                await displayDialog({
+                  title: "Unable to Save",
+                  description: "An error occurred while saving file",
+                });
+                console.error(res.error);
+                return;
+              }
+
+              Office.context.document.settings.set(CONSTANTS.SETTINGS.FILE_REF, fileRow.data.number);
+              Office.context.document.settings.set(CONSTANTS.SETTINGS.VERSION_REF, 1);
+              await saveSettings();
+
+              await launch(); // reload the doc
+
               return;
-            case "close":
+
+            case FileSelectorParentMessageTypes.CLOSE:
               result.value.close();
               return;
+
             default:
               console.warn(`dialog message type "${arg.message}" is unhandled`);
           }

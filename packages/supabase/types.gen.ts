@@ -378,7 +378,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      "storage.objects.get_object_by_id": {
+      get_storage_object_by_id: {
         Args: { object_id: string }
         Returns: Database["storage"]["Tables"]["objects"]["Row"]
         SetofOptions: {

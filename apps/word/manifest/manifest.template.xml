@@ -53,17 +53,16 @@
           </GetStarted>
           <FunctionFile resid="Commands.Url"/>
           <ExtensionPoint xsi:type="PrimaryCommandSurface">
-            <OfficeTab id="TabHome">
 
-              <!-- MAIN COMMAND GROUP -->
-              <Group id="CommandsGroup">
-                <Label resid="CommandsGroup.Label"/>
+            <CustomTab id="__TAB_ID__">
+
+              <Group id="__GROUP_A_ID__">
+                <Label resid="__GROUP_A_ID__.Label" />
                 <Icon>
                   <bt:Image size="16" resid="Icon.16x16"/>
                   <bt:Image size="32" resid="Icon.32x32"/>
                   <bt:Image size="80" resid="Icon.80x80"/>
                 </Icon>
-
                 <Control xsi:type="Button" id="__LAUNCH_BUTTON_ID__">
                   <Label resid="__LAUNCH_BUTTON_ID__.Label"/>
                   <Supertip>
@@ -79,6 +78,16 @@
                     <FunctionName>__LAUNCH_FUNC_ID__</FunctionName>
                   </Action>
                 </Control>
+              </Group>
+
+              <!-- MAIN COMMAND GROUP -->
+              <Group id="__GROUP_B_ID__">
+                <Label resid="__GROUP_B_ID__.Label"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
 
                 <!-- Button 1: Save -->
                 <Control xsi:type="Button" id="__SAVE_BUTTON_ID__">
@@ -135,8 +144,33 @@
                 </Control>
               </Group>
 
+              <Group id="__GROUP_C_ID__">
+                <Label resid="__GROUP_C_ID__.L"/>
+                <Icon>
+                  <bt:Image size="16" resid="Icon.16x16"/>
+                  <bt:Image size="32" resid="Icon.32x32"/>
+                  <bt:Image size="80" resid="Icon.80x80"/>
+                </Icon>
+                <Control xsi:type="Button" id="__INSERT_DOC_ID_BUTTON_ID__">
+                  <Label resid="__GROUP_C_ID__.M.L" />
+                  <Supertip>
+                    <Title resid="__GROUP_C_ID__.M.L" />
+                    <Description resid="__GROUP_C_ID__.M.T" />
+                  </Supertip>
+                  <Icon>
+                    <bt:Image size="16" resid="Icon.16x16"/>
+                    <bt:Image size="32" resid="Icon.32x32"/>
+                    <bt:Image size="80" resid="Icon.80x80"/>
+                  </Icon>
+                  <Action xsi:type="ExecuteFunction">
+                    <FunctionName>__INSERT_DOC_ID_FUNC__</FunctionName>
+                  </Action>
+                  <Enabled>false</Enabled>
+                </Control>
+              </Group>
 
-            </OfficeTab>
+              <Label resid="__TAB_ID__.Label"/>
+            </CustomTab>
           </ExtensionPoint>
         </DesktopFormFactor>
       </Host>
@@ -176,29 +210,24 @@
       <bt:ShortStrings>
 
         <bt:String id="GetStarted.Title" DefaultValue="ProjDocs loaded successfully!"/>
-        <bt:String id="CommandsGroup.Label" DefaultValue="Commands Group"/>
-        <bt:String id="TaskpaneButton.Label" DefaultValue="Show Task Pane"/>
+        <bt:String id="__TAB_ID__.Label" DefaultValue="ProjDocs" />
+
+        <bt:String id="__GROUP_A_ID__.Label" DefaultValue="Setup" />
         <bt:String id="__LAUNCH_BUTTON_ID__.Label" DefaultValue="Launch ProjDocs"/>
 
-        <!-- Button 1: Save -->
+        <bt:String id="__GROUP_B_ID__.Label" DefaultValue="Commands Group"/>
         <bt:String id="__SAVE_BUTTON_ID__.Label" DefaultValue="Save Document"/>
-
-        <!-- Button 2: Save As New Version -->
         <bt:String id="__SAVE_NEW_VERSION_BUTTON_ID__.Label" DefaultValue="Save as New Version"/>
-
-        <!-- Button 3: Save As New Document -->
         <bt:String id="__SAVE_NEW_DOC_BUTTON_ID__.Label" DefaultValue="Save as New Document"/>
+
+        <bt:String id="__GROUP_C_ID__.L" DefaultValue="Tools" />
+        <bt:String id="__GROUP_C_ID__.M.L" DefaultValue="Insert" />
 
       </bt:ShortStrings>
       <bt:LongStrings>
         <bt:String
             id="GetStarted.Description"
             DefaultValue="The ProjDocs add-in loaded successfully. Go to the HOME tab to continue."
-        />
-
-        <bt:String
-            id="TaskpaneButton.Tooltip"
-            DefaultValue="Click to Show a Task Pane"
         />
 
         <bt:String
@@ -223,6 +252,10 @@
             id="__SAVE_NEW_DOC_BUTTON_ID__.Tooltip"
             DefaultValue="Save the document as a new file."
         />
+
+        <bt:String id="__GROUP_C_ID__.M.T" DefaultValue="Insert a dynamic value into the document." />
+
+
 
       </bt:LongStrings>
     </Resources>

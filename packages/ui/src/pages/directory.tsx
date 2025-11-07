@@ -23,6 +23,8 @@ export const DirectoryPage = (props: {
   projectID: string | number;
   directoryID: string;
   supabase: SupabaseClient;
+  disableFileSelection?: boolean;
+  disableDirectorySelection?: boolean;
 }) => {
 
   const [ state, setState ] = useState<DirectoryPageState>(undefined);
@@ -74,6 +76,7 @@ export const DirectoryPage = (props: {
           <div className={"flex flex-col gap-2"}>
             <div className={"flex flex-row items-center gap-2"}>
               <Link
+                className={"transition-colors"}
                 href={`/dashboard/clients/${state.client.id}`}
                 onClick={() => props.navigate(`/dashboard/clients/${state.client.id}`)}
               >
@@ -81,6 +84,7 @@ export const DirectoryPage = (props: {
               </Link>
               <P className={"text-secondary"}>{"·"}</P>
               <Link
+                className={"transition-colors"}
                 onClick={() => props.navigate(`/dashboard/clients/${state.client.id}/${state.project.project_number}`)}
                 href={`/dashboard/clients/${state.client.id}/${state.project.project_number}`}
               >
@@ -111,6 +115,8 @@ export const DirectoryPage = (props: {
               project={state.project}
               directoryID={state.directory.id}
               supabase={props.supabase}
+              disableDirectorySelection={props.disableDirectorySelection}
+              disableFileSelection={props.disableFileSelection}
             />
           </div>
         </>

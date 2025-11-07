@@ -6,14 +6,23 @@ import { Spinner } from "@workspace/ui/components/spinner";
 
 
 
-export const FileBrowser = ({ client, project, directoryID, supabase, navigate }: {
+export const FileBrowser = ({
+                              client,
+                              project,
+                              directoryID,
+                              supabase,
+                              navigate,
+                              disableDirectorySelection,
+                              disableFileSelection
+                            }: {
   client: Tables<"clients">;
   project: Tables<"projects">;
   directoryID?: string;
   supabase: SupabaseClient;
   navigate: (url: string) => void;
+  disableFileSelection?: boolean;
+  disableDirectorySelection?: boolean;
 }) => {
-
 
   const [ directory, setDirectory ] = useState<Tables<"directories"> | null | undefined>(undefined);
 
@@ -42,6 +51,8 @@ export const FileBrowser = ({ client, project, directoryID, supabase, navigate }
           directory={directory}
           supabase={supabase}
           navigate={navigate}
+          disableFileSelection={disableFileSelection}
+          disableDirectorySelection={disableDirectorySelection}
         />
       )}
     </div>

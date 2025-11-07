@@ -1,6 +1,6 @@
 import type { Server } from "http";
 import cors from "cors";
-import express, { Express, NextFunction, Request, Response } from "express";
+import express, { Express } from "express";
 import { app } from "electron";
 import { Secrets } from "@workspace/desktop/electron/src/secrets";
 import https from "https";

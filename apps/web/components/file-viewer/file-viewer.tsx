@@ -143,7 +143,6 @@ export const FileViewer = (props: {
             object: props.file
           },
           directory: props.directory,
-          bucket: props.project.id,
           onError: error => {
             if ("originalResponse" in error && error.originalResponse?.getStatus() === 403) toast.error("Permission Denied", {
               description: "You do not have permission to upload to this project."

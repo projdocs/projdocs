@@ -3,9 +3,7 @@ import { CONSTANTS } from "@workspace/word/lib/consts";
 
 
 
-
 type EventHandler = (event: Office.AddinCommands.Event) => Promise<void>;
-
 
 
 const safely = (action: Action): EventHandler => async (event) => {
@@ -24,6 +22,7 @@ export const Ribbon = {
     Office.actions.associate(CONSTANTS.BUTTONS.SAVE.FUNC_ID, safely(Actions.save));
     Office.actions.associate(CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.FUNC_ID, safely(Actions.saveAsNewVersion));
     Office.actions.associate(CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.FUNC_ID, safely(Actions.saveAsNewFile));
+    Office.actions.associate(CONSTANTS.BUTTONS.INSERT.FUNC_ID, safely(Actions.insertDocumentNumber));
     await Actions.launch();
   }
 };

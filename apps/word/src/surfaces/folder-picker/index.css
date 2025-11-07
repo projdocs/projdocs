@@ -1,6 +1,6 @@
 @import "../../../../../packages/ui/src/styles/globals.css";
 @source "../../../../../packages/ui/**/*.{ts,tsx}";
-@source "../../**/*.{ts,tsx}";
+@source "../../../../**/*.{ts,tsx}";
 
 html, body, #root {
     height: 100%;

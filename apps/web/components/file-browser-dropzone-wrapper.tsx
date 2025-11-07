@@ -21,7 +21,6 @@ export const FileBrowserDropzoneWrapper = ({ children, project, directory }: {
         object: null
       },
       directory: directory,
-      bucket: project.id,
       onError: error => {
         if ("originalResponse" in error && error.originalResponse?.getStatus() === 403) toast.error("Permission Denied", {
           description: "You do not have permission to upload to this project."

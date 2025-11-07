@@ -24,6 +24,8 @@ export const ProjectPage = (props: {
   projectID: string | number;
   supabase: SupabaseClient;
   navigate: (url: string) => void;
+  disableFileSelection?: boolean;
+  disableDirectorySelection?: boolean;
 }) => {
 
   const [ state, setState ] = useState<ProjectPageState | undefined | null>(undefined);
@@ -80,6 +82,7 @@ export const ProjectPage = (props: {
             <Link
               href={`/dashboard/clients/${state.client.id}`}
               onClick={() => props.navigate(`/dashboard/clients/${state.client.id}`)}
+              className={"transition-colors"}
             >
               {state.client.name}
             </Link>
@@ -124,6 +127,8 @@ export const ProjectPage = (props: {
               project={state.project}
               directoryID={undefined}
               supabase={props.supabase}
+              disableDirectorySelection={props.disableDirectorySelection}
+              disableFileSelection={props.disableFileSelection}
             />
 
           </div>

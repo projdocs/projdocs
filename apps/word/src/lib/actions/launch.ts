@@ -1,6 +1,6 @@
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import { saveSettings, setButtons } from "@workspace/word/lib/utils";
-import { displayDialog } from "@workspace/word/lib/display-dialog";
+import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 
 
 
@@ -16,12 +16,15 @@ export const launch: Action = async () => {
   await waitForRibbon();
 
   // always disable everything briefly while we determine state (prevents flicker)
-  await setButtons({
-    [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: false },
-    [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: false },
-    [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: false },
-    [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
-  });
+  await setButtons([
+    [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
+    [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
+      { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
+      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
+      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: false }
+    ] ],
+    [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
+  ]);
 
   const documentID = Office.context.document.settings.get(CONSTANTS.SETTINGS.FILE_REF);
 
@@ -39,35 +42,47 @@ export const launch: Action = async () => {
       title: "Unable to Connect to ProjDocs Connector",
       description: "Is the connector running on your device?"
     });
-    await setButtons({
-      [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: true },
-      [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
-    });
+    await setButtons([
+      [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: true } ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
+        { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: false }
+      ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
+    ]);
   } else if (!status.connector.loggedIn) {
     await displayDialog({
       title: "Not Logged In",
       description: "The ProjDocs Connector is running on your device, but is not logged in.",
     });
-    await setButtons({
-      [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: true },
-      [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: false },
-    });
-  } else if (typeof documentID === "number" && documentID > 0) await setButtons({
-    [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: false }, // hide/disable launcher once bootstrapped
-    [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: true },
-    [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: true },
-    [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: true },
-  });
-  else await setButtons({
-      [CONSTANTS.BUTTONS.LAUNCH.ID]: { enabled: false }, // launcher pressed or autoloaded; keep disabled
-      [CONSTANTS.BUTTONS.SAVE.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID]: { enabled: false },
-      [CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID]: { enabled: true },
-    });
+    await setButtons([
+      [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: true } ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
+        { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: false }
+      ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
+    ]);
+  } else if (typeof documentID === "number" && documentID > 0) await setButtons([
+    [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
+    [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
+      { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: true },
+      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: true },
+      { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: true }
+    ] ],
+    [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: true } ] ]
+  ]);
+  else await setButtons([
+      [ CONSTANTS.WORD.TAB.GROUPS.A.ID, [ { id: CONSTANTS.BUTTONS.LAUNCH.ID, enabled: false } ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.B.ID, [
+        { id: CONSTANTS.BUTTONS.SAVE.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_VERSION.ID, enabled: false },
+        { id: CONSTANTS.BUTTONS.SAVE_AS_NEW_DOCUMENT.ID, enabled: true }
+      ] ],
+      [ CONSTANTS.WORD.TAB.GROUPS.C.ID, [ { id: CONSTANTS.BUTTONS.INSERT.ID, enabled: false } ] ]
+    ]);
 };
 
 type Status = {

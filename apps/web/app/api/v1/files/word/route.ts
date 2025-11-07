@@ -120,7 +120,6 @@ export const POST: RouteHandler = withAuth(handle<RequestBody>(schema, async (da
       const uploaded = await new Promise<null | Error | DetailedError>((res) => uploadFile(supabase, {
         retry: false,
         directory: data.directory,
-        bucket: directory.data!.project_id,
         file: {
           type: "buffer",
           data: newFile,
