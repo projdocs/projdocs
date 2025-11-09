@@ -17,6 +17,7 @@ export const FileBrowserDropzoneWrapper = ({ children, project, directory }: {
   <DropzoneWrapper
     onDrop={files => files.forEach(file => uploadFile(createClient(), {
       file: {
+        type: "file",
         data: file,
         object: null
       },

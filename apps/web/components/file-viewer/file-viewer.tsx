@@ -92,7 +92,7 @@ export const FileViewer = (props: {
         return;
       }
 
-      const { data: object } = await supabase.rpc("storage.objects.get_object_by_id", { object_id: version.object_id });
+      const { data: object } = await supabase.rpc("get_storage_object_by_id", { object_id: version.object_id });
       if (!object) {
         setState({ version, data: null, isLoading: false });
         return;

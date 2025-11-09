@@ -15,7 +15,7 @@ type RequestBody = {
     name: string;
     base64: string;
   }
-  directory: Pick<Tables<"directories">, "id">;
+  directory: Pick<Tables<"directories">, "id" | "project_id">;
 }
 
 const schema: JSONSchemaType<RequestBody> = ({
@@ -32,9 +32,13 @@ const schema: JSONSchemaType<RequestBody> = ({
     },
     directory: {
       type: "object",
-      required: [ "id" ],
+      required: [ "id", "project_id" ],
       properties: {
         id: {
+          type: "string",
+          format: "uuid"
+        },
+        project_id: {
           type: "string",
           format: "uuid"
         }
@@ -154,7 +158,7 @@ export const POST: RouteHandler = withAuth(handle<RequestBody>(schema, async (da
  * - Detects required DOCX internal structure
  * - Never fully extracts files to memory
  */
-export async function validateWordBase64(base64: string): Promise<{
+async function validateWordBase64(base64: string): Promise<{
   ok: boolean;
   reason?: string;
 }> {

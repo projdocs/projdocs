@@ -1,12 +1,27 @@
 import { H1, H2 } from "@workspace/ui/components/text";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
-import { columns } from "@workspace/web/app/dashboard/clients/[clientID]/columns";
 import * as React from "react";
-import { Tables, Database } from "@workspace/supabase/types";
-import { SupabaseClient } from "@supabase/supabase-js";
 import { useEffect, useState } from "react";
+import { Database, Tables } from "@workspace/supabase/types";
+import { SupabaseClient } from "@supabase/supabase-js";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { PageContent } from "@workspace/ui/components/page-content";
+
+
+
+const columns: readonly {
+  key: keyof Tables<"projects">;
+  header: string;
+}[] = [
+  {
+    key: "project_number",
+    header: "No.",
+  },
+  {
+    key: "name",
+    header: "Name"
+  }
+];
 
 type PermissionsTable = Tables<"permissions"> & {
   user: Tables<"users">;
@@ -29,14 +44,14 @@ export const ClientPage = (props: {
   useEffect(() => {
     (async () => {
       const client = await props.supabase.from("clients").select().eq("id", typeof props.clientID === "string" ? Number(props.clientID) : props.clientID).single();
-      if(client.error) {
+      if (client.error) {
         console.error(client.error);
         setState(null);
         return;
       }
 
       const projects = await props.supabase.from("projects").select().eq("client_id", client.data.id);
-      if(projects.error) {
+      if (projects.error) {
         console.error(projects.error);
         setState(null);
         return;
@@ -47,7 +62,7 @@ export const ClientPage = (props: {
         .select("*, user:users (*)")
         .eq("client_id", client.data.id)
         .overrideTypes<Array<PermissionsTable>>();
-      if(permissions.error){
+      if (permissions.error) {
         console.error(permissions.error);
         setState(null);
         return;
@@ -59,7 +74,7 @@ export const ClientPage = (props: {
         projects: projects.data,
       });
     })();
-  }, [props.clientID]);
+  }, [ props.clientID ]);
 
   return (
     <PageContent>
@@ -140,7 +155,7 @@ export const ClientPage = (props: {
       )}
     </PageContent>
   );
-}
+};
 
 export const ProjectRow = ({ project, onClick }: {
   project: Tables<"projects">;
