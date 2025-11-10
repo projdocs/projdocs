@@ -1,4 +1,4 @@
-name: Build (Web)
+name: Build (Desktop)
 
 on:
   workflow_dispatch:
@@ -6,19 +6,12 @@ on:
     branches:
       - main
     paths:
-      - 'apps/web/**'
-      - '.github/workflows/build-web.yml'
-
-env:
-  IMAGE_NAME: ghcr.io/${{ github.repository }}
+      - 'apps/desktop/**'
+      - '.github/workflows/build-desktop.yml'
 
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write # required for GitHub OIDC token authentication
 
     steps:
       - uses: actions/checkout@v4
@@ -31,4 +24,4 @@ jobs:
       - run: npm i
 
       - run: npm run build
-        working-directory: ./apps/web
+        working-directory: ./apps/desktop
