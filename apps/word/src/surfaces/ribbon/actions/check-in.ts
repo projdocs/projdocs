@@ -3,7 +3,6 @@ import { statusCheck } from "@workspace/word/surfaces/ribbon/actions/launch";
 import { _save } from "@workspace/word/surfaces/ribbon/actions/save";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import CloseBehavior = Word.CloseBehavior;
-import { setButtons } from "@workspace/word/lib/utils";
 
 
 
@@ -44,10 +43,10 @@ export const checkIn: Action = async () => {
   // check-in the file
   const url = new URL(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/checkin`);
   url.searchParams.set("file-number", `${documentID}`);
-  url.searchParams.set("doc-path", path)
+  url.searchParams.set("doc-path", path);
   const success = await fetch(url.toString())
     .then(async (res) => {
-      if(res.status !== 200) await res.json().then(console.error).catch(console.error);
+      if (res.status !== 200) await res.json().then(console.error).catch(console.error);
       return res.status === 200;
     })
     .catch((err) => {

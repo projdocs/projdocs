@@ -88,11 +88,12 @@ function buildApp() {
 
   app.get("/checkout", async (req, res) => {
 
-    const fileID = req.query["file-id"];
-    if (!fileID) return res.status(400).json({ error: "`file-id` query parameter is required" });
-    if (typeof fileID !== "string") return res.status(400).json({ error: "`file-id` query parameter must be a string" });
     if (!auth) return res.status(500).json({ error: "unable to access authentication" });
     const supabase = createClientImpl(auth.supabase.url, auth.supabase.key, async () => auth?.token ?? null);
+
+    const url = new URL(`https://${HOST}:${PORT}${req.url}`);
+    const fileID = url.searchParams.get("file-id");
+    if (!fileID) return res.status(400).json({ error: "`file-id` query parameter is required" });
 
     // get current user
     const uid = await supabase.rpc("get_user_id");
@@ -121,6 +122,17 @@ function buildApp() {
       await fixPerms(filePath);
     } catch (error) {
       console.error(error);
+    }
+
+    // optional file to remove, on success
+    const oldFilePath = url.searchParams.get("remove");
+    if(!!oldFilePath) {
+      try {
+        const resolved = path.resolve(oldFilePath);
+        if (fs.existsSync(resolved)) fs.unlinkSync(resolved);
+      } catch (error) { // fail quietly
+        console.error(error);
+      }
     }
 
     res.status(201).json({ success: true, path: filePath });

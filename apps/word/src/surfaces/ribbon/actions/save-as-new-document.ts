@@ -1,4 +1,4 @@
-import { baseUrl, getFileBlob, saveSettings } from "@workspace/word/lib/utils";
+import { baseUrl, getFileBlob, pathSeparator, saveSettings } from "@workspace/word/lib/utils";
 import { Tables } from "@workspace/supabase/types.gen";
 import { createClient } from "@workspace/supabase/client";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
@@ -27,8 +27,8 @@ export const saveAsNewFile: Action = async () => {
     await saveSettings();
   }
 
-  let baseFileName = Office.context.document.url.includes("/")
-    ? Office.context.document.url.split("/").pop()!
+  let baseFileName = Office.context.document.url.includes(pathSeparator)
+    ? Office.context.document.url.split(pathSeparator).pop()!
     : "NewDocument";
   if (baseFileName.toLowerCase().endsWith(".docx")) baseFileName = baseFileName.substring(0, baseFileName.length - (".docx").length);
   baseFileName = baseFileName.replace(/-\d+\.\d+$/, ""); // matches: "-{number}.{number}" at the very end of the string

@@ -1,5 +1,6 @@
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import Group = Office.Group;
+import PlatformType = Office.PlatformType;
 
 
 // @ts-expect-error meta.env.MODE
@@ -7,6 +8,7 @@ export const isDev = import.meta.env.MODE === "development";
 export const baseUrl = isDev
   ? "https://localhost:8000"
   : "https://word.projdocs.com";
+export const pathSeparator = Office.context.diagnostics.platform === PlatformType.PC ? "\\" : "/"
 
 export function saveSettings(): Promise<void> {
   return new Promise((resolve, reject) => {
@@ -38,9 +40,9 @@ export type FileBlob = {
   hash: string;
 }
 
-export const getFileBlob = async (): Promise<FileBlob> => {
+export const getFileBlob = async (type: Office.FileType = Office.FileType.Compressed): Promise<FileBlob> => {
   const file = await new Promise<Office.File>((resolve, reject) => {
-    Office.context.document.getFileAsync(Office.FileType.Compressed, (res) => {
+    Office.context.document.getFileAsync(type, (res) => {
       console.log(res);
       if (res.status === Office.AsyncResultStatus.Succeeded) resolve(res.value);
       else reject(res.error || new Error("getFileAsync failed"));
