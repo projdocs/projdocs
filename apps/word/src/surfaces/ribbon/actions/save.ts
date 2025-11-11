@@ -1,16 +1,17 @@
 import { CONSTANTS } from "@workspace/word/lib/consts";
-import { FileBlob, getFileBlob, saveSettings } from "@workspace/word/lib/utils";
+import { blobToDataUri, getFileBlob, saveSettings } from "@workspace/word/lib/utils";
 import { createClient } from "@workspace/supabase/client";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import { Tables } from "@workspace/supabase/types.gen";
-import SaveBehavior = Word.SaveBehavior;
+
+
 
 export const _save = async (): Promise<boolean> => {
 
   // save file locally
   await Word.run(async (context) => {
-    context.document.save(SaveBehavior.save);
+    context.document.save(Word.SaveBehavior.save);
     await context.sync();
   });
 
@@ -76,9 +77,16 @@ export const _save = async (): Promise<boolean> => {
   }
 
   // get doc contents
-  let blob: FileBlob;
+  let docxBlob: Blob;
+  let previewBlob: Blob;
   try {
-    blob = await getFileBlob();
+    // document itself
+    const { blob: dBlob } = await getFileBlob();
+    docxBlob = dBlob;
+
+    // preview
+    const { blob: pBlob } = await getFileBlob(Office.FileType.Pdf);
+    previewBlob = pBlob;
   } catch (e) {
     console.error(e);
     displayDialog({
@@ -90,10 +98,13 @@ export const _save = async (): Promise<boolean> => {
 
   const res = await supabase.storage.from(file.data.project_id).update(
     object.data.path_tokens.join("/"),
-    blob.blob,
+    docxBlob,
     {
-      // @ts-expect-error
-      metadata: object.data.user_metadata,
+      metadata: {
+        // @ts-expect-error
+        ...object.data.user_metadata,
+        preview: (await blobToDataUri(previewBlob)) satisfies string,
+      },
       upsert: true,
     }
   );
@@ -107,10 +118,8 @@ export const _save = async (): Promise<boolean> => {
     return false;
   }
 
-  Office.context.document.settings.set(CONSTANTS.SETTINGS.LAST_SAVE_HASH, blob.hash);
-  await saveSettings();
   return true;
-}
+};
 
 export const save: Action = async () => {
   await _save();

@@ -1,4 +1,4 @@
-import { getFileBlob, pathSeparator, saveSettings } from "@workspace/word/lib/utils";
+import { blobToDataUri, getFileBlob, pathSeparator, saveSettings } from "@workspace/word/lib/utils";
 import { CONSTANTS } from "@workspace/word/lib/consts";
 import { createClient } from "@workspace/supabase/client";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
@@ -6,7 +6,6 @@ import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import { Tables } from "@workspace/supabase/types.gen";
 import { statusCheck } from "@workspace/word/surfaces/ribbon/actions/launch";
 import { v4 } from "uuid";
-import CloseBehavior = Word.CloseBehavior;
 
 
 
@@ -66,6 +65,7 @@ export const saveAsNewVersion: Action = async () => {
 
     // get the blob
     const { blob } = await getFileBlob();
+    const { blob: previewBlob } = await getFileBlob(Office.FileType.Pdf);
 
     // revert version in THIS document
     Office.context.document.settings.set(CONSTANTS.SETTINGS.VERSION_REF, curVerNum);
@@ -81,6 +81,7 @@ export const saveAsNewVersion: Action = async () => {
           file_id: file.data.id,
           directory_id: null,
           filename: baseFileName.toLowerCase().endsWith(".docx") ? baseFileName : `${baseFileName}.docx`,
+          preview: (await blobToDataUri(previewBlob)) satisfies string,
         }
       });
 
@@ -108,7 +109,7 @@ export const saveAsNewVersion: Action = async () => {
         title: "Unable to Checkout File",
         description: `File saved successfully, but an error occurred while opening it (${checkout.status})`,
         onClose: async () => await Word.run(async (context) => {
-          context.document.close(CloseBehavior.skipSave);
+          context.document.close(Word.CloseBehavior.skipSave);
           await context.sync();
         })
       });
@@ -122,7 +123,7 @@ export const saveAsNewVersion: Action = async () => {
       await Word.run(async (context) => {
         context.application.openDocument(path);
         await context.sync();
-        context.document.close(CloseBehavior.skipSave);
+        context.document.close(Word.CloseBehavior.skipSave);
         await context.sync();
       });
 
@@ -132,7 +133,7 @@ export const saveAsNewVersion: Action = async () => {
         title: "Unable to Checkout File",
         description: "File saved successfully, but an error occurred while opening it",
         onClose: async () => await Word.run(async (context) => {
-          context.document.close(CloseBehavior.skipSave);
+          context.document.close(Word.CloseBehavior.skipSave);
           await context.sync();
         })
       });

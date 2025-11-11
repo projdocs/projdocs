@@ -117,3 +117,12 @@ function base64ToBytes(b64: string): Uint8Array {
   for (let i = 0; i < len; i++) bytes[i] = bin.charCodeAt(i) & 0xff;
   return bytes;
 }
+
+export async function blobToDataUri(blob: Blob): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onloadend = () => resolve(reader.result as string);
+    reader.onerror = reject;
+    reader.readAsDataURL(blob); // Converts directly to data:[mime];base64,...
+  });
+}
