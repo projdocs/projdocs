@@ -7,7 +7,6 @@ import { Tables } from "@workspace/supabase/types.gen";
 import { statusCheck } from "@workspace/word/surfaces/ribbon/actions/launch";
 import { v4 } from "uuid";
 import CloseBehavior = Word.CloseBehavior;
-import PlatformType = Office.PlatformType;
 
 
 
@@ -24,7 +23,7 @@ export const saveAsNewVersion: Action = async () => {
   const { connector: { loggedIn } } = await statusCheck();
   if (!loggedIn) return;
 
-  const docPath =  Office.context.document.url;
+  const docPath = Office.context.document.url;
   let baseFileName = docPath.includes(pathSeparator)
     ? docPath.split(pathSeparator).pop()!
     : "NewDocument";
