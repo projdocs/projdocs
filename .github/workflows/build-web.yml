@@ -7,11 +7,6 @@ on:
         description: "Version string to inject into the build"
         required: false
         type: string
-    secrets: {}
-    outputs:
-      image:
-        description: "The built image name (if applicable)"
-        value: ${{ jobs.build.outputs.image }}
 
 env:
   IMAGE_NAME: ghcr.io/${{ github.repository }}
@@ -22,7 +17,6 @@ jobs:
     permissions:
       contents: read
       packages: write
-      id-token: write
 
     steps:
       - name: checkout

@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write  # needed to push tags & create releases
+  packages: write
 
 jobs:
 
