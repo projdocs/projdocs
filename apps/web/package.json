@@ -5,7 +5,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev --hostname 127.0.0.1 --port 3030 --turbopack",
-    "build": "next build",
+    "build": "npm run typecheck && next build",
     "start": "next start",
     "lint": "next lint",
     "lint:fix": "next lint --fix",

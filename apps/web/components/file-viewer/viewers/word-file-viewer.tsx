@@ -4,6 +4,7 @@ import { PDFFileViewer } from "@workspace/web/components/file-viewer/viewers/pdf
 
 function dataUriToBlob(dataUri: string): Blob {
   const [header, base64] = dataUri.split(',');
+  if(!header || !base64) throw new Error("dataUri is not valid")
   const mime = header.match(/:(.*?);/)?.[1] || 'application/octet-stream';
   const binary = atob(base64);
   const len = binary.length;
