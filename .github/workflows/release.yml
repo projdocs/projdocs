@@ -19,3 +19,11 @@ jobs:
     uses: train360-corp/actions/.github/workflows/get-release-version.yml@main
     with:
       bump-type: ${{ github.event.inputs.type }}
+
+  build:
+    strategy:
+      matrix:
+        action:
+          - ./github/workflows/build-web.yml
+          - ./github/workflows/build-desktop.yml
+      uses: ${{ matrix.action }}
