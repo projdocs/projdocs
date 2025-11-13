@@ -12,10 +12,6 @@ permissions:
   contents: read
   pages: write
 
-concurrency:
-  group: 'build'
-  cancel-in-progress: true
-
 jobs:
   deploy:
     environment:
