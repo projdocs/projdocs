@@ -98,7 +98,6 @@ export const saveAsNewVersion: Action = async () => {
     // checkout the file
     const url = new URL(`${CONSTANTS.DESKTOP.HTTP_SERVER.ORIGIN}/checkout`);
     url.searchParams.set("file-id", file.data.id);
-    url.searchParams.set("remove", docPath);
     const checkout = await fetch(url.toString());
     if (checkout.status !== 201) {
       try {
@@ -117,30 +116,11 @@ export const saveAsNewVersion: Action = async () => {
       return;
     }
 
-    try {
-      const { path } = await checkout.json();
-
-      // save and re-open
-      await Word.run(async (context) => {
-        context.application.openDocument(path);
-        await context.sync();
-        context.document.close(Word.CloseBehavior.skipSave);
-        await context.sync();
-      });
-
-    } catch (e) {
-      console.error(e);
-      displayDialog({
-        title: "Unable to Checkout File",
-        description: "File saved successfully, but an error occurred while opening it",
-        onClose: async () => await Word.run(async (context) => {
-          context.document.close(Word.CloseBehavior.skipSave);
-          await context.sync();
-        })
-      });
-      return;
-    }
-
+    // save and re-open
+    await Word.run(async (context) => {
+      context.document.close(Word.CloseBehavior.skipSave);
+      await context.sync();
+    });
 
   } catch (e) {
     console.error(e);

@@ -1,7 +1,7 @@
 import type { Server } from "http";
 import cors from "cors";
 import express, { Express } from "express";
-import { app } from "electron";
+import { app as App, shell } from "electron";
 import { Secrets } from "@workspace/desktop/electron/src/secrets";
 import https from "https";
 import { trustRootCert } from "@workspace/desktop/electron/src/certs";
@@ -13,6 +13,7 @@ import { createClientImpl } from "../../../../packages/supabase/client";
 import { Tables } from "../../../../packages/supabase/types.gen";
 import { exec } from "node:child_process";
 import os from "os";
+import { Socket } from "node:net";
 
 
 
@@ -24,7 +25,7 @@ let server: Server | null = null;
 
 const makeFolder = (...segments: string[]) => {
 
-  const home = app.getPath("home"); // /Users/username or C:\Users\username
+  const home = App.getPath("home"); // /Users/username or C:\Users\username
   const baseDir = path.join(home, ".projdocs");
   fs.mkdirSync(baseDir, { recursive: true });
 
@@ -66,7 +67,7 @@ function buildApp() {
     const fileNumber = url.searchParams.get("file-number");
     if (!fileNumber) return res.status(400).json({ error: "`file-id` query parameter is required" });
     const docPath = url.searchParams.get("doc-path");
-    if(!docPath) return res.status(400).json({ error: "`doc-path` query parameter is required" });
+    if (!docPath) return res.status(400).json({ error: "`doc-path` query parameter is required" });
 
     // get file row
     const supabase = createClientImpl(auth.supabase.url, auth.supabase.key, async () => auth?.token ?? null);
@@ -84,7 +85,40 @@ function buildApp() {
 
     // done
     return res.status(200).json({ ok: true });
-  })
+  });
+
+  app.get("/word/open/:display", async (req, res) => {
+    try {
+
+      const url = new URL(`https://${HOST}:${PORT}${req.url}`);
+      const filePath = url.searchParams.get("file-path");
+      if (!filePath) return res.status(400).json({ error: "`file-path` query parameter is required" });
+
+      const base = path.join(App.getPath("home"), ".projdocs", "files");
+      const safeFilePath = path.resolve(filePath); // resolve any directory traversal
+
+      // require filepath to be in ~/.projdocs/files
+      if (!safeFilePath.startsWith(base)) return res.status(401).json({ error: "unable to access authentication" });
+      if (!fs.existsSync(safeFilePath)) return res.status(404).send("File not found");
+
+      // Set headers for Word document
+      res.setHeader(
+        "Content-Type",
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+      );
+      res.setHeader(
+        "Content-Disposition",
+        `inline; filename="${path.basename(safeFilePath)}"`
+      );
+
+      // Stream the file
+      const stream = fs.createReadStream(safeFilePath);
+      stream.pipe(res);
+    } catch (err) {
+      console.error(err);
+      res.status(500).send("Internal Server Error");
+    }
+  });
 
   app.get("/checkout", async (req, res) => {
 
@@ -94,6 +128,8 @@ function buildApp() {
     const url = new URL(`https://${HOST}:${PORT}${req.url}`);
     const fileID = url.searchParams.get("file-id");
     if (!fileID) return res.status(400).json({ error: "`file-id` query parameter is required" });
+
+    const versionID = url.searchParams.get("version-id");
 
     // get current user
     const uid = await supabase.rpc("get_user_id");
@@ -106,16 +142,35 @@ function buildApp() {
     if (file.error) return res.status(500).json({ error: "unable to checkout file", detail: file.error });
     if (file.data.version === null) return res.status(400).json({ error: "file does not have a current version" });
 
+    let version: Tables<"files_versions">;
+    if (versionID) {
+      const {
+        data: v,
+        error: e
+      } = await supabase.from("files_versions").select().eq("id", versionID).eq("file_id", file.data.id).single();
+      if (e) return res.status(400).json({ error: "unable to retrieve version", detail: e });
+      version = v;
+    } else {
+      version = file.data.version;
+    }
+
     // get the object
-    const object = await supabase.rpc("get_storage_object_by_id", { object_id: file.data.version.object_id });
-    if(object.error || object.data === null) return res.status(500).json({ error: "unable to checkout file", detail: object.error ?? "no object found" });
-    if(object.data.path_tokens === null) return res.status(500).json({ error: "unable to checkout file", detail: "no path tokens on object" });
+    const object = await supabase.rpc("get_storage_object_by_id", { object_id: version.object_id });
+    if (object.error || object.data === null) return res.status(500).json({
+      error: "unable to checkout file",
+      detail: object.error ?? "no object found"
+    });
+    if (object.data.path_tokens === null) return res.status(500).json({
+      error: "unable to checkout file",
+      detail: "no path tokens on object"
+    });
 
     // download file
     const download = await supabase.storage.from(file.data.project_id).download(object.data.path_tokens.join("/"));
     if (download.error) return res.status(500).json({ error: "unable to download file", detail: download.error });
     const buffer = Buffer.from(await download.data.arrayBuffer());
-    const filePath = path.join(makeFolder("files", file.data.project_id, file.data.version.id), `${!!file.data.version.name ? (file.data.version.name.toLowerCase().endsWith(".docx") ? file.data.version.name.substring(0, file.data.version.name.length-(".docx").length) : file.data.version.name) + "-" : ""}${file.data.number}.${file.data.version.version}.docx`);
+    const fileName = `${!!file.data.version.name ? (file.data.version.name.toLowerCase().endsWith(".docx") ? file.data.version.name.substring(0, file.data.version.name.length - (".docx").length) : file.data.version.name) + "-" : ""}${file.data.number}.${file.data.version.version}.docx`;
+    const filePath = path.join(makeFolder("files", file.data.project_id, file.data.version.id), fileName);
     fs.writeFileSync(filePath, buffer);
 
     try {
@@ -126,13 +181,31 @@ function buildApp() {
 
     // optional file to remove, on success
     const oldFilePath = url.searchParams.get("remove");
-    if(!!oldFilePath) {
+    if (!!oldFilePath) {
       try {
         const resolved = path.resolve(oldFilePath);
         if (fs.existsSync(resolved)) fs.unlinkSync(resolved);
       } catch (error) { // fail quietly
         console.error(error);
       }
+    }
+
+    // see: https://learn.microsoft.com/en-us/office/client-developer/office-uri-schemes
+    // ofe = Open For Edit
+    // ofv = Open For View
+    const redirect = new URL(`https://${HOST}:${PORT}/word/open/${encodeURIComponent(fileName)}`);
+    redirect.searchParams.set("file-path", filePath);
+
+    try {
+      shell.openExternal(file.data.current_version_id === version.id
+        ? `ms-word:ofe|u|file://${filePath}`
+        : `ms-word:ofv|u|${redirect.toString()}`);
+    } catch (error) {
+      console.error(error);
+      return res.status(500).json({
+        error: "file downloaded successfully, but an error occurred while trying to open it",
+        detail: JSON.stringify(error)
+      });
     }
 
     res.status(201).json({ success: true, path: filePath });
@@ -163,7 +236,7 @@ function buildForwardProxy(server: Server, app: Express) {
           if (auth) {
 
             if (proxyReq.path.startsWith("/realtime/v1/websocket")) {
-              const url = new URL(`http://placeholder.local${proxyReq.path}`);
+              const url = new URL(`https://${HOST}:${PORT}${proxyReq.path}`);
               url.searchParams.set("apikey", auth.supabase.key);
               proxyReq.path = url.pathname + "?" + url.searchParams.toString();
             }
@@ -189,8 +262,7 @@ function buildForwardProxy(server: Server, app: Express) {
   server.on("upgrade", (req, socket, head) => {
     try {
       if (req.url?.startsWith("/supabase/realtime/v1/websocket")) {
-        // @ts-expect-error: Node typings use Socket, but proxy expects Duplex
-        middleware.upgrade(req, socket, head);
+        middleware.upgrade(req, socket as Socket, head);
       } else {
         socket.destroy();
       }
@@ -225,7 +297,7 @@ async function startHttpServer(): Promise<void> {
       reject(err);
     });
     server!.listen(PORT, HOST, () => {
-      console.log(`[http] Listening on http://${HOST}:${PORT}`);
+      console.log(`[http] Listening on https://${HOST}:${PORT}`);
       resolve();
     });
   });
@@ -246,13 +318,13 @@ async function stopHttpServer(): Promise<void> {
 
 function appOnWillQuit(cb: () => void) {
   // Ensure single subscription
-  app.once("will-quit", cb);
-  app.once("quit", cb);
+  App.once("will-quit", cb);
+  App.once("quit", cb);
 }
 
 function appName() {
   try {
-    return app.getName();
+    return App.getName();
   } catch {
     return "ProjDocs";
   }
@@ -260,7 +332,7 @@ function appName() {
 
 function appVersion() {
   try {
-    return app.getVersion();
+    return App.getVersion();
   } catch {
     return "0.0.0";
   }
@@ -277,7 +349,7 @@ export const HttpServer = {
 };
 
 const fixPerms = (filePath: string) => new Promise<void>((res, rej) => {
-  if(os.platform() !== "darwin") return;
+  if (os.platform() !== "darwin") return;
   exec(`xattr -d com.apple.provenance "${filePath}"`, (error, stdout, stderr) => {
     if (error) return rej(`exec error: ${error}`);
     if (stderr) return rej(`stderr: ${stderr}`);
@@ -288,4 +360,4 @@ const fixPerms = (filePath: string) => new Promise<void>((res, rej) => {
     if (stderr) return rej(`stderr: ${stderr}`);
     res();
   });
-})
+});

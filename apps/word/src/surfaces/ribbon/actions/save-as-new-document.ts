@@ -158,29 +158,11 @@ export const saveAsNewFile: Action = async () => {
                 return;
               }
 
-              try {
-                const { path } = await checkout.json();
-
-                // save and re-open
-                await Word.run(async (context) => {
-                  context.application.openDocument(path);
-                  await context.sync();
-                  context.document.close(Word.CloseBehavior.skipSave);
-                  await context.sync();
-                });
-
-              } catch (e) {
-                console.error(e);
-                displayDialog({
-                  title: "Unable to Checkout File",
-                  description: "File saved successfully, but an error occurred while opening it",
-                  onClose: async () => await Word.run(async (context) => {
-                    context.document.close(Word.CloseBehavior.skipSave);
-                    await context.sync();
-                  })
-                });
-                return;
-              }
+              // close this document
+              await Word.run(async (context) => {
+                context.document.close(Word.CloseBehavior.skipSave);
+                await context.sync();
+              });
 
               return;
 
