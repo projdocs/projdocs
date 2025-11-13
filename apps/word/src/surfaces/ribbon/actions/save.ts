@@ -120,14 +120,11 @@ export const _save = async (): Promise<boolean> => {
     docxBlob,
     {
       metadata: {
-        // @ts-expect-error
-        ...object.data.user_metadata,
+        ...object.data.user_metadata as Record<string, any>,
         version_id: version.data.id,
         preview: (await blobToDataUri(previewBlob)) satisfies string,
       }
     });
-
-  console.log(res);
 
   if (res.error) {
     console.error(res.error);
