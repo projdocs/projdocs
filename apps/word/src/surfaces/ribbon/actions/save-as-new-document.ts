@@ -2,7 +2,7 @@ import { baseUrl, blobToDataUri, getFileBlob, pathSeparator, saveSettings } from
 import { Tables } from "@workspace/supabase/types.gen";
 import { createClient } from "@workspace/supabase/client";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
 import { v4 } from "uuid";
 

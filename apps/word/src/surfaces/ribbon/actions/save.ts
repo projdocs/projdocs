@@ -1,4 +1,4 @@
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import { blobToDataUri, getFileBlob, saveSettings } from "@workspace/word/lib/utils";
 import { createClient } from "@workspace/supabase/client";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";

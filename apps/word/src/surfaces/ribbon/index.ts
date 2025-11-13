@@ -1,5 +1,5 @@
 import { Ribbon } from "@workspace/word/surfaces/ribbon/actions";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../packages/consts/src/consts";
 
 // inject custom envs
 window.env = {

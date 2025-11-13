@@ -2,7 +2,7 @@ import "./index.css";
 import React from "react";
 import { createRoot } from "react-dom/client";
 import App from "./App";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../packages/consts/src/consts";
 import { SupabaseBrowserRuntimeEnvironment } from "@workspace/supabase/types";
 
 declare global {

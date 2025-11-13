@@ -2,7 +2,7 @@ import { save } from "@workspace/word/surfaces/ribbon/actions/save";
 import { saveAsNewVersion } from "@workspace/word/surfaces/ribbon/actions/save-as-new-version";
 import { launch } from "@workspace/word/surfaces/ribbon/actions/launch";
 import { saveAsNewFile } from "@workspace/word/surfaces/ribbon/actions/save-as-new-document";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import { insertDocumentNumber } from "@workspace/word/surfaces/ribbon/actions/insert-doc-id-number";
 import { checkIn } from "@workspace/word/surfaces/ribbon/actions/check-in";
 

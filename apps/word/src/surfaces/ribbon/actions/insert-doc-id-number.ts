@@ -1,5 +1,5 @@
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 
 
 

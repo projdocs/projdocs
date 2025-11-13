@@ -4,7 +4,7 @@ import { Layout } from "@workspace/word/surfaces/folder-picker/src/layout";
 import { SupabaseRealtimeListener } from "@workspace/supabase/realtime/listener";
 import { v4 } from "uuid";
 import { createClient } from "@workspace/supabase/client";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../packages/consts/src/consts";
 import { LoadingPage } from "@workspace/ui/pages/loading";
 import { H3, P } from "@workspace/ui/components/text";
 import { ThemeProvider } from "@workspace/desktop/src/theme/theme-provider";

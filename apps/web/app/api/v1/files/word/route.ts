@@ -1,7 +1,7 @@
 import { handle, withAuth } from "@workspace/web/lib/api";
 import { createClient } from "@workspace/web/lib/supabase/server";
 import { json2xml, xml2json } from "xml-js";
-import { CONSTANTS } from "@workspace/word/src/lib/consts";
+import { CONSTANTS } from "@workspace/consts/consts";
 import JSZip from "jszip";
 import { uploadFile } from "@workspace/web/lib/supabase/upload-file";
 import { JSONSchemaType } from "ajv";

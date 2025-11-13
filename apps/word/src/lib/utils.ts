@@ -1,4 +1,4 @@
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../packages/consts/src/consts";
 import Group = Office.Group;
 import PlatformType = Office.PlatformType;
 

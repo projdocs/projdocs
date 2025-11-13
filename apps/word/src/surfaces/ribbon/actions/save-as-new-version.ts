@@ -1,5 +1,5 @@
 import { blobToDataUri, getFileBlob, pathSeparator, saveSettings } from "@workspace/word/lib/utils";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import { createClient } from "@workspace/supabase/client";
 import { refreshFileIdContentControls } from "@workspace/word/lib/content-controls";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";

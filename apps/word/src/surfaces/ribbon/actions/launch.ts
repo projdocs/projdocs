@@ -1,4 +1,4 @@
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import { saveSettings, setButtons } from "@workspace/word/lib/utils";
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import CloseBehavior = Word.CloseBehavior;

@@ -1,7 +1,7 @@
 import { displayDialog } from "@workspace/word/surfaces/dialog/display";
 import { statusCheck } from "@workspace/word/surfaces/ribbon/actions/launch";
 import { _save } from "@workspace/word/surfaces/ribbon/actions/save";
-import { CONSTANTS } from "@workspace/word/lib/consts";
+import { CONSTANTS } from "../../../../../../packages/consts/src/consts";
 import CloseBehavior = Word.CloseBehavior;
 
 

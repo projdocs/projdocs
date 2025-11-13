@@ -1,7 +1,7 @@
 import fs from "fs";
 import path from "path";
 import {fileURLToPath} from "url";
-import {CONSTANTS} from "../src/lib/consts.ts";
+import {CONSTANTS} from "../../../packages/consts/src/consts.ts";
 
 /**
  * @type {(env: "dev" | "prod") => Promise<void>}
