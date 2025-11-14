@@ -3,7 +3,6 @@ import "./index.css";
 import { ThemeProvider } from "@workspace/ui/components/theme-provider";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { ReactNode } from "react";
-import Script from 'next/script'
 import * as process from "node:process";
 
 
