@@ -33,7 +33,6 @@ export function NavUser() {
       await supabase.auth.refreshSession();
 
       const { data: { user: auth }, error } = await supabase.auth.getUser();
-      console.log(user, error);
 
       const { data: $public } = await supabase.from("users").select().eq("id", auth?.id ?? "").single();
       if (auth && $public) setUser({

@@ -18,6 +18,7 @@
     "hooks": "@workspace/ui/hooks"
   },
   "registries": {
-    "@supabase": "https://supabase.com/ui/r/{name}.json"
+    "@supabase": "https://supabase.com/ui/r/{name}.json",
+    "@reui": "https://reui.io/r/{name}.json"
   }
 }

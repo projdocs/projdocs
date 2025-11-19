@@ -6,7 +6,7 @@ function Input({ className, type, suffix, ...props }: React.ComponentProps<"inpu
   suffix?: string;
 }) {
   return (
-    <div className={"relative"}>
+    <div className={cn("relative", className)}>
       <input
         type={type}
         data-slot="input"

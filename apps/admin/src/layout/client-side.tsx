@@ -24,12 +24,12 @@ type NavGroup = NavItem & {
 
 const nav: readonly NavGroup[] = [
   {
-    title: "Dashboard",
-    url: "/",
+    title: "Services",
+    url: "/dashboard",
   },
   {
     title: "Backend",
-    url: "/supabase",
+    url: "/dashboard/supabase",
   }
 ];
 

@@ -1,6 +1,7 @@
 export const CONSTANTS = {
   DOCKER: {
-    LABEL: "com.projdocs"
+    LABEL: "com.projdocs",
+    NETWORK: "projdocs-net"
   } as const,
   VALIDATORS: {
     FILENAME: /^(?!\.)(?!.*[\\/])(?!.*\.\.)[A-Za-z0-9._ -]+$/

@@ -1,32 +1,23 @@
 import {
-  Breadcrumb,
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from "@workspace/ui/components/breadcrumb";
-import { Separator } from "@workspace/ui/components/separator";
-import {
   Sidebar,
   SidebarContent,
   SidebarGroup,
   SidebarHeader,
   SidebarInset,
-  SidebarMenu, SidebarMenuButton, SidebarMenuItem, SidebarMenuSub, SidebarMenuSubButton, SidebarMenuSubItem,
   SidebarProvider,
-  SidebarTrigger,
 } from "@workspace/ui/components/sidebar";
-import { CSSProperties, ReactNode } from "react";
-import { GalleryVerticalEnd } from "lucide-react";
 import * as React from "react";
+import { CSSProperties, ReactNode } from "react";
 import AdminSidebarMenu from "@workspace/admin/layout/client-side";
+import { H3, H4 } from "@workspace/ui/components/text.tsx";
+import * as process from "node:process";
+import { Badge } from "@workspace/ui/components/badge.tsx";
 
 
-export default function DashboardLayout({children}: {
+
+export default function DashboardLayout({ children }: {
   children: ReactNode;
 }) {
-
 
 
   return (
@@ -39,25 +30,17 @@ export default function DashboardLayout({children}: {
     >
       <Sidebar variant="floating" className={"bg-background p-4 pr-0"}>
         <SidebarHeader>
-          <SidebarMenu>
-            <SidebarMenuItem>
-              <SidebarMenuButton size="lg" asChild>
-                <a href="#">
-                  <div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-                    <GalleryVerticalEnd className="size-4" />
-                  </div>
-                  <div className="flex flex-col gap-0.5 leading-none">
-                    <span className="font-medium">Documentation</span>
-                    <span className="">v1.0.0</span>
-                  </div>
-                </a>
-              </SidebarMenuButton>
-            </SidebarMenuItem>
-          </SidebarMenu>
+          <div className={"p-2"}>
+            <H3>{"ProjDocs"}</H3>
+            <div className={"flex flex-row items-center gap-2"}>
+              <H4>{"Server"}</H4>
+              <Badge>v{process.env.VERSION ?? "0.0.0"}</Badge>
+            </div>
+          </div>
         </SidebarHeader>
         <SidebarContent>
           <SidebarGroup>
-            <AdminSidebarMenu />
+            <AdminSidebarMenu/>
           </SidebarGroup>
         </SidebarContent>
       </Sidebar>

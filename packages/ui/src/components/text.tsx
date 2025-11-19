@@ -117,16 +117,28 @@ export const InlineCode = React.forwardRef<
   HTMLElement,
   React.HTMLAttributes<HTMLElement>
 >(({ className, children, ...props }, ref) => (
-  <code
-    ref={ref}
-    className={cn(
-      "bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
-      className
-    )}
-    {...props}
-  >
-    {children}
-  </code>
+  typeof children === "string"
+    ? (
+      <div className={cn("flex flex-col bg-muted relative rounded px-[0.3rem] py-[0.2rem]", className)}>
+        {children.replace(/ /g, "\u00A0").split("\n").map((child, i) => (
+          <code key={i} ref={ref} {...props} className={cn("font-mono text-sm font-semibold", className)}>
+            {child}
+          </code>
+        ))}
+      </div>
+    )
+    : (
+      <code
+        ref={ref}
+        className={cn(
+          "bg-muted relative rounded px-[0.3rem] py-[0.2rem] font-mono text-sm font-semibold",
+          className
+        )}
+        {...props}
+      >
+        {children}
+      </code>
+    )
 ));
 InlineCode.displayName = "InlineCode";
 
@@ -144,7 +156,7 @@ export const Link = React.forwardRef<HTMLAnchorElement, LinkProps>(
           onClick(e);
         }
       },
-      [onClick]
+      [ onClick ]
     );
 
     return (

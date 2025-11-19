@@ -6,7 +6,7 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
   output: "standalone",
   experimental: {
-    globalNotFound: true,
+    globalNotFound: false,
   },
 };
 

@@ -2,7 +2,7 @@
 
 
 import { Button } from "@workspace/ui/components/button.tsx";
-import { DockerService } from "../../../app/page.tsx";
+import { DockerService } from "../../../app/dashboard/page.tsx";
 import { onClick } from "./action.ts";
 import { ContainerInspectResponses } from "@workspace/admin/lib/docker/gen";
 import { LoaderIcon, PlusIcon } from "lucide-react";
