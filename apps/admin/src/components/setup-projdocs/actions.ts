@@ -3,8 +3,9 @@
 import { SetupProjDocsState, SetupProjDocsStore } from "@workspace/admin/components/setup-projdocs/store.ts";
 import { Client } from "pg";
 import { SignJWT } from "jose";
-import { kv, KvKeys } from "@workspace/admin/lib/db/kv.ts";
+import { kv } from "@workspace/admin/lib/db/kv.ts";
 import { random } from "@workspace/admin/lib/random.ts";
+import { KvKeys } from "@workspace/admin/lib/db/enum.ts";
 
 
 
@@ -45,40 +46,7 @@ export const onComplete = async (store: SetupProjDocsStore): Promise<void> => {
     .set(KvKeys.POSTGRES_PORT, useSelfHosted ? "5432" : store.state.database.port)
     .set(KvKeys.POSTGRES_DB, useSelfHosted ? "postgres" : store.state.database.database)
     .set(KvKeys.POSTGRES_USER, useSelfHosted ? "postgres" : store.state.database.username)
-    .set(KvKeys.POSTGRES_PASSWORD, store.state.database.password);
-};
-
-
-export const testDbConnection = async (
-  db: SetupProjDocsState["database"]
-): Promise<{ success: boolean; error?: string }> => {
-  const { host, port, database, username, password, mode } = db;
-
-  // Self-hosted mode doesn't test remote PG
-  if (mode === "self-hosted") {
-    return { success: true };
-  }
-
-  const client = new Client({
-    host,
-    port: parseInt(port, 10),
-    database,
-    user: username,
-    password,
-    ssl: false, // If you want SSL: { rejectUnauthorized: false }
-    connectionTimeoutMillis: 3000,
-  });
-
-  try {
-    await client.connect();
-    await client.query("SELECT 1;");
-    await client.end();
-    return { success: true };
-  } catch (err: any) {
-    console.error(err);
-    return {
-      success: false,
-      error: err?.message ?? "Unknown connection error",
-    };
-  }
+    .set(KvKeys.POSTGRES_PASSWORD, store.state.database.password)
+    .set(KvKeys.CLOUDFLARE_AUTOPROVISION_HTTPS, store.state.auth.useCloudflare ? "1" : null)
+    .set(KvKeys.CLOUDFLARE_API_TOKEN, store.state.auth.useCloudflare ? store.state.auth.cloudflareApiToken : null);
 };

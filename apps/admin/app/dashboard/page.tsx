@@ -174,8 +174,10 @@ export default async function () {
             <TableBody>
               <Container service={DockerService.KONG}/>
               <Container service={DockerService.DB}/>
+              <Container service={DockerService.GOTRUE} />
               <Container service={DockerService.REALTIME}/>
               <Container service={DockerService.REST} />
+              <Container service={DockerService.STORAGE} />
             </TableBody>
           </Table>
         </Card>

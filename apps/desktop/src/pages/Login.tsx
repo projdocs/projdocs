@@ -8,13 +8,14 @@ import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, } from "@workspace/ui/components/form";
 import { AuthStatus, useAuthStore } from "@workspace/desktop/src/lib/auth/store";
+import { CONSTANTS } from "@workspace/packages/consts/consts";
 
 // --- Zod Schema ---
 const LoginSchema = z.object({
   serverURL: z
     .string()
     .regex(
-      /^(?:localhost(?::\d{1,5})?|127(?:\.\d{1,3}){3}(?::\d{1,5})?|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/,
+      CONSTANTS.VALIDATORS.SITE_URL,
       "Server URL must be a valid host (no protocol or path)"
     ),
 });

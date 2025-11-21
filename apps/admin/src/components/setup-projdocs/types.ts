@@ -5,7 +5,8 @@ import { LucideIcon } from "lucide-react";
 
 
 export type StepComponentProps = {
-  store: SetupProjDocsStore
+  store: SetupProjDocsStore;
+  osType: NodeJS.Platform
 }
 
 export type Step = {

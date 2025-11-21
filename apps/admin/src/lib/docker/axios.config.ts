@@ -6,4 +6,5 @@ export const createClientConfig: CreateClientConfig = (config) => ({
   ...config,
   baseURL: "http://unix:/v1.47",
   socketPath: "/var/run/docker.sock",
+  validateStatus: () => true,
 });

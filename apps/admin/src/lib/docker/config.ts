@@ -5,9 +5,10 @@ import axios from "axios";
 import process from "node:process";
 import { CONSTANTS } from "@workspace/consts/consts.ts";
 import os from "node:os";
-import { kv, KvKeys } from "@workspace/admin/lib/db/kv.ts";
+import { kv } from "@workspace/admin/lib/db/kv.ts";
 import { random } from "@workspace/admin/lib/random.ts";
 import { DockerService } from "@workspace/admin/lib/docker/types.ts";
+import { KvKeys } from "@workspace/admin/lib/db/enum.ts";
 
 
 
@@ -50,6 +51,99 @@ export const getContainerConfig = async (svc: DockerService): Promise<ContainerC
 
   switch (svc) {
 
+    case DockerService.GOTRUE:
+      return {
+        ...shared,
+        Image: "ghcr.io/supabase/gotrue:v2.182.1",
+        Healthcheck: {
+          Test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:9999/health" ],
+          Interval: seconds(5),
+          Timeout: seconds(5),
+          Retries: 3
+        },
+        Env: [
+          `GOTRUE_API_HOST=0.0.0.0`,
+          `GOTRUE_API_PORT=9999`,
+          `API_EXTERNAL_URL=${kv.get(KvKeys.API_URL)}`,
+          `GOTRUE_DB_DRIVER=postgres`,
+          `GOTRUE_DB_DATABASE_URL=postgres://supabase_auth_admin:${kv.get(KvKeys.POSTGRES_PASSWORD)}@${kv.get(KvKeys.POSTGRES_HOST)}:${kv.get(KvKeys.POSTGRES_PORT)}/${kv.get(KvKeys.POSTGRES_DB)}`,
+          `GOTRUE_SITE_URL=${kv.get(KvKeys.SITE_URL)}`,
+          // `GOTRUE_URI_ALLOW_LIST=${ADDITIONAL_REDIRECT_URLS}`,
+          `GOTRUE_DISABLE_SIGNUP=true`,
+          `GOTRUE_JWT_ADMIN_ROLES=service_role`,
+          `GOTRUE_JWT_AUD=authenticated`,
+          `GOTRUE_JWT_DEFAULT_GROUP_NAME=authenticated`,
+          `GOTRUE_JWT_EXP=3600`,
+          `GOTRUE_JWT_SECRET=${kv.get(KvKeys.JWT_SECRET)}`,
+          `GOTRUE_EXTERNAL_EMAIL_ENABLED=true`,
+          `GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED=false`,
+          `GOTRUE_MAILER_AUTOCONFIRM=false`,
+          `GOTRUE_SMTP_ADMIN_EMAIL=support@projdocs.com`,
+          `GOTRUE_SMTP_HOST=supabase-mail`,
+          `GOTRUE_SMTP_PORT=2500`,
+          `GOTRUE_SMTP_USER=fake_mail_user`,
+          `GOTRUE_SMTP_PASS=fake_mail_password`,
+          `GOTRUE_SMTP_SENDER_NAME=ProjDocs`,
+          `GOTRUE_MAILER_URLPATHS_INVITE=/auth/v1/verify`,
+          `GOTRUE_MAILER_URLPATHS_CONFIRMATION=/auth/v1/verify`,
+          `GOTRUE_MAILER_URLPATHS_RECOVERY=/auth/v1/verify`,
+          `GOTRUE_MAILER_URLPATHS_EMAIL_CHANGE=/auth/v1/verify`,
+          `GOTRUE_EXTERNAL_PHONE_ENABLED=false`,
+          `GOTRUE_SMS_AUTOCONFIRM=false`,
+        ],
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [CONSTANTS.DOCKER.NETWORK]: {
+              Aliases: [ "auth" ]
+            }
+          }
+        }
+      } satisfies ContainerCreateData["body"];
+
+    case DockerService.STORAGE:
+
+      const storageDir = path.join(os.homedir(), ".projdocs", "storage");
+      fs.mkdirSync(storageDir, { recursive: true });
+
+      return {
+        ...shared,
+        Image: "ghcr.io/supabase/storage-api:v1.29.0",
+        Healthcheck: {
+          Test: [ "CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://storage:5000/status" ],
+          Interval: seconds(5),
+          Timeout: seconds(5),
+          Retries: 3
+        },
+        HostConfig: {
+          NetworkMode: CONSTANTS.DOCKER.NETWORK,
+          RestartPolicy: { Name: "unless-stopped" },
+          Binds: [ `${storageDir}:/var/lib/storage:z` ],
+        },
+        Env: [
+          `ANON_KEY=${kv.get(KvKeys.PUBLIC_JWT)}`,
+          `SERVICE_KEY=${kv.get(KvKeys.PRIVATE_JWT)}`,
+          `POSTGREST_URL=http://${DockerService.REST}:3000`,
+          `PGRST_JWT_SECRET=${kv.get(KvKeys.JWT_SECRET)}`,
+          `DATABASE_URL=postgres://supabase_storage_admin:${kv.get(KvKeys.POSTGRES_PASSWORD)}@${kv.get(KvKeys.POSTGRES_HOST)}:${kv.get(KvKeys.POSTGRES_PORT)}/${kv.get(KvKeys.POSTGRES_DB)}`,
+          `REQUEST_ALLOW_X_FORWARDED_PATH=true`,
+          `FILE_SIZE_LIMIT=52428800`,
+          `STORAGE_BACKEND=file`,
+          `FILE_STORAGE_BACKEND_PATH=/var/lib/storage`,
+          `TENANT_ID=stub`,
+          `REGION=stub`,
+          `GLOBAL_S3_BUCKET=stub`,
+          `ENABLE_IMAGE_TRANSFORMATION=true`,
+          // `IMGPROXY_URL=http://imgproxy:5001`,
+        ],
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [CONSTANTS.DOCKER.NETWORK]: {
+              Aliases: [ "storage" ]
+            }
+          }
+        }
+      } satisfies ContainerCreateData["body"];
+
     case DockerService.REST:
       return {
         ...shared,
@@ -67,7 +161,14 @@ export const getContainerConfig = async (svc: DockerService): Promise<ContainerC
           `PGRST_APP_SETTINGS_JWT_SECRET=${kv.get(KvKeys.JWT_SECRET)}`,
           `PGRST_APP_SETTINGS_JWT_EXP=3600`,
         ],
-        Cmd: [ "postgrest" ]
+        Cmd: [ "postgrest" ],
+        NetworkingConfig: {
+          EndpointsConfig: {
+            [CONSTANTS.DOCKER.NETWORK]: {
+              Aliases: [ "rest" ]
+            }
+          }
+        }
       } satisfies ContainerCreateData["body"];
 
     case DockerService.KONG:
@@ -80,7 +181,13 @@ export const getContainerConfig = async (svc: DockerService): Promise<ContainerC
       return {
         ...shared,
         Image: "kong:2.8.1",
+        ExposedPorts: { "8000/tcp": {} },
         HostConfig: {
+          PortBindings: {
+            "8000/tcp": [
+              { HostPort: "8000", HostIp: "0.0.0.0" }
+            ]
+          },
           NetworkMode: CONSTANTS.DOCKER.NETWORK,
           RestartPolicy: { Name: "unless-stopped" },
           Binds: [

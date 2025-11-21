@@ -2,12 +2,12 @@
 
 
 import { Button } from "@workspace/ui/components/button.tsx";
-import { DockerService } from "../../../app/dashboard/page.tsx";
 import { createContainer } from "./action.ts";
 import { ContainerInspectResponses } from "@workspace/admin/lib/docker/gen";
 import { LoaderIcon, PlusIcon } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { DockerService } from "@workspace/admin/lib/docker/types.ts";
 
 
 

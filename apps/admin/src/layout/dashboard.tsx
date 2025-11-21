@@ -39,9 +39,7 @@ export default function DashboardLayout({ children }: {
           </div>
         </SidebarHeader>
         <SidebarContent>
-          <SidebarGroup>
-            <AdminSidebarMenu/>
-          </SidebarGroup>
+          <AdminSidebarMenu/>
         </SidebarContent>
       </Sidebar>
       <SidebarInset>

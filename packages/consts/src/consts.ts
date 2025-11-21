@@ -4,7 +4,8 @@ export const CONSTANTS = {
     NETWORK: "projdocs-net"
   } as const,
   VALIDATORS: {
-    FILENAME: /^(?!\.)(?!.*[\\/])(?!.*\.\.)[A-Za-z0-9._ -]+$/
+    FILENAME: /^(?!\.)(?!.*[\\/])(?!.*\.\.)[A-Za-z0-9._ -]+$/,
+    SITE_URL: /^(?:localhost(?::\d{1,5})?|127(?:\.\d{1,3}){3}(?::\d{1,5})?|([a-zA-Z0-9-]+\.)+[a-zA-Z]{2,})$/,
   } satisfies {
     [id: string]: RegExp
   },

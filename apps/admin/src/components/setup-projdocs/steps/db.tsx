@@ -4,14 +4,13 @@ import { Label } from "@workspace/ui/components/label.tsx";
 import { defaultSetupProjDocsState, SetupProjDocsState } from "@workspace/admin/components/setup-projdocs/store.ts";
 import { Input } from "@workspace/ui/components/input.tsx";
 import { toast } from "sonner";
-import { testDbConnection } from "@workspace/admin/components/setup-projdocs/actions.ts";
+import { testDbConnection } from "@workspace/admin/components/setup-projdocs/steps/actions.ts";
 import { useState } from "react";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip.tsx";
 import { Button } from "@workspace/ui/components/button.tsx";
 import { P } from "@workspace/ui/components/text.tsx";
 import { random } from "@workspace/admin/lib/random.ts";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs.tsx";
-import { Separator } from "@workspace/ui/components/separator.tsx";
 
 
 

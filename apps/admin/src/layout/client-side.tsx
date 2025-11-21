@@ -1,6 +1,9 @@
 "use client";
 
 import {
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -13,24 +16,34 @@ import { usePathname } from "next/navigation";
 
 
 
-type NavItem = {
+type NavItemBase = {
   title: string;
+}
+
+type NavItemLink = NavItemBase & {
   url: string;
 }
 
-type NavGroup = NavItem & {
-  items?: readonly NavItem[];
+type NavGroup = NavItemBase & {
+  items: readonly NavItemLink[];
 }
 
-const nav: readonly NavGroup[] = [
+type NavItem = NavItemLink | NavGroup;
+
+const nav: readonly NavItem[] = [
   {
     title: "Services",
     url: "/dashboard",
   },
   {
-    title: "Backend",
-    url: "/dashboard/supabase",
-  }
+    title: "Settings",
+    items: [
+      {
+        title: "Authentication",
+        url: "/dashboard/authentication",
+      },
+    ]
+  },
 ];
 
 export default function AdminSidebarMenu() {
@@ -38,34 +51,50 @@ export default function AdminSidebarMenu() {
   const path = usePathname();
 
   return (
-    <SidebarMenu className="gap-2">
-      {nav.map((group, groupNumber) => (
-        <SidebarMenuItem key={`navGroup-${groupNumber}`}>
-          <SidebarMenuButton
-            disabled={group.url === path}
-            isActive={group.url === path}
-            asChild
-          >
-            <a href={group.url} className="font-medium">
+    nav.map((group, groupNumber) => (
+      ("items" in group)
+        ? (
+          <SidebarGroup key={groupNumber}>
+            <SidebarGroupLabel>
               {group.title}
-            </a>
-          </SidebarMenuButton>
-          {group.items?.length ? (
-            <SidebarMenuSub className="ml-0 border-l-0 px-1.5">
-              {group.items.map((item, key) => (
-                <SidebarMenuSubItem key={`navGroup-${groupNumber}-item-${key}`}>
-                  <SidebarMenuSubButton
-                    isActive={path === item.url}
-                    asChild
-                  >
-                    <a href={item.url}>{item.title}</a>
-                  </SidebarMenuSubButton>
-                </SidebarMenuSubItem>
-              ))}
-            </SidebarMenuSub>
-          ) : null}
-        </SidebarMenuItem>
-      ))}
-    </SidebarMenu>
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu className="gap-2">
+                <SidebarMenuItem key={`navGroup-${groupNumber}`}>
+                  {group.items.length ? (
+                    <SidebarMenuSub className="ml-0 border-l-0 px-1.5">
+                      {group.items.map((item, key) => (
+                        <SidebarMenuSubItem key={`navGroup-${groupNumber}-item-${key}`}>
+                          <SidebarMenuSubButton
+                            isActive={path === item.url}
+                            asChild
+                          >
+                            <a href={item.url}>{item.title}</a>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      ))}
+                    </SidebarMenuSub>
+                  ) : null}
+                </SidebarMenuItem>
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        )
+        : (
+          <SidebarGroup key={groupNumber}>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                disabled={group.url === path}
+                isActive={group.url === path}
+                asChild
+              >
+                <a href={group.url} className="font-medium">
+                  {group.title}
+                </a>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarGroup>
+        )
+    ))
   );
 }

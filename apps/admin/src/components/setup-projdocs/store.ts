@@ -1,7 +1,11 @@
 import { create } from "zustand";
 import { random } from "@workspace/admin/lib/random.ts";
 
-
+type SetupProjDocsStateSchema = {
+  [key: string]: {
+    [key: string]: string | boolean;
+  }
+}
 
 export type SetupProjDocsState = {
   database: {
@@ -14,6 +18,10 @@ export type SetupProjDocsState = {
   };
   auth: {
     jwtSecret: string;
+    apiUrl: string;
+    siteUrl: string;
+    useCloudflare: boolean;
+    cloudflareApiToken: string;
   };
 };
 
@@ -28,8 +36,12 @@ export const defaultSetupProjDocsState: SetupProjDocsState = {
   },
   auth: {
     jwtSecret: random.string(32),
+    apiUrl: "",
+    siteUrl: "",
+    useCloudflare: false,
+    cloudflareApiToken: "",
   }
-};
+} satisfies SetupProjDocsStateSchema & SetupProjDocsState;
 
 export interface SetupProjDocsStore {
   state: SetupProjDocsState;

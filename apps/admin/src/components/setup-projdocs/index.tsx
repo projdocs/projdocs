@@ -17,13 +17,15 @@ import { Badge } from "@workspace/ui/components/badge.tsx";
 import { Button } from "@workspace/ui/components/button.tsx";
 import { useState } from "react";
 import { SetupProjDocsStore, useSetupProjDocsStore } from "@workspace/admin/components/setup-projdocs/store.ts";
-import { steps } from "@workspace/admin/components/setup-projdocs/steps/0-index.ts";
+import { steps } from "@workspace/admin/components/setup-projdocs/steps";
 import { onComplete } from "@workspace/admin/components/setup-projdocs/actions.ts";
 import { useRouter } from "next/navigation";
 
 
 
-export const SetupProjDocs = () => {
+export const SetupProjDocs = ({platform}: {
+  platform: NodeJS.Platform;
+}) => {
 
   const [ currentStep, setCurrentStep ] = useState<number>(1);
   const store: SetupProjDocsStore = useSetupProjDocsStore();
@@ -67,25 +69,14 @@ export const SetupProjDocs = () => {
                           {step.title}
                         </StepperTitle>
                         <div>
-                          <Badge
-                            variant="primary"
-                            size="sm"
-                            appearance="light"
-                            className="hidden group-data-[state=active]/step:inline-flex"
-                          >
+                          <Badge className="hidden group-data-[state=active]/step:inline-flex">
                             In Progress
                           </Badge>
-                          <Badge
-                            variant="success"
-                            size="sm"
-                            appearance="light"
-                            className="hidden group-data-[state=completed]/step:inline-flex"
-                          >
-                            Completed
+                          <Badge className="hidden group-data-[state=completed]/step:inline-flex">
+                            {"Completed"}
                           </Badge>
                           <Badge
                             variant="secondary"
-                            size="sm"
                             className="hidden group-data-[state=inactive]/step:inline-flex text-muted-foreground"
                           >
                             Pending
@@ -106,9 +97,10 @@ export const SetupProjDocs = () => {
               {steps.map((step, index) => (
                 <StepperContent key={index} value={index + 1}
                                 className="flex flex-col items-center justify-center w-full">
-                  <step.component store={store}/>
+                  <step.component store={store} osType={platform}/>
                 </StepperContent>
               ))}
+
             </StepperPanel>
             <div className="flex items-center justify-between gap-2.5">
               <Button
@@ -116,7 +108,7 @@ export const SetupProjDocs = () => {
                 onClick={async () => setCurrentStep((prev) => prev - 1)}
                 disabled={currentStep === 1}
               >
-                Previous
+                {"Previous"}
               </Button>
               <Button
                 variant="outline"
@@ -131,7 +123,7 @@ export const SetupProjDocs = () => {
                   else setCurrentStep((prev) => prev + 1);
                 }}
               >
-                {currentStep === steps.length ? "Finish" : "Next"}
+                {currentStep >= steps.length ? "Finish" : "Next"}
               </Button>
             </div>
           </Stepper>
