@@ -60,6 +60,11 @@ _run() {
   fi
 }
 
+_run_subshell() {
+  local cmd="$*"
+  _run bash -c "$cmd"
+}
+
 _require() {
   local cmd="$1"
   local msg="${2:-}"
@@ -116,10 +121,10 @@ _install_alpine() {
   _run git clone https://github.com/train360-corp/projdocs.git /projdocs
 
   _info "installing dependencies for admin portal"
-  _run cd /projdocs && npm ci
+  _run_subshell cd /projdocs && npm ci
 
   _info "building admin portal"
-  _run cd /projdocs/apps/admin && npm run build
+  _run_subshell cd /projdocs/apps/admin && npm run build
 }
 
 _install() {

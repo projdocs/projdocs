@@ -1,0 +1,3 @@
+#! /usr/bin/env sh
+
+docker run -it --rm --name alpine-vm --privileged alpine:3.22 /bin/sh
