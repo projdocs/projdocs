@@ -48,9 +48,10 @@ _fatal() {
 
 _run() {
   _debug "running command: $*"
-  local output
+  set +e  # <--- disable exit-on-error temporarily
   output="$("$@" 2>&1)"
   local status=$?
+  set -e  # <--- re-enable strict mode
   if [[ $status -ne 0 ]]; then
     _error "$output"
     _fatal "command failed ($status): $*"
@@ -110,11 +111,15 @@ _install_alpine() {
 
   _info "installing dependencies"
   _run apk add git nodejs npm
+
+  _info "pulling source code"
   _run git clone https://github.com/train360-corp/projdocs.git /projdocs
-  _run cd /projdocs
-  _run npm ci
-  _run cd /projdocs/apps/admin
-  _run npm run build
+
+  _info "installing dependencies for admin portal"
+  _run cd /projdocs && npm ci
+
+  _info "building admin portal"
+  _run cd /projdocs/apps/admin && npm run build
 }
 
 _install() {
