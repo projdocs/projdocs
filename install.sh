@@ -1,44 +1,48 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 
-set -euo pipefail
+set -eu
 
 # ============================================================
-# Colors (disable by exporting NO_COLOR=1)
+# Colors (POSIX-safe; disable by NO_COLOR=1)
 # ============================================================
-if [[ "${NO_COLOR:-0}" == "1" ]]; then
-  COLOR_RESET="" COLOR_INFO="" COLOR_WARN="" COLOR_ERROR="" COLOR_DEBUG=""
+if [ "${NO_COLOR:-0}" = "1" ]; then
+  COLOR_RESET=""
+  COLOR_INFO=""
+  COLOR_WARN=""
+  COLOR_ERROR=""
+  COLOR_DEBUG=""
 else
-  COLOR_RESET="\033[0m"
-  COLOR_INFO="\033[1;34m"
-  COLOR_WARN="\033[1;33m"
-  COLOR_ERROR="\033[1;31m"
-  COLOR_DEBUG="\033[1;35m"
+  COLOR_RESET="$(printf '\033[0m')"
+  COLOR_INFO="$(printf '\033[1;34m')"
+  COLOR_WARN="$(printf '\033[1;33m')"
+  COLOR_ERROR="$(printf '\033[1;31m')"
+  COLOR_DEBUG="$(printf '\033[1;35m')"
 fi
 
 # ============================================================
-# Logging
+# Logging (POSIX: use printf, not echo -e)
 # ============================================================
 
-_debug() {  # Only prints if DEBUG=1
-  if [[ "${DEBUG:-0}" == "1" ]]; then
-    echo -e "${COLOR_DEBUG}[DEBUG]${COLOR_RESET} $*"
+_debug() {
+  if [ "${DEBUG:-0}" = "1" ]; then
+    printf "%s[DEBUG]%s %s\n" "$COLOR_DEBUG" "$COLOR_RESET" "$*"
   fi
 }
 
 _info() {
-  echo -e "${COLOR_INFO}[ INFO] ${COLOR_RESET} $*"
+  printf "%s[ INFO]%s %s\n" "$COLOR_INFO" "$COLOR_RESET" "$*"
 }
 
 _warn() {
-  echo -e "${COLOR_WARN}[ WARN] ${COLOR_RESET} $*" >&2
+  printf "%s[ WARN]%s %s\n" "$COLOR_WARN" "$COLOR_RESET" "$*" >&2
 }
 
 _error() {
-  echo -e "${COLOR_ERROR}[ERROR]${COLOR_RESET} $*" >&2
+  printf "%s[ERROR]%s %s\n" "$COLOR_ERROR" "$COLOR_RESET" "$*" >&2
 }
 
 _fatal() {
-  echo -e "${COLOR_ERROR}[FATAL]${COLOR_RESET} $*" >&2
+  printf "%s[FATAL]%s %s\n" "$COLOR_ERROR" "$COLOR_RESET" "$*" >&2
   exit 1
 }
 
@@ -48,11 +52,14 @@ _fatal() {
 
 _run() {
   _debug "running command: $*"
-  set +e  # <--- disable exit-on-error temporarily
-  output="$("$@" 2>&1)"
-  local status=$?
-  set -e  # <--- re-enable strict mode
-  if [[ $status -ne 0 ]]; then
+
+  # POSIX cannot disable pipefail; only disable -e safely here
+  set +e
+  output=$("$@" 2>&1)
+  status=$?
+  set -e
+
+  if [ "$status" -ne 0 ]; then
     _error "$output"
     _fatal "command failed ($status): $*"
   else
@@ -61,30 +68,28 @@ _run() {
 }
 
 _run_subshell() {
-  local cmd="$*"
-  _run bash -c "$cmd"
+  cmd="$*"
+  _run sh -c "$cmd"
 }
 
 _require() {
-  local cmd="$1"
-  local msg="${2:-}"
+  cmd="$1"
+  msg="${2:-}"
 
   if ! command -v "$cmd" >/dev/null 2>&1; then
-    if [[ -n "$msg" ]]; then
-      _fatal "$msg"
-    else
-      _fatal "required command '$cmd' not found in PATH"
-    fi
+    [ -n "$msg" ] && _fatal "$msg"
+    _fatal "required command '$cmd' not found in PATH"
   else
     _debug "found required command: $cmd"
   fi
 }
 
 # ============================================================
-# Header
+# Header (POSIX heredoc)
 # ============================================================
+
 _printHeader() {
-cat <<'EOF'
+cat <<EOF
 
   ░█████████               ░█░███████
   ░██     ░██                ░██   ░██
@@ -107,10 +112,6 @@ EOF
 # ============================================================
 
 _install_alpine() {
-  # docker run -it --rm --name alpine-vm --privileged alpine:3.22 /bin/sh
-  # wget -O - https://raw.githubusercontent.com/train360-corp/projdocs/refs/heads/main/install.sh | sh
-
-
   _info "updating base os"
   _run apk update
 
@@ -121,20 +122,23 @@ _install_alpine() {
   _run git clone https://github.com/train360-corp/projdocs.git /projdocs
 
   _info "installing dependencies for admin portal"
-  _run_subshell cd /projdocs && npm ci
+  _run_subshell "cd /projdocs && npm ci"
 
   _info "building admin portal"
-  _run_subshell cd /projdocs/apps/admin && npm run build
+  _run_subshell "cd /projdocs/apps/admin && npm run build"
 }
 
 _install() {
   _info "installing ProjDocs"
-  case "$(uname -s)" in
+
+  os="$(uname -s)"
+
+  case "$os" in
     Linux)
       _debug "os: Linux"
 
       if [ -f /etc/alpine-release ]; then
-        ALPINE_VERSION="$(cat /etc/alpine-release 2>/dev/null)"
+        ALPINE_VERSION=$(cat /etc/alpine-release 2>/dev/null || true)
         _debug "Alpine: $ALPINE_VERSION"
       else
         _debug "/etc/alpine-release not found"
@@ -145,16 +149,17 @@ _install() {
       _install_alpine
       _info "Alpine install complete"
       ;;
+
     Darwin)
-      _debug "detected os: macOS"
-      _fatal "not implemented"
+      _fatal "macOS not implemented"
       ;;
+
     CYGWIN*|MINGW*|MSYS*)
-      _debug "Detected Windows (POSIX environment)"
-      _fatal "not implemented"
+      _fatal "Windows POSIX not implemented"
       ;;
+
     *)
-      _fatal "detected os: $(uname -s)"
+      _fatal "unsupported OS: $os"
       ;;
   esac
 }
@@ -162,8 +167,9 @@ _install() {
 # ============================================================
 # Main
 # ============================================================
+
 _main() {
-  clear || true
+  clear 2>/dev/null || true
   _debug "entering _main"
   _printHeader
   _install
