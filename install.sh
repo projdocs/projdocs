@@ -46,6 +46,19 @@ _fatal() {
 # Utils
 # ============================================================
 
+_run() {
+  _debug "running command: $*"
+  local output
+  output="$("$@" 2>&1)"
+  local status=$?
+  if [[ $status -ne 0 ]]; then
+    _error "$output"
+    _fatal "command failed ($status): $*"
+  else
+    _debug "command completed: $*"
+  fi
+}
+
 _require() {
   local cmd="$1"
   local msg="${2:-}"
@@ -86,18 +99,45 @@ EOF
 # ============================================================
 # OS-Specific Install Logic
 # ============================================================
+
+_install_alpine() {
+  # docker run -it --rm --name alpine-vm --privileged alpine:3.22 /bin/sh
+  # wget -O - https://raw.githubusercontent.com/train360-corp/projdocs/refs/heads/main/install.sh | sh
+
+
+  _info "updating base os"
+  _run apk update
+
+  _info "installing dependencies"
+  _run apk add git nodejs npm
+  _run git clone https://github.com/train360-corp/projdocs.git /projdocs
+  _run cd /projdocs
+  _run npm ci
+  _run cd /projdocs/apps/admin
+  _run npm run build
+}
+
 _install() {
+  _info "installing ProjDocs"
   case "$(uname -s)" in
     Linux)
-      _debug "detected os: Linux"
-      _fatal "not implemented"
+      _debug "os: Linux"
+
+      if [ -f /etc/alpine-release ]; then
+        ALPINE_VERSION="$(cat /etc/alpine-release 2>/dev/null)"
+        _debug "Alpine: $ALPINE_VERSION"
+      else
+        _debug "/etc/alpine-release not found"
+        _fatal "only Alpine Linux is supported"
+      fi
+
+      _info "starting Alpine install"
+      _install_alpine
+      _info "Alpine install complete"
       ;;
     Darwin)
       _debug "detected os: macOS"
-      _require docker "install docker to continue: https://docs.docker.com/desktop/setup/install/mac-install/"
-
-
-      _fatal "implementation not completed"
+      _fatal "not implemented"
       ;;
     CYGWIN*|MINGW*|MSYS*)
       _debug "Detected Windows (POSIX environment)"
@@ -117,7 +157,7 @@ _main() {
   _debug "entering _main"
   _printHeader
   _install
-  _debug "done"
+  _debug "install complete"
 }
 
 _main
