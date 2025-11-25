@@ -2,7 +2,7 @@
 
 set -eu
 
-# docker run -it --rm --name alpine-vm --privileged alpine:3.22 /bin/sh
+# docker run -it --rm --name alpine-vm --privileged -p 3000:3000 alpine:3.22 /bin/sh
 # wget -O - https://raw.githubusercontent.com/train360-corp/projdocs/refs/heads/main/install.sh | sh
 
 # ============================================================
@@ -130,20 +130,27 @@ _install_alpine() {
   _info "building admin portal"
   _run_subshell "cd /projdocs/apps/admin && npm run build"
 
-  if ! id projdocs >/dev/null 2>&1; then
-    _info "creating projdocs service user"
-    _run adduser -S -D -H -s /sbin/nologin projdocs
-  else
-    _info "projdocs user exists"
-  fi
+  # Only install OpenRC service if the system actually supports it
+  if [ -d /etc/init.d ]; then
+    _info "OpenRC detected — configuring service"
 
-  _info "creating OpenRC service"
-  _run_subshell "
-cat > /etc/init.d/projdocs-admin << 'EOF'
+    if ! id projdocs >/dev/null 2>&1; then
+      _info "creating projdocs service user"
+      _run adduser -S -D -H -s /sbin/nologin projdocs
+    else
+      _info "projdocs user exists"
+    fi
+
+    _info "creating OpenRC service"
+    _run_subshell "
+cat << 'EOF' | tee /etc/init.d/projdocs-admin > /dev/null
 #!/sbin/openrc-run
 
 name='projdocs-admin'
 description='ProjDocs Admin Next.js standalone server'
+
+export HOST='0.0.0.0'
+export PORT='3000'
 
 directory='/projdocs/apps/admin/.next/standalone/apps/admin'
 command='/usr/bin/node'
@@ -163,14 +170,20 @@ start_pre() {
 }
 EOF
 "
-  _run chmod +x /etc/init.d/projdocs-admin
-  _info "service file created"
 
-  _info "enabling OpenRC service at boot"
-  _run rc-update add projdocs-admin default
+    _run chmod +x /etc/init.d/projdocs-admin
+    _info "service file created"
 
-  _info "starting ProjDocs Admin service"
-  _run rc-service projdocs-admin start
+    _info "enabling OpenRC service at boot"
+    _run rc-update add projdocs-admin default
+
+    _info "starting ProjDocs Admin service"
+    _run rc-service projdocs-admin start
+
+  else
+    _warn "/etc/init.d not found — skipping OpenRC service setup (Docker Alpine detected)"
+    _warn "admin panel will not start manually (consider a process manager, e.g., supervisor)"
+  fi
 }
 
 _install() {
