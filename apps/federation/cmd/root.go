@@ -3,6 +3,7 @@ package cmd
 import (
 	"fmt"
 	"github.com/train360-corp/projdocs/apps/federation/internal/db"
+	"github.com/train360-corp/projdocs/apps/federation/internal/utils"
 	"github.com/train360-corp/projdocs/apps/federation/pkg/config"
 	"github.com/train360-corp/projdocs/apps/federation/pkg/logger"
 	"go.uber.org/zap/zapcore"
@@ -19,6 +20,7 @@ func NewRootCommand() *cobra.Command {
 		Use:   "federation",
 		Short: "ProjDocs Federation",
 		Long:  `Federation server for centralized control over a ProjDocs cluster.`,
+		Run:   utils.EmptyHelpCmd,
 		PersistentPreRunE: func(cmd *cobra.Command, args []string) error {
 			if err := initializeConfig(cmd); err != nil {
 				return err
@@ -34,12 +36,6 @@ func NewRootCommand() *cobra.Command {
 
 			return nil
 		},
-		Run: func(cmd *cobra.Command, args []string) {
-			err := cmd.Help()
-			if err != nil {
-				logger.Global().Error(err.Error())
-			}
-		},
 	}
 
 	// define the global flags
@@ -47,6 +43,7 @@ func NewRootCommand() *cobra.Command {
 
 	rootCmd.AddCommand(
 		ServeCmd(),
+		InstancesCmd(),
 	)
 
 	return rootCmd
