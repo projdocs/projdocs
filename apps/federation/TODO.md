@@ -1,5 +1,0 @@
-- config
-- per ct
-  - DNS (reserved v available)
-  - password generation OR ssh key
-  - versioning information

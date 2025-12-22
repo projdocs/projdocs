@@ -40,7 +40,11 @@ _main() {
 
       # get the next available VM ID
       _next_id="$(curl -s -H "$AUTH" "$ENDPOINT/cluster/nextid" | jq --raw-output '.data')"
-      # echo "Next ID: $_next_id"
+
+      # reserve the VM ID and get ip
+      _federation_resp=$(curl -s -w "")
+      _federation_body="$(printf '%s' "$_federation_resp" | jq .data.ipv4 )"
+      [ "$_federation_body" = "null" ] || die "failed to federate: $_federation_body"
 
       # create the VM
       _resp="$(
