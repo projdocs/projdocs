@@ -118,72 +118,10 @@ _install_alpine() {
   _info "updating base os"
   _run apk update
 
-  _info "installing dependencies"
-  _run apk add git nodejs npm
-
-  _info "pulling source code"
-  _run git clone https://github.com/train360-corp/projdocs.git /projdocs
-
-  _info "installing dependencies for admin portal"
-  _run_subshell "cd /projdocs && npm ci"
-
-  _info "building admin portal"
-  _run_subshell "cd /projdocs/apps/admin && npm run build"
-
-  # Only install OpenRC service if the system actually supports it
-  if [ -d /etc/init.d ]; then
-    _info "OpenRC detected — configuring service"
-
-    if ! id projdocs >/dev/null 2>&1; then
-      _info "creating projdocs service user"
-      _run adduser -S -D -H -s /sbin/nologin projdocs
-    else
-      _info "projdocs user exists"
-    fi
-
-    _info "creating OpenRC service"
-    _run_subshell "
-cat << 'EOF' | tee /etc/init.d/projdocs-admin > /dev/null
-#!/sbin/openrc-run
-
-name='projdocs-admin'
-description='ProjDocs Admin Next.js standalone server'
-
-export HOST='0.0.0.0'
-export PORT='3000'
-
-directory='/projdocs/apps/admin/.next/standalone/apps/admin'
-command='/usr/bin/node'
-command_args='server.js'
-
-pidfile='/var/run/\${RC_SVCNAME}.pid'
-
-command_user='projdocs:projdocs'
-
-depend() {
-    need net
-    after firewall
-}
-
-start_pre() {
-    checkpath --directory --owner \${command_user%:*}:\${command_user#*:} /var/run
-}
-EOF
-"
-
-    _run chmod +x /etc/init.d/projdocs-admin
-    _info "service file created"
-
-    _info "enabling OpenRC service at boot"
-    _run rc-update add projdocs-admin default
-
-    _info "starting ProjDocs Admin service"
-    _run rc-service projdocs-admin start
-
-  else
-    _warn "/etc/init.d not found — skipping OpenRC service setup (Docker Alpine detected)"
-    _warn "admin panel will not start manually (consider a process manager, e.g., supervisor)"
-  fi
+  _info "installing postgres"
+  _run apk add postgresql17 postgresql17-contrib postgresql17-openrc
+  _run rc-update add postgresql default
+  _run rc-service postgresql start
 }
 
 _install() {

@@ -1,0 +1,10 @@
+
+
+> @workspace/web@0.0.1 build
+> npm run typecheck && next build
+
+[1G[0K
+> @workspace/web@0.0.1 typecheck
+> tsc --noEmit
+
+[1G[0K
