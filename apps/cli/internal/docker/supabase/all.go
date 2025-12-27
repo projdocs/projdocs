@@ -6,17 +6,26 @@ import (
 	"github.com/projdocs/projdocs/apps/cli/internal/docker"
 )
 
-type SupabaseContainerConstructor func(*config.Supabase) docker.ContainerConstructor
-
 func AllC(cfg *config.Supabase) []docker.ContainerConstructor {
 	return []docker.ContainerConstructor{
 		Kong(cfg),
+		Postgres(cfg),
+		Postgrest(cfg),
+		Storage(cfg),
+		Realtime(cfg),
+		Auth(cfg),
 	}
 }
 
-func All(cfg *config.Supabase) ([]*docker.Container, error) {
+func All(cfg *config.Supabase, mergeIn ...docker.SupabaseAbstractContainerConstructor) ([]*docker.Container, error) {
+
 	var containers []*docker.Container
+
 	constructors := AllC(cfg)
+	for _, constructor := range mergeIn {
+		constructors = append(constructors, constructor(cfg))
+	}
+
 	for i, constructor := range constructors {
 		svc, err := constructor()
 		if err != nil {

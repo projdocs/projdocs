@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"github.com/moby/moby/api/pkg/stdcopy"
 	"github.com/moby/moby/client"
 	"path"
 	"strings"
@@ -14,10 +15,9 @@ import (
 // copyToContainer copies a single file's contents into a docker container at file.Path.
 // It creates any missing parent directories with mode 0755 and writes the file as 0644.
 // Ownership will be the container default (usually root:root).
-func copyToContainer(
+func (this *Docker) copyToContainer(
 	ctx context.Context,
-	dkr *client.Client,
-	cid string,
+	c *Container,
 	file *EmbeddedFile,
 ) (*client.CopyToContainerResult, error) {
 	if file.Path == "" || !strings.HasPrefix(file.Path, "/") {
@@ -83,11 +83,47 @@ func copyToContainer(
 	}
 
 	// Extract under "/" so the tar's relative paths land at absolute locations
-	cpy, cpyErr := dkr.CopyToContainer(ctx, cid, client.CopyToContainerOptions{
+	cpy, cpyErr := this.api.CopyToContainer(ctx, c.GetID(), client.CopyToContainerOptions{
 		DestinationPath:           "/",
 		Content:                   bytes.NewReader(buf.Bytes()),
 		AllowOverwriteDirWithFile: true,
 		CopyUIDGID:                false, // do NOT preserve uid/gid from headers; use container defaults
 	})
 	return &cpy, cpyErr
+}
+
+// ExecInContainer runs "cmd" inside container cid and streams output to stdout/stderr
+func (this *Docker) ExecInContainer(ctx context.Context, c *Container, cmd []string) (string, error) {
+
+	execResp, err := this.api.ExecCreate(ctx, c.GetID(), client.ExecCreateOptions{
+		Cmd:          cmd,
+		AttachStdout: true,
+		AttachStderr: true,
+		TTY:          false,
+	})
+	if err != nil {
+		return "", fmt.Errorf("ExecInContainer create failed: %w", err)
+	}
+
+	// attach
+	att, err := this.api.ExecAttach(ctx, execResp.ID, client.ExecAttachOptions{TTY: false})
+	if err != nil {
+		return "", fmt.Errorf("ExecInContainer attach failed: %w", err)
+	}
+	defer att.Close()
+
+	// copy output to local stdout/stderr
+	var buf bytes.Buffer
+	_, _ = stdcopy.StdCopy(&buf, &buf, att.Reader)
+	output := buf.String()
+
+	// check exit code
+	if inspect, err := this.api.ExecInspect(ctx, execResp.ID, client.ExecInspectOptions{}); err != nil {
+		return output, fmt.Errorf("ExecInContainer inspect failed: %w", err)
+	} else {
+		if inspect.ExitCode != 0 {
+			return output, fmt.Errorf("ExecInContainer command exited with code %d", inspect.ExitCode)
+		}
+		return output, nil
+	}
 }

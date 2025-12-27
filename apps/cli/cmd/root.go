@@ -41,7 +41,7 @@ func RootCmd(writer io.Writer) *cobra.Command {
 				} else if !stat.IsDir() {
 					return fmt.Errorf("home dir (%s) is not a directory", home)
 				}
-				logger.Global().Debugf("home dir (%s): %v", home, stat.Sys())
+				logger.Global().Debugf("home dir: %s", home)
 			}
 
 			return nil

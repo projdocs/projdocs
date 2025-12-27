@@ -7,7 +7,7 @@ import (
 	"github.com/projdocs/projdocs/apps/cli/internal/docker/supabase/kong"
 )
 
-var Kong SupabaseContainerConstructor = func(cfg *config.Supabase) docker.ContainerConstructor {
+var Kong docker.SupabaseAbstractContainerConstructor = func(cfg *config.Supabase) docker.ContainerConstructor {
 	return func() (*docker.Container, error) {
 		return &docker.Container{
 			Name:  kong.ContainerName,
@@ -28,6 +28,7 @@ printf '%s' "$_rendered" > /usr/local/kong/kong.yml;
 /docker-entrypoint.sh kong docker-start;`,
 			},
 			Env: []string{
+				fmt.Sprintf("%s=%s", "KONG_STATUS_LISTEN", "127.0.0.1:8100"),
 				fmt.Sprintf("%s=%s", "KONG_DATABASE", "off"),
 				fmt.Sprintf("%s=%s", "KONG_DECLARATIVE_CONFIG", "/usr/local/kong/kong.yml"),
 				fmt.Sprintf("%s=%s", "KONG_DNS_ORDER", "LAST,A,CNAME"),

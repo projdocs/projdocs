@@ -16,7 +16,7 @@ func GetHomeDir() (string, error) {
 		if err != nil {
 			return "", err
 		}
-		return path.Join(path.Dir(binaryPath), "app-data"), nil
+		return path.Join(path.Dir(path.Dir(binaryPath)), "app-data"), nil
 	default:
 		return "", fmt.Errorf("OS %s not supported", runtime.GOOS)
 	}
