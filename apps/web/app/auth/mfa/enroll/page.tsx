@@ -37,7 +37,23 @@ export default function Page() {
 
   useEffect(() => {
     const supabase = createClient();
-    supabase.auth.mfa.listFactors().then(console.log)
+
+    const cleanup = () => {
+      supabase.auth.mfa.listFactors().then( ({ data }) => {
+        if(!data) return;
+        data.all // un-enroll any unverified factors to free-up namespace
+          .filter(factor => factor.status === "unverified")
+          .forEach(async (factor) => await supabase.auth.mfa.unenroll({
+            factorId: factor.id,
+          }))
+      })
+    }
+
+    // clean on mount
+    cleanup();
+
+    // clean on unmount
+    return cleanup;
   }, [])
 
   return (
@@ -122,7 +138,7 @@ export default function Page() {
                 variant="outline"
                 onClick={async () => {
                   const action = steps[currentStep - 1]?.beforeNext;
-                  const cont = action ? await action(store) : { canContinue: true };
+                  const cont = action ? await action(store, router) : { canContinue: true };
                   if (!cont.canContinue) {
                     toast.error("A validation error occurred", { description: cont.error });
                     return;

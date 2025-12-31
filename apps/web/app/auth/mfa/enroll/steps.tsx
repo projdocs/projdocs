@@ -20,6 +20,9 @@ import { Label } from "@workspace/ui/components/label";
 import { Input } from "@workspace/ui/components/input";
 import { Spinner } from "@workspace/ui/components/spinner";
 import { useRouter } from "next/navigation";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@workspace/ui/components/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 
 
@@ -75,7 +78,7 @@ export const steps: ReadonlyArray<{
   title: string;
   icon: LucideIcon;
   component: (store: SetupMFAStore) => ReactNode;
-  beforeNext?: (store: SetupMFAStore) => Promise<{ canContinue: boolean; error?: string }>;
+  beforeNext?: (store: SetupMFAStore, router: AppRouterInstance) => Promise<{ canContinue: boolean; error?: string }>;
 }> = [
   {
     title: "Type",
@@ -124,8 +127,9 @@ export const steps: ReadonlyArray<{
             value={store.state.options.name}
             onChange={e => store.set("options", "name", e.target.value)}
           />
-          <P
-            className={"text-muted-foreground"}>{"Enter a unique name that will help you identify this authentication device or application in the future."}</P>
+          <P className={"text-muted-foreground"}>
+            {"Enter a unique name that will help you identify this authentication device or application in the future."}
+          </P>
 
         </div>
       );
@@ -138,18 +142,18 @@ export const steps: ReadonlyArray<{
 
       // gen qr code
       if (store.state.options.type === "totp") {
-        createClient().auth.mfa.enroll({
+        const { data, error } = await createClient().auth.mfa.enroll({
           factorType: "totp",
           friendlyName: store.state.options.name.trim(),
-        }).then(({ data, error }) => {
-          if (error) {
-            toast.error(`Unexpected Error: ${error.message}`);
-            return;
-          }
-          store.replace("totp", {
-            factorId: data.id,
-            qrCode: data.totp.qr_code
-          });
+        });
+        if (error) {
+          toast.error(`Unexpected Error: ${error.message}`);
+          return { canContinue: false, error: error.message };
+        }
+        store.replace("totp", {
+          factorId: data.id,
+          qrCode: data.totp.qr_code,
+          value: "",
         });
       }
 
@@ -194,8 +198,9 @@ export const steps: ReadonlyArray<{
             <div className={"flex flex-col items-center justify-center"}>
 
               <H4>{"Scan QR Code"}</H4>
-              <P
-                className={"text-muted-foreground w-1/2 text-center mb-2"}>{"Scan the QR Code below in your authenticator app. Press the Next button when you're ready to continue."}</P>
+              <P className={"text-muted-foreground w-1/2 text-center mb-2"}>
+                {"Scan the QR Code below in your authenticator app. Press the Next button when you're ready to continue."}
+              </P>
 
               {store.state.totp.qrCode ? (
                 <img alt={"QR Code"} className={"w-[200px] h-[200px]"} src={store.state.totp.qrCode}/>
@@ -218,8 +223,53 @@ export const steps: ReadonlyArray<{
   {
     title: "Verify",
     icon: ShieldCheckIcon,
-    component: () => {
-      return null;
+    component: (store) => {
+      return (
+        <div className={"w-full flex flex-col items-center justify-center mb-4 gap-8"}>
+
+          <div className={"w-full flex flex-col items-center justify-center"}>
+            <H4>{"Enter Code"}</H4>
+            <P
+              className={"text-center w-1/2"}>{"Enter the 6-digit code from your authenticator application below to continue."}</P>
+          </div>
+
+          <InputOTP
+            value={store.state.totp.value}
+            onChange={(value) => store.set("totp", "value", value)}
+            maxLength={6}
+            pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+          >
+            <InputOTPGroup>
+              <InputOTPSlot index={0}/>
+              <InputOTPSlot index={1}/>
+              <InputOTPSlot index={2}/>
+              <InputOTPSlot index={3}/>
+              <InputOTPSlot index={4}/>
+              <InputOTPSlot index={5}/>
+            </InputOTPGroup>
+          </InputOTP>
+        </div>
+      );
+    },
+    beforeNext: async (store, router) => {
+
+      const supabase = createClient();
+
+      const resp = await supabase.auth.mfa.challengeAndVerify({
+        factorId: store.state.totp.factorId!,
+        code: store.state.totp.value!
+      });
+
+      if (resp.error) return {
+        canContinue: false,
+        error: resp.error.message
+      };
+
+      const { data } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+      if (data?.currentLevel !== "aal2") router.push("/auth/mfa/verify");
+      else router.push("/dashboard");
+
+      return { canContinue: true };
     }
   }
 ];

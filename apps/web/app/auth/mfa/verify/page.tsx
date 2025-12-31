@@ -30,7 +30,9 @@ import { createClient } from "@workspace/supabase/client";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@workspace/ui/components/skeleton";
 import { Spinner } from "@workspace/ui/components/spinner";
-import { OTPForm } from "@workspace/ui/components/otp-form";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@workspace/ui/components/input-otp";
+import { REGEXP_ONLY_DIGITS_AND_CHARS } from "input-otp";
+import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
 
 
 
@@ -59,31 +61,72 @@ type EnrolledMethod = AvailableMethod & {
 
 const EnrolledMFA = (props: EnrolledMethod & {
   onClick: () => Promise<void>;
-}) => {
-
-  return (
-    <Card
-      onClick={props.onClick}
-      className={"w-full transition-colors hover:bg-muted cursor-pointer"}>
-      <CardHeader className={"flex flex-row items-center gap-4"}>
-        <props.icon className={"w-[50px] h-[50px] shrink-0"}/>
-        <div className={"flex flex-col"}>
-          <CardTitle>{props.friendlyName}</CardTitle>
-          <CardDescription>{props.title}</CardDescription>
-        </div>
-      </CardHeader>
-    </Card>
-  );
-
-};
+}) => (
+  <Card
+    onClick={props.onClick}
+    className={"w-full transition-colors hover:bg-muted cursor-pointer"}>
+    <CardHeader className={"flex flex-row items-center gap-4"}>
+      <props.icon className={"w-[50px] h-[50px] shrink-0"}/>
+      <div className={"flex flex-col"}>
+        <CardTitle>{props.friendlyName}</CardTitle>
+        <CardDescription>{props.title}</CardDescription>
+      </div>
+    </CardHeader>
+  </Card>
+);
 
 const QRCodeChallengeAndVerify = (props: {
-  method: EnrolledMethod
+  method: EnrolledMethod;
 }) => {
 
+  const router = useRouter();
+  const [value, setValue] = useState<string>("");
+
   return (
-    <OTPForm />
-  )
+    <div className={"w-full flex flex-col items-center justify-center mb-4 gap-8"}>
+
+      <div className={"w-full flex flex-col items-center justify-center"}>
+        <H4>{"Enter Code"}</H4>
+        <P className={"text-center w-1/2"}>{"Enter the 6-digit code from your authenticator application below to continue."}</P>
+      </div>
+
+      <InputOTP
+        value={value}
+        onChange={setValue}
+        maxLength={6}
+        pattern={REGEXP_ONLY_DIGITS_AND_CHARS}
+      >
+        <InputOTPGroup>
+          <InputOTPSlot index={0}/>
+          <InputOTPSlot index={1}/>
+          <InputOTPSlot index={2}/>
+          <InputOTPSlot index={3}/>
+          <InputOTPSlot index={4}/>
+          <InputOTPSlot index={5}/>
+        </InputOTPGroup>
+      </InputOTP>
+
+      <Button
+        disabled={value.length !== 6}
+        className={"w-[216px]"}
+        onClick={async () => {
+
+          const supabase = createClient();
+          const verify = await supabase.auth.mfa.challengeAndVerify({
+            code: value,
+            factorId: props.method.id,
+          })
+          if (verify.error) {
+            toast.error("Unable to Verify Code!", { description: verify.error.message })
+            return;
+          }
+          router.push("/dashboard");
+        }}
+      >
+        {"Verify"}
+      </Button>
+    </div>
+  );
 
 };
 
@@ -192,12 +235,13 @@ const steps: ReadonlyArray<{
   {
     title: "Verify",
     icon: ShieldCheckIcon,
+    disableNext: true,
     component: (props) => {
       switch (props.method?.value) {
         case "webauthn":
-          return (
-            <WebAuthnChallengeAndVerify method={props.method}/>
-          );
+          return (<WebAuthnChallengeAndVerify method={props.method}/>);
+        case "totp":
+          return (<QRCodeChallengeAndVerify method={props.method}/>);
         default:
           return (<Spinner/>);
       }
@@ -238,6 +282,9 @@ export default function Page() {
       setMethods([ ...webauthnMethods, ...qrCodeMethods ]);
     });
   }, []);
+
+  const disableNext = steps[currentStep-1]!.disableNext
+
 
 
   return (
@@ -302,14 +349,15 @@ export default function Page() {
 
             </StepperPanel>
             <div className="flex items-center justify-between gap-2.5">
-              <Button
-                variant="outline"
-                onClick={async () => setCurrentStep((prev) => prev - 1)}
-                disabled={currentStep === 1}
-              >
-                {"Previous"}
-              </Button>
-              {!steps[currentStep]?.disableNext && (
+              { currentStep > 1 && (
+                <Button
+                  variant="outline"
+                  onClick={async () => setCurrentStep((prev) => prev - 1)}
+                >
+                  {"Previous"}
+                </Button>
+              ) }
+              {!disableNext && (
                 <Button
                   variant="outline"
                   onClick={next}

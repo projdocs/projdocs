@@ -17,6 +17,7 @@ export type SetupMFAState = {
   totp: {
     qrCode: string | null;
     factorId: string | null;
+    value: string;
   };
 };
 
@@ -27,7 +28,8 @@ const defaultState: SetupMFAState = {
   },
   totp: {
     qrCode: null,
-    factorId: null
+    factorId: null,
+    value: "",
   },
 } satisfies SetupMFAStateSchema & SetupMFAState;
 
