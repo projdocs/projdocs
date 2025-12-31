@@ -6,12 +6,14 @@ export {};
 
 export type RuntimeEnvironment = SupabaseRuntimeEnvironment & {
   MODE: "self-hosted" | "standalone";
+  HOSTNAME: string;
 };
 
 export type BrowserRuntimeEnvironment = Pick<RuntimeEnvironment,
   | "MODE"
   | "SUPABASE_PUBLIC_KEY"
   | "SUPABASE_PUBLIC_URL"
+  | "HOSTNAME"
 >
 
 

@@ -53,14 +53,14 @@ insert into projects (client_id, name) values
     ((select id from clients where name = 'Rekall Inc.'), 'Memory Implant Catalog'),
     ((select id from clients where name = 'Rekall Inc.'), 'Neural Stability Testing'),
 
-    ((select id from clients where name = 'E Corp (Evil Corp)'), 'Stage 2 Implementation'),
-    ((select id from clients where name = 'E Corp (Evil Corp)'), 'Banking Division Upgrade'),
+    ((select id from clients where name = 'E Corp'), 'Stage 2 Implementation'),
+    ((select id from clients where name = 'E Corp'), 'Banking Division Upgrade'),
 
     ((select id from clients where name = 'Globex Corporation'), 'Hammock District'),
     ((select id from clients where name = 'Globex Corporation'), 'Cypress Creek Relocation'),
 
-    ((select id from clients where name = 'GNB (Goliath National Bank)'), 'Executive Floor Remodel'),
-    ((select id from clients where name = 'GNB (Goliath National Bank)'), 'Ted Mosby Building Project'),
+    ((select id from clients where name = 'Goliath National Bank'), 'Executive Floor Remodel'),
+    ((select id from clients where name = 'Goliath National Bank'), 'Ted Mosby Building Project'),
 
     ((select id from clients where name = 'GreenTech'), 'Eco Initiative'),
     ((select id from clients where name = 'GreenTech'), 'Carbon Credit Management');

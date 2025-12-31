@@ -40,7 +40,7 @@ export function LoginForm({ className, ...props }: ComponentPropsWithoutRef<"div
           });
           if (r.error) throw r.error;
 
-          const res = await fetch("/api/v1/auth/desktop")
+          const res = await fetch("/api/v1/auth/desktop");
 
           if (res.status !== 200) {
             throw new Error(res.statusText);
@@ -72,8 +72,24 @@ export function LoginForm({ className, ...props }: ComponentPropsWithoutRef<"div
             password,
           });
           if (error) throw error;
-          // Update this route to redirect to an authenticated route. The user already has an active session.
-          router.push("/dashboard");
+
+          // handle MFA
+          const levels = await supabase.auth.mfa.getAuthenticatorAssuranceLevel();
+          if (levels.error) throw levels.error;
+
+          // SEE: https://supabase.com/docs/guides/auth/auth-mfa/totp#add-a-challenge-step-to-login
+          if (levels.data.currentLevel === "aal1") {
+            switch (levels.data.nextLevel) {
+              case "aal1": // User does not have MFA enrolled.
+                router.push("/auth/mfa/enroll");
+                break;
+              case "aal2": // User has an MFA factor enrolled but has not verified it.
+                router.push("/auth/mfa/verify");
+                break;
+            }
+          } else {
+            router.push("/dashboard");
+          }
           break;
         default:
           throw new Error(`Rediect Type "${query.get("redirect-type")}" is unhandled!`);

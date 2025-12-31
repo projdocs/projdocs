@@ -70,6 +70,15 @@ var Auth docker.SupabaseAbstractContainerConstructor = func(cfg *config.Supabase
 
 				fmt.Sprintf("%s=%s", "GOTRUE_EXTERNAL_PHONE_ENABLED", "false"),
 				fmt.Sprintf("%s=%s", "GOTRUE_SMS_AUTOCONFIRM", "false"),
+
+				// MFA
+				"GOTRUE_MFA_PHONE_ENROLL_ENABLED=false",
+				"GOTRUE_MFA_PHONE_VERIFY_ENABLED=false",
+				"GOTRUE_MFA_TOTP_ENROLL_ENABLED=true",
+				"GOTRUE_MFA_TOTP_VERIFY_ENABLED=true",
+				"GOTRUE_MFA_WEB_AUTHN_ENROLL_ENABLED=true",
+				"GOTRUE_MFA_WEB_AUTHN_VERIFY_ENABLED=true",
+				"GOTRUE_MFA_MAX_ENROLLED_FACTORS=10",
 			},
 		}, nil
 	}

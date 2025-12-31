@@ -31,11 +31,6 @@ type DatabaseConfig struct {
 	Password      string
 }
 
-type LogFlareConfig struct {
-	PrivateKey string
-	PublicKey  string
-}
-
 type KongSMTPFromConfig struct {
 	Email string
 	Name  string
@@ -63,7 +58,6 @@ type Supabase struct {
 	Database  DatabaseConfig
 	Storage   StorageConfig
 	Dashboard DashboardConfig
-	LogFlare  LogFlareConfig
 	Keys      KeysConfig
 	Kong      KongConfig
 }
@@ -95,10 +89,6 @@ func NewSupabase(vaultEncryptionKey string, homeDir string) (*Supabase, error) {
 		Dashboard: DashboardConfig{
 			Username: utils.RandomString(32),
 			Password: utils.RandomString(32),
-		},
-		LogFlare: LogFlareConfig{
-			PrivateKey: utils.RandomString(32),
-			PublicKey:  utils.RandomString(32),
 		},
 		Kong: KongConfig{
 			URLs: KongURLsConfig{

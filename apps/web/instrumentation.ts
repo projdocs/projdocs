@@ -17,24 +17,33 @@ const green = (s: string) => {
 /**
  * called once on app start
  */
-export function register() {
+export async function register() {
 
   const runtime: RuntimeEnvironment = {
     SUPABASE_JWT_SECRET: "",
     SUPABASE_PUBLIC_URL: "",
     SUPABASE_PUBLIC_KEY: "",
-    MODE: "self-hosted"
-  }
+    HOSTNAME: "",
+    MODE: "self-hosted",
+  };
 
   // check environment variables
   for (const envKey of Object.keys(runtime)) {
     if (!process.env[envKey]?.trim()) {
-      console.error(` ${red("✗")} Runtime environment variable "${envKey}" is not defined!`);
-      process.exitCode = 1;
-      process.exit(1);
+      throw new Error(` ${red("✗")} Runtime environment variable "${envKey}" is not defined!`);
     } else {
       console.log(` ${green("✓")} Runtime environment variable "${envKey}" set`);
     }
+  }
+
+  // check supabase connection
+  const base = process.env.SUPABASE_PUBLIC_URL?.replace(/\/$/, "");
+  try {
+    const resp = await fetch(`${base}/auth/v1/health`);
+    const data = await resp.json();
+    console.log(` ${green("✓")} Connected to Supabase (Auth ${data.version})`);
+  } catch (error) {
+    throw new Error(`cannot connect to supabase: ${error}`);
   }
 
 }

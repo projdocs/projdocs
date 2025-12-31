@@ -1,12 +1,13 @@
 "use client";
 import { ReactNode } from "react";
-import { DashboardLayout } from "@workspace/web/components/_layout";
+import { DashboardLayout } from "@workspace/web/components/layout";
 
 
 
 export default function Layout({ children }: {
   children: ReactNode;
 }) {
+
   return (
     <DashboardLayout>
       {children}

@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="SqlDialectMappings">
-    <file url="file://$PROJECT_DIR$/apps/admin" dialect="SQLite" />
+    <file url="file://$PROJECT_DIR$/supabase/migrations/20251228203329_chore: use display domain.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/supabase/migrations/20251229071832_chore: enable realtime on company.sql" dialect="PostgreSQL" />
+    <file url="file://$PROJECT_DIR$/supabase/seeds/2_users.sql" dialect="PostgreSQL" />
     <file url="PROJECT" dialect="PostgreSQL" />
   </component>
 </project>

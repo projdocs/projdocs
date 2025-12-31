@@ -56,6 +56,8 @@ BEGIN
 
   -- Seed users
   PERFORM __seed_user('Harvey', 'Specter', 'harvey@pearsonspecter.com');
+  INSERT INTO public.admins (id) values ((select id from auth.users a where a.email = 'harvey@pearsonspecter.com' limit 1));
+
   PERFORM __seed_user('Mike', 'Ross', 'mike@pearsonspecter.com');
   PERFORM __seed_user('Jessica', 'Pearson', 'jessica@pearsonspecter.com');
   PERFORM __seed_user('Louis', 'Litt', 'louis@pearsonspecter.com');

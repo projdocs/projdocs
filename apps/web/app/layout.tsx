@@ -4,6 +4,8 @@ import { ThemeProvider } from "@workspace/ui/components/theme-provider";
 import { Toaster } from "@workspace/ui/components/sonner";
 import { ReactNode } from "react";
 import * as process from "node:process";
+import { AuthProvider } from "@workspace/web/components/auth-provider";
+import { BrowserRuntimeEnvironment } from "@workspace/web/types/env";
 
 
 
@@ -17,9 +19,16 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 });
 
-export default function RootLayout({
-                                     children,
-                                   }: Readonly<{
+function getWindowEnv(): BrowserRuntimeEnvironment {
+  return {
+    MODE: process.env.MODE,
+    SUPABASE_PUBLIC_URL: process.env.SUPABASE_PUBLIC_URL,
+    SUPABASE_PUBLIC_KEY: process.env.SUPABASE_PUBLIC_KEY,
+    HOSTNAME: process.env.HOSTNAME,
+  }
+}
+
+export default function RootLayout({ children, }: Readonly<{
   children: ReactNode
 }>) {
   return (
@@ -30,18 +39,7 @@ export default function RootLayout({
     <body
       className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
     >
-    {/*<script>*/}
-    {/*  {"window.env = {" +*/}
-    {/*    `'SUPABASE_PUBLIC_URL':'${process.env.SUPABASE_PUBLIC_URL}',` +*/}
-    {/*    `'SUPABASE_PUBLIC_KEY':'${process.env.SUPABASE_PUBLIC_KEY}'` +*/}
-    {/*    "};console.log(window.env);"}*/}
-    {/*</script>*/}
-    <script>{`
-  window.env = {
-    SUPABASE_PUBLIC_URL: '${process.env.SUPABASE_PUBLIC_URL}',
-    SUPABASE_PUBLIC_KEY: '${process.env.SUPABASE_PUBLIC_KEY}'
-  };
-`}</script>
+    <script>{`window.env = ${JSON.stringify(getWindowEnv())};`}</script>
     <Toaster/>
     <ThemeProvider
       attribute="class"
@@ -50,7 +48,9 @@ export default function RootLayout({
       disableTransitionOnChange
       enableColorScheme
     >
-      {children}
+      <AuthProvider>
+        {children}
+      </AuthProvider>
     </ThemeProvider>
     </body>
     </html>

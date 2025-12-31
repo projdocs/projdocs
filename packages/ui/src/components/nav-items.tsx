@@ -19,7 +19,7 @@ export const icons = [
 
 export const sections: readonly NavSection[] = [
   {
-    title: undefined,
+    title: "Landing",
     items: [
       {
         name: "Dashboard",
@@ -60,5 +60,10 @@ export const sections: readonly NavSection[] = [
         isComingSoon: true
       },
     ]
+  },
+  {
+    title: "Admin",
+    isAdmin: true,
+    items: []
   }
 ];

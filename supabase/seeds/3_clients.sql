@@ -15,7 +15,7 @@ insert into clients (name) values
     ('Chartwell Pharmaceuticals'),
     ('Strickland Propane'),
     ('Rekall Inc.'),
-    ('E Corp (Evil Corp)'),
+    ('E Corp'),
     ('Globex Corporation'),
-    ('GNB (Goliath National Bank)'),
+    ('Goliath National Bank'),
     ('GreenTech');

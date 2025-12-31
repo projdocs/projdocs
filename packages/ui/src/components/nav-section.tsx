@@ -20,6 +20,7 @@ export type NavSectionItem = {
 export type NavSection = {
   title: string | undefined;
   items: readonly NavSectionItem[];
+  isAdmin?: true;
 }
 
 const Icon = ({ item }: {
