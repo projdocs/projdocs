@@ -5,9 +5,7 @@ import { useEffect, useState } from "react";
 import { createClient } from "@workspace/supabase/client";
 import { Tables } from "@workspace/supabase/types.gen";
 import { toast } from "sonner";
-import { createColumnHelper, flexRender, getCoreRowModel, TableOptions, useReactTable } from "@tanstack/react-table";
-
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, } from "@workspace/ui/components/table";
+import { createColumnHelper, TableOptions } from "@tanstack/react-table";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import {
   DropdownMenu,
@@ -29,17 +27,20 @@ import {
   CommandItem,
   CommandList
 } from "@workspace/ui/components/command";
+import { DataTable } from "@workspace/ui/components/data-table";
+import { useEventListener } from "@workspace/web/hooks/use-event-listener";
 
+const REFRESH_EVENT = `SUPABASE_ADMIN_REFRESH_REQUEST`;
 
 
 type User = Tables<"admins"> & {
   user: Tables<"users">;
 }
 
-const c = createColumnHelper<User>();
+const newColumn = createColumnHelper<User>();
 
 const columns: TableOptions<User>["columns"] = [
-  c.display({
+  newColumn.display({
     id: "avatar",
     cell: ({ row }) => (
       <Avatar>
@@ -48,20 +49,20 @@ const columns: TableOptions<User>["columns"] = [
       </Avatar>
     )
   }),
-  c.accessor("user.first_name", {
+  newColumn.accessor("user.first_name", {
     header: "First Name"
   }),
-  c.accessor("user.last_name", {
+  newColumn.accessor("user.last_name", {
     header: "Last Name",
   }),
-  c.accessor("created_at", {
+  newColumn.accessor("created_at", {
     header: "Admin Since",
     cell: ({ row }) => DateTime.fromISO(row.original.created_at).toRelative()
   }),
-  c.accessor("user.id", {
+  newColumn.accessor("user.id", {
     header: "ID"
   }),
-  c.display({
+  newColumn.display({
     id: "options",
     cell: ({ row }) => (
       <DropdownMenu>
@@ -80,7 +81,7 @@ const columns: TableOptions<User>["columns"] = [
                                                                                                                            }) => {
                 if (data === null && error === null) toast.error("Cannot Demote Self!", { description: "You cannot demote your own account. Add another administrator, who can then demote your account to a standard user." });
                 else if (error) toast.error("Unable to Demote User!", { description: error.message });
-                else window.dispatchEvent(new CustomEvent(refreshEvent));
+                else useEventListener.RemoteDispatch(REFRESH_EVENT, null);
               })}
             >
               {"Demote to Standard User"}
@@ -91,72 +92,6 @@ const columns: TableOptions<User>["columns"] = [
     )
   })
 ];
-
-
-interface DataTableProps<TData, TValue> {
-  columns: TableOptions<TData>["columns"];
-  data: TData[];
-}
-
-export function DataTable<TData, TValue>({
-                                           columns,
-                                           data,
-                                         }: DataTableProps<TData, TValue>) {
-  const table = useReactTable<TData>({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-  });
-
-  return (
-    <div className="overflow-hidden rounded-md border">
-      <Table>
-        <TableHeader className="bg-muted sticky top-0 z-10">
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead key={header.id}>
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && "selected"}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id}>
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
-    </div>
-  );
-}
-
-const refreshEvent = `SUPABASE_ADMIN_REFRESH_REQUEST`;
 
 const PromoteUserButton = (props: {
   onAdd: () => void;
@@ -239,11 +174,8 @@ export default function Page() {
   // load once on mount
   useEffect(refresh, []);
 
-  // listen for refresh changes
-  useEffect(() => {
-    window.addEventListener(refreshEvent, refresh);
-    return () => window.removeEventListener(refreshEvent, refresh);
-  }, []);
+  // refresh on changes
+  useEventListener(REFRESH_EVENT, refresh);
 
   return (
     <div className={"flex flex-col p-6 gap-6"}>
