@@ -23,6 +23,7 @@ export async function register() {
     SUPABASE_JWT_SECRET: "",
     SUPABASE_PUBLIC_URL: "",
     SUPABASE_PUBLIC_KEY: "",
+    SUPABASE_PRIVATE_KEY: "",
     HOSTNAME: "",
     MODE: "self-hosted",
   };

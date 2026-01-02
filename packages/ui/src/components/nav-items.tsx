@@ -82,7 +82,11 @@ export const sections: readonly NavSection[] = [
             url: "/dashboard/admin/org"
           },
           {
-            name: "Admins",
+            name: "Users",
+            url: "/dashboard/admin/org/users",
+          },
+          {
+            name: "Administrators",
             url: "/dashboard/admin/org/admins"
           }
         ],

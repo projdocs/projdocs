@@ -9,6 +9,7 @@ export type SupabaseRuntimeEnvironment = {
   SUPABASE_JWT_SECRET: string;
   SUPABASE_PUBLIC_URL: string;
   SUPABASE_PUBLIC_KEY: string;
+  SUPABASE_PRIVATE_KEY: string;
 };
 
 export type SupabaseBrowserRuntimeEnvironment = Pick<SupabaseRuntimeEnvironment,

@@ -1,6 +1,6 @@
 "use client";
 
-import { H1 } from "@workspace/ui/components/text";
+import { H1, InlineCode } from "@workspace/ui/components/text";
 import { useEffect, useState } from "react";
 import { createClient } from "@workspace/supabase/client";
 import { Tables } from "@workspace/supabase/types.gen";
@@ -60,7 +60,12 @@ const columns: TableOptions<User>["columns"] = [
     cell: ({ row }) => DateTime.fromISO(row.original.created_at).toRelative()
   }),
   newColumn.accessor("user.id", {
-    header: "ID"
+    header: "ID",
+    cell: ({ row }) => (
+      <div className={"flex flex-row justify-between"}>
+        <InlineCode>{row.original.user.id}</InlineCode>
+      </div>
+    )
   }),
   newColumn.display({
     id: "options",
