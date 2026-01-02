@@ -32,11 +32,7 @@ export function DashboardLayout({ children, }: {
     >
       <AppSidebar
         variant={"inset"}
-        auth={{
-          company: store.state.auth.company,
-          user: store.state.auth.user,
-          isAdmin: undefined,
-        }}
+        auth={store.state.auth}
         router={{
           path: path,
           navigate: (url) => router.push(url),

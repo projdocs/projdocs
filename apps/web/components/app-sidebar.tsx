@@ -9,10 +9,10 @@ import {
 } from "@workspace/ui/components/sidebar";
 import { sections } from "@workspace/ui/components/nav-items";
 import { ComponentProps } from "react";
-import { Tables } from "@workspace/supabase/types.gen";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
 import { BuildingIcon } from "lucide-react";
 import { NavUser } from "@workspace/web/components/nav-user";
+import { AppState } from "@workspace/web/store";
 
 
 
@@ -21,11 +21,7 @@ type AppSidebarProps = ComponentProps<typeof Sidebar> & {
     path: string;
     navigate: (url: string) => void;
   }
-  auth?: {
-    company: Tables<"company"> | null | undefined;
-    user: Tables<"users"> | null | undefined;
-    isAdmin: boolean | undefined;
-  }
+  auth?: AppState["auth"];
 }
 
 
@@ -60,9 +56,9 @@ export function AppSidebar({ router, auth, ...props }: AppSidebarProps) {
         ))}
       </SidebarContent>
       <SidebarFooter>
-        { !!auth?.user && (
-          <NavUser user={auth.user} navigate={router.navigate} />
-        ) }
+        {!!auth?.user && (
+          <NavUser auth={auth.meta} user={auth.user} navigate={router.navigate}/>
+        )}
       </SidebarFooter>
     </Sidebar>
   );

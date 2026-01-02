@@ -14,31 +14,38 @@ const refresh = async (supabase: SupabaseClient, store: AppsStore): Promise<void
   const { data, error } = await supabase.auth.getUser();
   if (error) {
     if (!(error instanceof AuthSessionMissingError)) console.error(`auth error: ${error}`);
-    store.replace("auth", { company: null, user: null });
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
     return;
   } else if (data.user === null) {
-    store.replace("auth", { company: null, user: null });
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
     return;
   }
 
   const user = await supabase.from("users").select().eq("id", data.user.id).maybeSingle();
   if (user.error) {
     console.error(`auth: user error: ${user.error}`);
-    store.replace("auth", { company: null, user: null });
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
     return;
   } else if (!user.data) {
-    store.replace("auth", { company: null, user: null });
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
     return;
   }
 
   const company = await supabase.from("company").select().single();
   if (company.error) {
     console.error(`auth: company error: ${company.error}`);
-    store.replace("auth", { company: null, user: null });
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
     return;
   }
 
-  store.replace("auth", { company: company.data, user: user.data });
+  const isAdmin = await supabase.from("admins").select().eq("id", user.data.id).maybeSingle();
+  if (isAdmin.error) {
+    console.error(`auth: admin error: ${isAdmin.error}`);
+    store.replace("auth", { company: null, user: null, meta: null, isAdmin: null });
+    return;
+  }
+
+  store.replace("auth", { company: company.data, user: user.data, meta: data.user, isAdmin: isAdmin.data !== null });
   return;
 };
 

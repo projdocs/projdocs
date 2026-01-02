@@ -15,11 +15,13 @@ import { SidebarMenu, SidebarMenuButton, SidebarMenuItem, } from "@workspace/ui/
 import { Tables } from "@workspace/supabase/types";
 import { LogOutIcon } from "lucide-react";
 import { createClient } from "@workspace/supabase/client";
+import { User } from "@supabase/supabase-js";
 
 
 
-export function NavUser({ user, navigate }: {
+export function NavUser({ user, navigate, auth }: {
   user: Tables<"users">;
+  auth: User;
   navigate: (url: string) => void;
 }) {
 
@@ -40,7 +42,7 @@ export function NavUser({ user, navigate }: {
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{user.full_name}</span>
                 <span className="text-muted-foreground truncate text-xs">
-                  {user.id}
+                  {auth.email}
                 </span>
               </div>
               <IconDotsVertical className="ml-auto size-4"/>
@@ -61,7 +63,7 @@ export function NavUser({ user, navigate }: {
                 <div className="grid flex-1 text-left text-sm leading-tight">
                   <span className="truncate font-medium">{user?.full_name}</span>
                   <span className="text-muted-foreground truncate text-xs">
-                    {user.id}
+                    {auth.email}
                   </span>
                 </div>
               </div>

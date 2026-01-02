@@ -77,7 +77,7 @@ export const P = React.forwardRef<
 >(({ className, children, ...props }, ref) => (
   <p
     ref={ref}
-    className={cn(className)}
+    className={cn("leading-tight", className)}
     {...props}
   >
     {children}

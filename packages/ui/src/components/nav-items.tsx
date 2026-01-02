@@ -5,17 +5,23 @@ import {
   IconDatabaseStar,
   IconFolderStar,
   IconListDetails,
-  IconUsers
+  IconUsers,
+  TablerIcon
 } from "@tabler/icons-react";
+import { GlobeIcon, LucideIcon, SquareFunctionIcon } from "lucide-react";
 
-export const icons = [
+
+
+export const icons: readonly (LucideIcon | TablerIcon)[] = [
   IconDashboard,
   IconUsers,
   IconListDetails,
   IconDatabase,
   IconDatabaseStar,
-  IconFolderStar
-]
+  IconFolderStar,
+  SquareFunctionIcon,
+  GlobeIcon,
+];
 
 export const sections: readonly NavSection[] = [
   {
@@ -64,6 +70,40 @@ export const sections: readonly NavSection[] = [
   {
     title: "Admin",
     isAdmin: true,
-    items: []
+    items: [
+      {
+        name: "Organization",
+        pathStartsWith: "/dashboard/admin/org",
+        icon: 7,
+        items: [
+          {
+            name: "Settings",
+            isComingSoon: true,
+            url: "/dashboard/admin/org"
+          },
+          {
+            name: "Admins",
+            url: "/dashboard/admin/org/admins"
+          }
+        ],
+      },
+      {
+        name: "Clients",
+        pathStartsWith: "/dashboard/admin/clients",
+        icon: 3,
+        items: [
+          {
+            name: "Manage",
+            isComingSoon: true,
+            url: "/dashboard/admin/clients",
+          },
+          {
+            name: "Automations",
+            isComingSoon: true,
+            url: "/dashboard/admin/clients/automations"
+          }
+        ]
+      }
+    ]
   }
 ];
