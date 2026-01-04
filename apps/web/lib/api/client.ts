@@ -2,7 +2,7 @@ import axios, { AxiosInstance } from "axios";
 
 
 
-export const BackendAPI = (): AxiosInstance => {
+export const BackendAPI = (throwErrors?: boolean): AxiosInstance => {
   if (typeof window === "undefined") {
     throw new Error("BackendAPI must be called in the browser");
   }
@@ -12,6 +12,6 @@ export const BackendAPI = (): AxiosInstance => {
   return axios.create({
     baseURL: `${protocol}//${host}`,
     withCredentials: true,
-    validateStatus: () => true
+    validateStatus: throwErrors === undefined || !throwErrors ? (() => true) : undefined
   });
 };

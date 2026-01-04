@@ -1,40 +1,34 @@
 import { JSONSchemaType } from "ajv";
 import { handle, withAuth } from "@workspace/web/lib/api";
-import { GoTrueAdminApi } from "@supabase/supabase-js";
+import { User } from "@supabase/supabase-js";
 import { createServiceRoleClient } from "@workspace/supabase/admin-client";
 
 
 
-export type AdminUsersResponseBodySuccess = Extract<Awaited<ReturnType<GoTrueAdminApi["listUsers"]>>["data"], {
-  aud: string
-}>
+export type AdminUsersResponseBodySuccess = {
+  user: User
+}
 
 export type AdminUsersRequestBody = {
-  page: number;
-  perPage: number;
+  id: string;
 }
 
 const schema: JSONSchemaType<AdminUsersRequestBody> = ({
   type: "object",
   properties: {
-    page: { type: "number" },
-    perPage: { type: "number" }
+    id: { type: "string" },
   },
-  required: [ "page", "perPage" ],
+  required: [ "id" ],
 });
 
-export const POST: RouteHandler = withAuth(handle<AdminUsersRequestBody>(schema, async ({ page, perPage }) => {
-
-  if (typeof page !== "number" || typeof perPage !== "number" || page < 1 || perPage < 1) return Response.json({
-    error: "bad request"
-  }, { status: 400 });
+export const POST: RouteHandler = withAuth(handle<AdminUsersRequestBody>(schema, async ({ id }) => {
 
   const supabase = createServiceRoleClient();
-  const users = await supabase.auth.admin.listUsers({ page, perPage });
-  if (users.error) return Response.json({
-    error: users.error.message
+  const user = await supabase.auth.admin.getUserById(id);
+  if (user.error) return Response.json({
+    error: user.error.message
   }, { status: 500 });
 
-  return Response.json(users.data);
+  return Response.json(user.data satisfies AdminUsersResponseBodySuccess);
 
 }), { mustBeAdmin: true });

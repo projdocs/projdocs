@@ -379,6 +379,7 @@ export type Database = {
           first_name: string
           full_name: string
           id: string
+          is_suspended: boolean
           last_name: string
         }
         Insert: {
@@ -387,6 +388,7 @@ export type Database = {
           first_name: string
           full_name?: string
           id: string
+          is_suspended?: boolean
           last_name: string
         }
         Update: {
@@ -395,6 +397,7 @@ export type Database = {
           first_name?: string
           full_name?: string
           id?: string
+          is_suspended?: boolean
           last_name?: string
         }
         Relationships: []

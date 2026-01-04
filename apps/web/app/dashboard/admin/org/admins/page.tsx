@@ -30,6 +30,8 @@ import {
 import { DataTable } from "@workspace/ui/components/data-table";
 import { useEventListener } from "@workspace/web/hooks/use-event-listener";
 
+
+
 const REFRESH_EVENT = `SUPABASE_ADMIN_REFRESH_REQUEST`;
 
 
@@ -70,30 +72,32 @@ const columns: TableOptions<User>["columns"] = [
   newColumn.display({
     id: "options",
     cell: ({ row }) => (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button size={"icon"} variant="ghost">
-            <MoreVerticalIcon/>
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuLabel>{"Options"}</DropdownMenuLabel>
-          <DropdownMenuGroup>
-            <DropdownMenuItem
-              onClick={() => createClient().from("admins").delete().eq("id", row.original.id).select().maybeSingle().then(({
-                                                                                                                             data,
-                                                                                                                             error
-                                                                                                                           }) => {
-                if (data === null && error === null) toast.error("Cannot Demote Self!", { description: "You cannot demote your own account. Add another administrator, who can then demote your account to a standard user." });
-                else if (error) toast.error("Unable to Demote User!", { description: error.message });
-                else useEventListener.RemoteDispatch(REFRESH_EVENT, null);
-              })}
-            >
-              {"Demote to Standard User"}
-            </DropdownMenuItem>
-          </DropdownMenuGroup>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <div className={"flex flex-row justify-end"}>
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button size={"icon"} variant="ghost">
+              <MoreVerticalIcon/>
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuLabel>{"Options"}</DropdownMenuLabel>
+            <DropdownMenuGroup>
+              <DropdownMenuItem
+                onClick={() => createClient().from("admins").delete().eq("id", row.original.id).select().maybeSingle().then(({
+                                                                                                                               data,
+                                                                                                                               error
+                                                                                                                             }) => {
+                  if (data === null && error === null) toast.error("Cannot Demote Self!", { description: "You cannot demote your own account. Add another administrator, who can then demote your account to a standard user." });
+                  else if (error) toast.error("Unable to Demote User!", { description: error.message });
+                  else useEventListener.RemoteDispatch(REFRESH_EVENT, null);
+                })}
+              >
+                {"Demote to Standard User"}
+              </DropdownMenuItem>
+            </DropdownMenuGroup>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </div>
     )
   })
 ];

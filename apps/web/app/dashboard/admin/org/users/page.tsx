@@ -1,28 +1,45 @@
 "use client";
 
 import { H1, InlineCode } from "@workspace/ui/components/text";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { createColumnHelper, TableOptions } from "@tanstack/react-table";
-import { DataTable } from "@workspace/ui/components/data-table";
-import { BackendAPI } from "@workspace/web/lib/api/client";
+import { PaginatedDataTable } from "@workspace/ui/components/data-table";
 import { User } from "@supabase/supabase-js";
-import { AdminUsersRequestBody, AdminUsersResponseBodySuccess } from "@workspace/web/app/api/v1/admin/users/route";
 import { DateTime } from "luxon";
 import { Tables } from "@workspace/supabase/types.gen";
 import { createClient } from "@workspace/supabase/client";
 import { Avatar, AvatarFallback, AvatarImage } from "@workspace/ui/components/avatar";
-import { Code, MoreVerticalIcon } from "lucide-react";
+import { MoreVerticalIcon } from "lucide-react";
 import {
   DropdownMenu,
-  DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
+  DropdownMenuContent,
+  DropdownMenuGroup,
+  DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger
 } from "@workspace/ui/components/dropdown-menu";
 import { Button } from "@workspace/ui/components/button";
 import { useEventListener } from "@workspace/web/hooks/use-event-listener";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger
+} from "@workspace/ui/components/alert-dialog";
+import { Badge } from "@workspace/ui/components/badge";
+import { BackendAPI } from "@workspace/web/lib/api/client";
+import { AxiosResponse } from "axios";
+import { AdminUsersRequestBody, AdminUsersResponseBodySuccess } from "@workspace/web/app/api/v1/admin/users/route";
 
 
+
+const REFRESH_EVENT = `SUPABASE_ADMIN_REFRESH_REQUEST`;
 
 type UserModel = {
   auth: User;
@@ -31,8 +48,69 @@ type UserModel = {
 
 const newColumn = createColumnHelper<UserModel>();
 
+const Options = ({ row }: {
+  row: {
+    original: UserModel
+  }
+}) => {
+
+  const [ menuOpen, setMenuOpen ] = useState<boolean>(false);
+  const [ open, setOpen ] = useState<boolean>(false);
+
+  return (
+    <div className={"flex flex-row justify-end"}>
+      <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen || open}>
+        <DropdownMenuTrigger asChild>
+          <Button size={"icon"} variant="ghost">
+            <MoreVerticalIcon/>
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuLabel>{"Options"}</DropdownMenuLabel>
+          <DropdownMenuGroup>
+            <AlertDialog open={open} onOpenChange={setOpen}>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem>
+                  {`${row.original.public.is_suspended ? "Reinstate" : "Suspend"} User`}
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    This action cannot be undone. This will permanently delete your
+                    account and remove your data from our servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => createClient().from("users").update({ is_suspended: !row.original.public.is_suspended }).eq("id", row.original.public.id).select().single().then(({ error }) => {
+                      if (error) toast.error(`Unable to ${row.original.public.is_suspended ? "Reinstate" : "Suspend"} User!`, { description: "Error: " + error.message });
+                      else useEventListener.RemoteDispatch(REFRESH_EVENT, null);
+                    })}
+                  >
+                    {"Continue"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
+            <DropdownMenuItem
+
+            >
+              {"Delete User"}
+            </DropdownMenuItem>
+          </DropdownMenuGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </div>
+  );
+};
+
 const columns: TableOptions<UserModel>["columns"] = [
   newColumn.display({
+    enableSorting: false,
     id: "avatar",
     cell: ({ row }) => (
       <Avatar>
@@ -42,19 +120,35 @@ const columns: TableOptions<UserModel>["columns"] = [
     )
   }),
   newColumn.accessor("public.first_name", {
-    header: "First Name"
+    id: "users.public.first_name",
+    header: "First Name",
   }),
   newColumn.accessor("public.last_name", {
+    id: "users.public.last_name",
     header: "Last Name",
   }),
   newColumn.accessor("auth.email", {
-    header: "Email Address"
+    header: "Email Address",
+    enableSorting: false,
+  }),
+  newColumn.accessor("public.is_suspended", {
+    id: "users.public.is_suspended",
+    header: "Status",
+    cell: ({ row }) => (
+      <Badge
+        variant={row.original.public.is_suspended ? "destructive" : "default"}
+      >
+        {row.original.public.is_suspended ? "Suspended" : "Active"}
+      </Badge>
+    )
   }),
   newColumn.accessor("auth.created_at", {
     header: "Created",
+    enableSorting: false,
     cell: ({ row }) => DateTime.fromISO(row.original.auth.created_at).toRelative()
   }),
   newColumn.accessor("auth.id", {
+    enableSorting: false,
     header: "ID",
     cell: ({ row }) => (
       <div className={"flex flex-row justify-start"}>
@@ -62,78 +156,16 @@ const columns: TableOptions<UserModel>["columns"] = [
       </div>
     )
   }),
-  // newColumn.display({
-  //   id: "options",
-  //   cell: ({ row }) => (
-  //     <DropdownMenu>
-  //       <DropdownMenuTrigger asChild>
-  //         <Button size={"icon"} variant="ghost">
-  //           <MoreVerticalIcon/>
-  //         </Button>
-  //       </DropdownMenuTrigger>
-  //       <DropdownMenuContent>
-  //         <DropdownMenuLabel>{"Options"}</DropdownMenuLabel>
-  //         <DropdownMenuGroup>
-  //           <DropdownMenuItem
-  //             onClick={() => createClient().from("admins").delete().eq("id", row.original.id).select().maybeSingle().then(({
-  //                                                                                                                            data,
-  //                                                                                                                            error
-  //                                                                                                                          }) => {
-  //               if (data === null && error === null) toast.error("Cannot Demote Self!", { description: "You cannot demote your own account. Add another administrator, who can then demote your account to a standard user." });
-  //               else if (error) toast.error("Unable to Demote User!", { description: error.message });
-  //               else useEventListener.RemoteDispatch(REFRESH_EVENT, null);
-  //             })}
-  //           >
-  //             {"Demote to Standard User"}
-  //           </DropdownMenuItem>
-  //         </DropdownMenuGroup>
-  //       </DropdownMenuContent>
-  //     </DropdownMenu>
-  //   )
-  // })
+  newColumn.display({
+    id: "options",
+    cell: ({ row }) => (
+      <Options row={row}/>
+    ),
+  })
 ];
 
+
 export default function Page() {
-
-  const [ page, setPage ] = useState<number>(1);
-  const [ perPage, setPerPage ] = useState<number>(10);
-  const [ data, setData ] = useState<null | AdminUsersResponseBodySuccess & {
-    data: UserModel[];
-  }>();
-
-  const refresh = (): void => {
-    setData(undefined);
-    BackendAPI()
-      .post("/api/v1/admin/users", { page, perPage } satisfies AdminUsersRequestBody).then(async ({ data, status }) => {
-
-      if (status !== 200) {
-        toast.error("Unable to load users!", { description: "error" in data && typeof data.error === "string" ? `Error: ${data.error}` : "See the browser console for more details." });
-        console.log(data);
-        setData(null);
-        return;
-      }
-
-      const resp: AdminUsersResponseBodySuccess = data;
-      const users = await createClient().from("users").select().in("id", resp.users.map(u => u.id));
-      if (users.error) {
-        toast.error("Unable to load users!", { description: users.error.message });
-        setData(null);
-        return;
-      }
-
-      setData({
-        ...data,
-        data: users.data.map(u => ({ public: u, auth: resp.users.find(a => a.id === u.id)! })) satisfies UserModel[],
-      });
-    });
-
-  };
-
-  // load and refresh
-  useEffect(refresh, [ page, perPage ]);
-
-  // refresh on changes
-  // useEventListener(REFRESH_EVENT, refresh);
 
   return (
     <div className={"flex flex-col p-6 gap-6"}>
@@ -146,9 +178,68 @@ export default function Page() {
         {/*/>*/}
       </div>
 
-      <DataTable
+      <PaginatedDataTable<UserModel>
         columns={columns}
-        data={data?.data ?? []}
+        getData={async (props) => {
+
+          const from = props.pagination.pageIndex * props.pagination.pageSize;
+          const to = from + props.pagination.pageSize - 1;
+
+
+          const { data, error, count } = await createClient()
+            .from("users")
+            .select("*", { count: "exact" })
+            .order(props.sort === null ? "created_at" : props.sort.id.split(".").pop()!, { ascending: !props.sort?.desc })
+            .range(from, to)
+            .abortSignal(props.abortSignal);
+
+          if (error) {
+            toast.error("Unable to load users!", {
+              description: `Error: ${error.message}`,
+            });
+            return { count: 0, rows: [] };
+          }
+
+          const totalRows = count ?? 0;
+          const backend = BackendAPI(true);
+
+          // Chain upstream signal into axios' AbortSignal
+          const ac = new AbortController();
+          if (props.abortSignal.aborted) return { count: 0, rows: [] };
+          else props.abortSignal.addEventListener("abort", () => ac.abort(), { once: true });
+
+          try {
+            const authResponses = await Promise.all(
+              (data ?? []).map((user) =>
+                backend.post<any, AxiosResponse<AdminUsersResponseBodySuccess>, AdminUsersRequestBody>(
+                  "/api/v1/admin/users",
+                  { id: user.id },
+                  { signal: ac.signal }
+                )
+              )
+            );
+
+            const authById = new Map(authResponses.map((r) => [ r.data.user.id, r.data.user ] as const));
+
+            return {
+              count: totalRows,
+              rows: (data ?? []).map(
+                (d) =>
+                  ({
+                    public: d,
+                    auth: authById.get(d.id)!
+                  }) satisfies UserModel
+              )
+            }
+          } catch (err) {
+            ac.abort();
+            toast.error("Unable to load users!", {
+              description: "See the browser console for more details.",
+            });
+            console.error(err);
+            return { count: 0, rows: [] };
+          }
+        }}
       />
 
     </div>
