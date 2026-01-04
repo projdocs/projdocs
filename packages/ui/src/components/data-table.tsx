@@ -159,7 +159,8 @@ export function PaginatedDataTable<TData>(props: {
       <div className="relative">
         <div
           className={cn(
-            isLoading && "opacity-60 pointer-events-none select-none"
+            isLoading && "opacity-60 pointer-events-none select-none",
+            "gap-2 flex flex-col"
           )}
         >
           <div className="rounded-md border">
