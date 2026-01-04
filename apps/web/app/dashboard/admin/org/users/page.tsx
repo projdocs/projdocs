@@ -180,6 +180,7 @@ export default function Page() {
 
       <PaginatedDataTable<UserModel>
         columns={columns}
+        refreshEvent={REFRESH_EVENT}
         getData={async (props) => {
 
           const from = props.pagination.pageIndex * props.pagination.pageSize;
