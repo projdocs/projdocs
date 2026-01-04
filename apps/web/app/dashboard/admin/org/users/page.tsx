@@ -55,11 +55,12 @@ const Options = ({ row }: {
 }) => {
 
   const [ menuOpen, setMenuOpen ] = useState<boolean>(false);
-  const [ open, setOpen ] = useState<boolean>(false);
+  const [ deleteOpen, setDeleteOpen ] = useState<boolean>(false);
+  const [ suspendOpen, setSuspendOpen ] = useState<boolean>(false);
 
   return (
     <div className={"flex flex-row justify-end"}>
-      <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen || open}>
+      <DropdownMenu onOpenChange={setMenuOpen} open={menuOpen || suspendOpen || deleteOpen}>
         <DropdownMenuTrigger asChild>
           <Button size={"icon"} variant="ghost">
             <MoreVerticalIcon/>
@@ -68,7 +69,7 @@ const Options = ({ row }: {
         <DropdownMenuContent>
           <DropdownMenuLabel>{"Options"}</DropdownMenuLabel>
           <DropdownMenuGroup>
-            <AlertDialog open={open} onOpenChange={setOpen}>
+            <AlertDialog open={suspendOpen} onOpenChange={setSuspendOpen}>
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem>
                   {`${row.original.public.is_suspended ? "Reinstate" : "Suspend"} User`}
@@ -78,8 +79,7 @@ const Options = ({ row }: {
                 <AlertDialogHeader>
                   <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
                   <AlertDialogDescription>
-                    This action cannot be undone. This will permanently delete your
-                    account and remove your data from our servers.
+                    This account can be reinstated at any time. Suspended users will have their access revoked, but their underlying data will not be disturbed.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
@@ -96,11 +96,51 @@ const Options = ({ row }: {
               </AlertDialogContent>
             </AlertDialog>
 
-            <DropdownMenuItem
+            <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem>
+                  {`Delete User`}
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                <AlertDialogHeader>
+                  <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+                  <AlertDialogDescription>
+                    Deleting a user cannot be undone. This will permanently delete this account and remove its data from the servers.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter>
+                  <AlertDialogCancel>Cancel</AlertDialogCancel>
+                  <AlertDialogAction
+                    onClick={() => {
 
-            >
-              {"Delete User"}
-            </DropdownMenuItem>
+                      BackendAPI().delete<any, AxiosResponse<{ id: string } | { error?: any }>, AdminUsersRequestBody>("/api/v1/admin/users", {
+                        data: { id: row.original.public.id }
+                      }).then(({ data, status }) => {
+
+                        if (status === 200) {
+                          toast.success("User deleted successfully!");
+                          useEventListener.RemoteDispatch(REFRESH_EVENT, null);
+                          return;
+                        }
+
+                        toast.error("Unable to delete user!", { description: ("error" in data && typeof data.error === "string" ? "Error: " + data.error : "Check the browser console for more details.")  });
+                        console.error(data);
+
+                      })
+
+                      // createClient().from("users").update({ is_suspended: !row.original.public.is_suspended }).eq("id", row.original.public.id).select().single().then(({ error }) => {
+                      //   if (error) toast.error(`Unable to ${row.original.public.is_suspended ? "Reinstate" : "Suspend"} User!`, { description: "Error: " + error.message });
+                      //   else
+                      // });
+                    }}
+                  >
+                    {"Continue"}
+                  </AlertDialogAction>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+
           </DropdownMenuGroup>
         </DropdownMenuContent>
       </DropdownMenu>
