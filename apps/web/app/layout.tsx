@@ -4,6 +4,7 @@ import "@workspace/ui/globals.css"
 import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
+import { LayoutProps } from "@/lib/types/layout"
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -12,11 +13,7 @@ const fontMono = Geist_Mono({
   variable: "--font-mono",
 })
 
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode
-}>) {
+export default function ({ children }: LayoutProps) {
   return (
     <html
       lang="en"
