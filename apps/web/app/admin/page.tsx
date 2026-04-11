@@ -1,24 +1,20 @@
-"use client";
-import { useState } from "react"
+import { cookies } from "next/headers";
+import { redirect } from "next/navigation";
 
-import SupabaseManagerDialog from "@/components/supabase-manager"
-import { Button } from "@workspace/ui/components/button"
-import { useIsMobile } from "@workspace/ui/hooks/use-mobile"
 
-export default function () {
-  const [open, setOpen] = useState(false)
-  const projectRef = "your-project-ref" // Replace with your actual project ref
-  const isMobile = useIsMobile()
 
-  return (
-    <>
-      <Button onClick={() => setOpen(true)}>Open Supabase Manager</Button>
-      <SupabaseManagerDialog
-        projectRef={projectRef}
-        open={open}
-        onOpenChange={setOpen}
-        isMobile={isMobile}
-      />
-    </>
-  )
+export default async function() {
+  const cookieStore = await cookies();
+  const adminApiKey = cookieStore.get("admin-api-key")?.value;
+
+  if (
+    !adminApiKey ||
+    !process.env.__PROJDOCS_ADMIN_API_KEY ||
+    process.env.__PROJDOCS_ADMIN_API_KEY.length !== 32 ||
+    adminApiKey !== process.env.__PROJDOCS_ADMIN_API_KEY
+  ) {
+    return redirect("/admin/auth");
+  }
+
+  return redirect("/admin/dashboard");
 }

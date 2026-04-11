@@ -1,21 +1,30 @@
-# shadcn/ui monorepo template
+# projdocs
 
-This is a Next.js monorepo template with shadcn/ui.
+An open-source Document Management System (DMS).
 
-## Adding components
+## Configuration
 
-To add components to your app, run the following command at the root of your `web` app:
+### Environment Variables
 
-```bash
-pnpm dlx shadcn@latest add button -c apps/web
-```
+### `ENABLE_PROJDOCS_ADMIN`
+- Accepts: `1` | `any`
+- Description: Whether to enable the admin portal on the `/admin` endpoint (https://your-projdocs-url.local/admin)
 
-This will place the ui components in the `packages/ui/src/components` directory.
+### `PROJDOCS_VERSION`
+- Accepts: `any`
+- Description: the build-version of ProjDocs
 
-## Using components
+### `SUPABASE_KONG_URL`
+- Accepts: `URL` (FQDN)
+- Description: the FQDN address to a Supabase Kong gateway (e.g., `http://127.0.0.1:54321`)
 
-To use the components in your app, import them from the `ui` package.
+### `SUPABASE_PUBLISHABLE_KEY`
+- Accepts: `sb_publishable_[...]`
+- Description: a Supabase publishable API key (e.g., `sb_publishable_ACJWlzQHlZjBrEguHvfOxg_3BJgxAaH`)
 
-```tsx
-import { Button } from "@workspace/ui/components/button";
-```
+### `SUPABASE_SECRET_KEY`
+- Accepts: `sb_secret_[...]`
+- Description: a Supabase secret API key (e.g., `sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz`)
+
+
+

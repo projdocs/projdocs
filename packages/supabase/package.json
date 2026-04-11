@@ -1,0 +1,17 @@
+{
+  "name": "@workspace/supabase",
+  "version": "0.0.0",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "typecheck": "tsc --noEmit",
+    "gen:types": "supabase gen types --local --lang=typescript > ./types.gen.ts"
+  },
+  "dependencies": {
+    "@supabase/ssr": "^0.10.2",
+    "@supabase/supabase-js": "^2.103.0"
+  },
+  "exports": {
+    "./*": "./*.ts"
+  }
+}

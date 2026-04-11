@@ -27,6 +27,8 @@ const badgeVariants = cva(
   }
 )
 
+export type BadgeVariant = (VariantProps<typeof badgeVariants>)["variant"];
+
 function Badge({
   className,
   variant = "default",
