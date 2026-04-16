@@ -44,7 +44,6 @@ export default async function (
     .select()
     .eq("id", params["organization-id"])
     .single();
-
   if (orgError)
     return (
       <div className="flex min-h-svh items-center justify-center p-4">
@@ -64,6 +63,46 @@ export default async function (
       </div>
     );
 
+  const user = await supabase.auth.getClaims();
+  if(user.error || !user.data?.claims)
+    return (
+      <div className="flex min-h-svh items-center justify-center p-4">
+        <Card className={"w-full max-w-sm"}>
+          <CardHeader>
+            <CardTitle>{"Unable to load user!"}</CardTitle>
+            <CardDescription>
+              {
+                "An error occurred while loading the current user."
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className={"flex flex-row justify-center"}>
+            <SelectOrgButton />
+          </CardFooter>
+        </Card>
+      </div>
+    );
+
+  const profile = await supabase.from("profiles").select().eq("user_id", user.data.claims.sub).single();
+  if(profile.error)
+    return (
+      <div className="flex min-h-svh items-center justify-center p-4">
+        <Card className={"w-full max-w-sm"}>
+          <CardHeader>
+            <CardTitle>{"Unable to load profile!"}</CardTitle>
+            <CardDescription>
+              {
+                "An error occurred while loading the current user's profile."
+              }
+            </CardDescription>
+          </CardHeader>
+          <CardFooter className={"flex flex-row justify-center"}>
+            <SelectOrgButton />
+          </CardFooter>
+        </Card>
+      </div>
+    );
+
   return (
     <SidebarProvider>
       <CustomSidebar
@@ -71,6 +110,10 @@ export default async function (
         groups={getItems({
           organization,
         })}
+        user={{
+          profile: profile.data,
+          account: user.data.claims,
+        }}
       />
       <SidebarInset>
         <div className="flex h-dvh w-full flex-col overflow-scroll">

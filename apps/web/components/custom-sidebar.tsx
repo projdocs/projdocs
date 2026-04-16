@@ -16,18 +16,23 @@ import {
 import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
 import { NavUser } from "@apps/web/components/nav-user";
 import { Tables } from "@packages/supabase/types.gen";
+import { JwtPayload } from "@supabase/auth-js";
 
 export type CustomSidebarGroups = readonly SidebarGroups[];
 
 export async function CustomSidebar({
   groups,
   organization,
+  user,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   groups: CustomSidebarGroups;
   organization?: Tables<"organizations">;
+  user?: {
+    account: JwtPayload;
+    profile: Tables<"profiles">;
+  };
 }) {
-
   const supabase = await createServiceRoleClient();
   const orgs = await supabase.from("organizations").select();
 
@@ -35,7 +40,11 @@ export async function CustomSidebar({
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
         <OrganizationSwitcher
-          current={organization ? { isAdmin: false, org: organization } : { isAdmin: true, org: null }}
+          current={
+            organization
+              ? { isAdmin: false, org: organization }
+              : { isAdmin: true, org: null }
+          }
           orgs={orgs.data}
         />
       </SidebarHeader>
@@ -48,9 +57,11 @@ export async function CustomSidebar({
 
       <SidebarFooter>
         <SidebarTrigger />
-        <NavUser
-          user={{ name: "Foo Bar", email: "foo@bar.com", avatar: null }}
-        />
+        {user && (
+          <NavUser
+            user={{ name: user.profile.full_name, email: user.account.email ?? user.account.phone ?? user.account.sub, avatar: null }}
+          />
+        )}
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

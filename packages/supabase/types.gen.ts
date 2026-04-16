@@ -1146,21 +1146,53 @@ export type Database = {
       }
       organizations: {
         Row: {
-          created_at: string
           display: string
           id: string
         }
         Insert: {
-          created_at?: string
           display: string
           id?: string
         }
         Update: {
-          created_at?: string
           display?: string
           id?: string
         }
         Relationships: []
+      }
+      profiles: {
+        Row: {
+          first_name: string
+          full_name: string
+          id: string
+          last_name: string
+          organization_id: string
+          user_id: string
+        }
+        Insert: {
+          first_name: string
+          full_name?: string
+          id?: string
+          last_name: string
+          organization_id: string
+          user_id: string
+        }
+        Update: {
+          first_name?: string
+          full_name?: string
+          id?: string
+          last_name?: string
+          organization_id?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

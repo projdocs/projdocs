@@ -8,7 +8,7 @@ AS
 $function$
 declare
     _user       auth.users%rowtype := null;
-    _full_name  text := '';
+    _full_name  text               := '';
     _first_name person_name        := 'New'::person_name;
     _last_name  person_name        := 'User'::person_name;
 begin
@@ -42,6 +42,8 @@ begin
                 NEW.user_id,
                 _first_name,
                 _last_name);
+    elsif tg_op = 'DELETE' then
+        delete from public.profiles p where p.organization_id = old.organization_id and p.user_id = old.user_id;
     end if;
 
     return coalesce(old, new);
