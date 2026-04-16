@@ -1,5 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { Database } from "@workspace/supabase/types.gen";
+import { Database } from "@packages/supabase/types.gen";
 
 export function supabase() {
   const url = new URL(window.origin);

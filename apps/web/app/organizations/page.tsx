@@ -1,12 +1,13 @@
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@apps/web/lib/supabase/server";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
+} from "@packages/ui/components/card";
+import { H2 } from "@packages/ui/components/typography";
+import { OrgCard } from "@apps/web/app/organizations/_components/org-card";
 import { redirect } from "next/navigation";
-import { H1 } from "@workspace/ui/components/typography";
 
 export default async function () {
   const supabase = await createServerClient();
@@ -41,18 +42,14 @@ export default async function () {
         </Card>
       </div>
     );
-  // else if (orgs.data.length === 1)
-  //   return redirect(`/organizations/${orgs.data.at(0)!.id}`);
+  else if (orgs.data.length === 1)
+    return redirect(`/organizations/${orgs.data.at(0)!.id}`);
   else
     return (
-      <div className="flex min-h-svh items-center justify-center p-4">
-        <H1>{"Select an organization"}</H1>
-        {orgs.data.map(org => (
-          <Card key={org.id} className={"w-full max-w-sm"}>
-            <CardHeader>
-              <CardTitle>{org.display}</CardTitle>
-            </CardHeader>
-          </Card>
+      <div className="flex min-h-svh flex-col items-center justify-center gap-2 p-4">
+        <H2 className={"text-muted-foreground"}>{"Select an Organization"}</H2>
+        {orgs.data.map((org) => (
+          <OrgCard organization={org} key={org.id} />
         ))}
       </div>
     );

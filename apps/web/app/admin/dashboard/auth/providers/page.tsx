@@ -1,9 +1,9 @@
-import OIDCConnectionForm from "@/app/admin/dashboard/auth/providers/_components/create-provider";
-import { H2 } from "@workspace/ui/components/typography";
-import OIDCProvidersTable from "@/app/admin/dashboard/auth/providers/_components/providers-table";
-import { isAdmin } from "@/lib/is-admin";
+import OIDCConnectionForm from "@apps/web/app/admin/dashboard/auth/providers/_components/create-provider";
+import { H2 } from "@packages/ui/components/typography";
+import OIDCProvidersTable from "@apps/web/app/admin/dashboard/auth/providers/_components/providers-table";
+import { isAdmin } from "@apps/web/lib/is-admin";
 import { AuthError, CustomProviderResponse } from "@supabase/auth-js";
-import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
+import { createServerClient, createServiceRoleClient } from "@apps/web/lib/supabase/server";
 import { v4 } from "uuid";
 
 export default function () {
@@ -47,6 +47,18 @@ export default function () {
 
       <OIDCProvidersTable
         refreshEvent={refreshEvent}
+        onUpdateAction={async (provider) => {
+          "use server";
+
+          if (!(await isAdmin()))
+            return {
+              data: null,
+              error: new AuthError("unauthorized", 401),
+            } satisfies CustomProviderResponse;
+
+          const supabase = await createServiceRoleClient();
+          return await supabase.auth.admin.customProviders.updateProvider(provider.identifier, provider);
+        }}
       />
     </div>
   );

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { isAdmin } from "@/lib/is-admin";
+import { isAdmin } from "@apps/web/lib/is-admin";
 
 async function forwardToSupabaseAPI(
   request: Request,

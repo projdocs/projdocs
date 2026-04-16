@@ -1,10 +1,10 @@
-import { H2, H3 } from "@workspace/ui/components/typography";
-import { Card, CardContent } from "@workspace/ui/components/card";
+import { H2, H3 } from "@packages/ui/components/typography";
+import { Card, CardContent } from "@packages/ui/components/card";
 import {
   ServiceStatusIndicator,
   ServiceStatusIndicatorProps,
   ServiceStatusIndicatorValue,
-} from "@/components/service-status-indicator";
+} from "@apps/web/components/service-status-indicator";
 
 type StatusGroup = {
   title: string;

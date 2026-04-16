@@ -9,25 +9,41 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@workspace/ui/components/dropdown-menu";
+} from "@packages/ui/components/dropdown-menu";
 import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
-} from "@workspace/ui/components/sidebar";
-import { AlertCircleIcon, Building, ChevronsUpDownIcon, PlusIcon } from "lucide-react";
-import { Tables } from "@workspace/supabase/types.gen";
+} from "@packages/ui/components/sidebar";
+import {
+  AlertCircleIcon,
+  Building,
+  BuildingIcon,
+  ChevronsUpDownIcon,
+  PlusIcon,
+} from "lucide-react";
+import { Tables } from "@packages/supabase/types.gen";
 import { redirect } from "next/navigation";
-import Favicon from "@workspace/ui/branding/favicon/no-bg";
+import Favicon from "@packages/ui/branding/favicon/no-bg";
 import {
   Alert,
   AlertDescription,
   AlertTitle,
-} from "@workspace/ui/components/alert";
+} from "@packages/ui/components/alert";
 
 export function OrganizationSwitcher({
   orgs,
+  current,
 }: {
+  current:
+    | {
+        isAdmin: false;
+        org: Tables<"organizations">;
+      }
+    | {
+        isAdmin: true;
+        org: null;
+      };
   orgs: null | readonly Tables<"organizations">[];
 }) {
   return (
@@ -40,13 +56,12 @@ export function OrganizationSwitcher({
               className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
             >
               <div className="flex aspect-square size-8 items-center justify-center rounded-lg bg-secondary text-sidebar-primary-foreground">
-                <Favicon />
+                {current.isAdmin ? <Favicon /> : <BuildingIcon />}
               </div>
               <div className="grid flex-1 text-left text-sm leading-tight">
                 <span className="truncate font-medium">{"ProjDocs"}</span>
                 <span className="truncate text-xs text-muted-foreground">
-                  {" "}
-                  {"Admin Portal"}
+                  {current.isAdmin ? "Admin Portal" : current.org.display}
                 </span>
               </div>
               <ChevronsUpDownIcon className="ml-auto" />
@@ -73,7 +88,7 @@ export function OrganizationSwitcher({
               orgs.map((org) => (
                 <DropdownMenuItem
                   key={org.id}
-                  onClick={() => redirect(`/teams/${org.id}`)}
+                  onClick={() => redirect(`/organizations/${org.id}`)}
                   className="gap-2 p-2"
                 >
                   <div className="flex size-6 items-center justify-center rounded-md border">

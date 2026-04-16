@@ -4,7 +4,7 @@ import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from "@workspace/ui/components/collapsible";
+} from "@packages/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -12,47 +12,55 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarMenuSub,
-  SidebarMenuSubButton,
   SidebarMenuSubItem,
-} from "@workspace/ui/components/sidebar";
+} from "@packages/ui/components/sidebar";
 import { ChevronRightIcon } from "lucide-react";
 import { ReactNode } from "react";
+import { usePathname, useRouter } from "next/navigation";
+import { Button } from "@packages/ui/components/button";
 
 export type AdminSidebarMenuSubitem = Pick<
   AdminSidebarMenuItem,
-  "title" | "url" | "isActive"
+  "title" | "url"
 >;
 
 export type AdminSidebarMenuItem = {
   title: string;
   url: string;
-  isActive?: boolean;
   icon: ReactNode;
   items?: readonly AdminSidebarMenuSubitem[];
 };
 
-export type AdminSidebarGroupProps = {
-  title: string;
+export type SidebarGroups = {
+  title?: string;
   items: readonly AdminSidebarMenuItem[];
 };
 
+export function CustomSidebarGroup(props: SidebarGroups) {
+  const router = useRouter();
+  const pathname = usePathname();
 
-
-export function AdminSidebarGroup(props: AdminSidebarGroupProps) {
   return (
     <SidebarGroup>
-      <SidebarGroupLabel>{props.title}</SidebarGroupLabel>
+      {typeof props.title === "string" && (
+        <SidebarGroupLabel>{props.title}</SidebarGroupLabel>
+      )}
       <SidebarMenu>
         {props.items.map((item, index) => (
           <Collapsible
             key={`${index}-${item.url}`}
             asChild
-            defaultOpen={item.isActive}
+            defaultOpen={item.url === pathname || ( item.items !== undefined && !!item.items.find(item => item.url === pathname) )}
             className="group/collapsible"
           >
             <SidebarMenuItem>
-              { item.items === undefined ? (
-                <SidebarMenuButton tooltip={item.title}>
+              {item.items === undefined ? (
+                <SidebarMenuButton
+                  tooltip={item.title}
+                  onClick={() => router.push(item.url)}
+                  disabled={item.url === pathname}
+                  className={"disabled:bg-secondary"}
+                >
                   {item.icon}
                   <span>{item.title}</span>
                 </SidebarMenuButton>
@@ -67,19 +75,25 @@ export function AdminSidebarGroup(props: AdminSidebarGroupProps) {
                   </CollapsibleTrigger>
                   <CollapsibleContent>
                     <SidebarMenuSub>
-                      {item.items?.map((subItem) => (
-                        <SidebarMenuSubItem key={subItem.title}>
-                          <SidebarMenuSubButton asChild>
-                            <a href={subItem.url}>
-                              <span>{subItem.title}</span>
-                            </a>
-                          </SidebarMenuSubButton>
+                      {item.items?.map((item) => (
+                        <SidebarMenuSubItem key={item.title}>
+                          <Button
+                            size={"sm"}
+                            variant={"ghost"}
+                            onClick={() => router.push(item.url)}
+                            disabled={item.url === pathname}
+                            className={
+                              "w-full justify-start disabled:bg-secondary"
+                            }
+                          >
+                            <span>{item.title}</span>
+                          </Button>
                         </SidebarMenuSubItem>
                       ))}
                     </SidebarMenuSub>
                   </CollapsibleContent>
                 </>
-              ) }
+              )}
             </SidebarMenuItem>
           </Collapsible>
         ))}

@@ -1,6 +1,6 @@
 import { createServerClient as createClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
-import { Database } from "@workspace/supabase/types.gen";
+import { Database } from "@packages/supabase/types.gen";
 
 export async function createServiceRoleClient() {
   return createClient<Database>(

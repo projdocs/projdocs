@@ -1,4 +1,4 @@
-import { LayoutProps } from "@/lib/types/layout";
+import { LayoutProps } from "@apps/web/lib/types/layout";
 
 export default function ({ children }: LayoutProps) {
   return (

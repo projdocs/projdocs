@@ -1,11 +1,11 @@
 import { Geist_Mono, Inter } from "next/font/google"
 
-import "@workspace/ui/globals.css"
-import { ThemeProvider } from "@/components/theme-provider"
-import { cn } from "@workspace/ui/lib/utils"
-import { TooltipProvider } from "@workspace/ui/components/tooltip"
-import { LayoutProps } from "@/lib/types/layout"
-import { Toaster } from "@workspace/ui/components/sonner";
+import "@packages/ui/globals.css"
+import { ThemeProvider } from "@apps/web/components/theme-provider"
+import { cn } from "@packages/ui/lib/utils"
+import { TooltipProvider } from "@packages/ui/components/tooltip"
+import { LayoutProps } from "@apps/web/lib/types/layout"
+import { Toaster } from "@packages/ui/components/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { cn } from "@workspace/ui/lib/utils";
+import { cn } from "@packages/ui/lib/utils";
 
 export function H1({
   className,

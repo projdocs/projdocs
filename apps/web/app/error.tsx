@@ -1,9 +1,9 @@
 "use client" // Error boundaries must be Client Components
 
 import { useEffect } from "react"
-import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@workspace/ui/components/card"
-import { DisplayableError } from "@/lib/types/displayable-error"
-import { Button } from "@workspace/ui/components/button"
+import { Card, CardAction, CardDescription, CardFooter, CardHeader, CardTitle } from "@packages/ui/components/card"
+import { DisplayableError } from "@apps/web/lib/types/displayable-error"
+import { Button } from "@packages/ui/components/button"
 import { useRouter } from "next/navigation"
 
 

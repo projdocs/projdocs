@@ -1,11 +1,12 @@
 {
-  "name": "@workspace/supabase",
+  "name": "@packages/supabase",
   "version": "0.0.0",
   "type": "module",
   "private": true,
   "scripts": {
     "typecheck": "tsc --noEmit",
-    "gen:types": "supabase gen types --local --lang=typescript > ./types.gen.ts"
+    "gen": "npm run gen:types",
+    "gen:types": "supabase gen types --local --schema=public,auth --lang=typescript > ./types.gen.ts"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

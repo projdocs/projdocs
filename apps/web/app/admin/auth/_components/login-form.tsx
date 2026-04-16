@@ -1,13 +1,13 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { loginAction } from "@/app/admin/auth/actions";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@workspace/ui/components/dialog";
+import { loginAction } from "@apps/web/app/admin/auth/actions";
+import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@packages/ui/components/dialog";
 import { Info, LockKeyhole } from "lucide-react";
-import { Label } from "@workspace/ui/components/label";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@workspace/ui/components/tooltip";
-import { Input } from "@workspace/ui/components/input";
-import { Button } from "@workspace/ui/components/button";
+import { Label } from "@packages/ui/components/label";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@packages/ui/components/tooltip";
+import { Input } from "@packages/ui/components/input";
+import { Button } from "@packages/ui/components/button";
 
 
 export default function LoginForm({isDev}: {

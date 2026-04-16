@@ -2,9 +2,9 @@
 
 import { useEffect, useState } from "react";
 import type { AuthTokenResponse, CustomOAuthProvider } from "@supabase/auth-js";
-import { Button } from "@workspace/ui/components/button";
+import { Button } from "@packages/ui/components/button";
 import { createBrowserClient } from "@supabase/ssr";
-import { H1, P } from "@workspace/ui/components/typography";
+import { H1, P } from "@packages/ui/components/typography";
 import { toast } from "sonner";
 import {
   Card,
@@ -12,10 +12,13 @@ import {
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
-import { supabase } from "@/lib/supabase/client";
-import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation";
-import { navigate } from "next/dist/client/components/segment-cache/navigation";
+} from "@packages/ui/components/card";
+import { supabase } from "@apps/web/lib/supabase/client";
+import {
+  ReadonlyURLSearchParams,
+  useRouter,
+  useSearchParams,
+} from "next/navigation";
 
 interface LoginFormProps {
   providers: Pick<CustomOAuthProvider, "id" | "identifier" | "name">[];
@@ -35,28 +38,23 @@ const ExchangePKCECode = (
 
   // detect session code
   useEffect(() => {
-    let mounted = true;
     if (props.params.has("code"))
       supabase()
         .auth.exchangeCodeForSession(props.params.get("code")!)
         .then((response: AuthTokenResponse) => {
           if (response.error) setState(response.error);
-          else if(props.params.has("next")) {
+          else if (props.params.has("next")) {
             try {
               const url = new URL(props.params.get("next")!);
-              if(url.hostname === "localhost" ) url.hostname = "127.0.0.1";
-              console.log(url.toString())
+              if (url.hostname === "localhost") url.hostname = "127.0.0.1";
+              console.log(url.toString());
               window.location.assign(url);
             } catch (e) {
-              console.error("`next` threw an error:", e)
+              console.error("`next` threw an error:", e);
               router.push("/organizations");
             }
-          }
-          else router.push("/organizations");
+          } else router.push("/organizations");
         });
-    return () => {
-      mounted = false;
-    }
   }, []);
 
   if (state)

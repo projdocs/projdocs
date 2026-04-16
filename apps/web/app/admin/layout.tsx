@@ -1,5 +1,5 @@
-import { DisplayableError } from "@/lib/types/displayable-error";
-import { LayoutProps } from "@/lib/types/layout";
+import { DisplayableError } from "@apps/web/lib/types/displayable-error";
+import { LayoutProps } from "@apps/web/lib/types/layout";
 
 export default async function ({ children }: LayoutProps) {
   if (process.env.ENABLE_PROJDOCS_ADMIN !== "1")

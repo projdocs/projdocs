@@ -1,11 +1,11 @@
-import { createServiceRoleClient } from "@/lib/supabase/server";
+import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
 import { LoginForm } from "./_components/login-form";
 import {
   Card,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@workspace/ui/components/card";
+} from "@packages/ui/components/card";
 
 export default async function () {
 

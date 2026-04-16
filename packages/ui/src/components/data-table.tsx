@@ -10,8 +10,8 @@ import {
   TableOptions,
   useReactTable
 } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@workspace/ui/components/table";
-import { cn } from "@workspace/ui/lib/utils";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
+import { cn } from "@packages/ui/lib/utils";
 import {
   ChevronDownIcon,
   ChevronFirstIcon,
@@ -21,13 +21,13 @@ import {
   ChevronsUpDownIcon,
   ChevronUpIcon, Loader2
 } from "lucide-react";
-import { Label } from "@workspace/ui/components/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@workspace/ui/components/select";
-import { Pagination, PaginationContent, PaginationItem } from "@workspace/ui/components/pagination";
-import { Button } from "@workspace/ui/components/button";
+import { Label } from "@packages/ui/components/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@packages/ui/components/select";
+import { Pagination, PaginationContent, PaginationItem } from "@packages/ui/components/pagination";
+import { Button } from "@packages/ui/components/button";
 import { useEffect, useId, useMemo, useState } from "react";
-import { useOnceler } from "@workspace/ui/hooks/use-onceler";
-import { useEventListener } from "@workspace/ui/hooks/use-event-listener";
+import { useOnceler } from "@packages/ui/hooks/use-onceler";
+import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 
 type PaginatedDataTableState<TData> = {
   count: number;
@@ -87,7 +87,7 @@ export function PaginatedDataTable<TData>(props: {
 
   const refresh = useOnceler<PaginatedDataTableState<TData>>(
     async (as) => {
-      setIsLoading(true);
+      if(state.rows.length === 0) setIsLoading(true);
       try {
         return await props.getData({
           abortSignal: as,

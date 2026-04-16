@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  transpilePackages: ["@workspace/ui"],
+  transpilePackages: ["@packages/ui"],
   allowedDevOrigins: ["127.0.0.1", "localhost"],
   devIndicators: false,
   reactStrictMode: false,

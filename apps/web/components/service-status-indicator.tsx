@@ -1,8 +1,8 @@
 
-import { Badge, BadgeVariant } from "@workspace/ui/components/badge";
-import { Spinner } from "@workspace/ui/components/spinner";
-import { Code } from "@workspace/ui/components/typography";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@workspace/ui/components/tooltip";
+import { Badge, BadgeVariant } from "@packages/ui/components/badge";
+import { Spinner } from "@packages/ui/components/spinner";
+import { Code } from "@packages/ui/components/typography";
+import { Tooltip, TooltipContent, TooltipTrigger } from "@packages/ui/components/tooltip";
 
 export type ServiceStatusIndicatorValue = {
   status: "HEALTHY" | "DEGRADED" | "UNHEALTHY" | "STOPPED";

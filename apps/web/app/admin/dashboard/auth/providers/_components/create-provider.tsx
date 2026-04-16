@@ -4,10 +4,10 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { toast } from "sonner"
+import { toast } from "sonner";
 
-import { Button } from "@workspace/ui/components/button";
-import { Input } from "@workspace/ui/components/input";
+import { Button } from "@packages/ui/components/button";
+import { Input } from "@packages/ui/components/input";
 import {
   Field,
   FieldDescription,
@@ -17,7 +17,7 @@ import {
   FieldLegend,
   FieldSeparator,
   FieldSet,
-} from "@workspace/ui/components/field";
+} from "@packages/ui/components/field";
 import {
   CheckIcon,
   ClipboardIcon,
@@ -36,12 +36,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "@workspace/ui/components/dialog";
-import { isAdmin } from "@/lib/is-admin";
-import { createServerClient } from "@/lib/supabase/server";
-import { v4 } from "uuid";
-import { AuthError, CustomProviderResponse } from "@supabase/auth-js";
-import { useEventListener } from "@workspace/ui/hooks/use-event-listener";
+} from "@packages/ui/components/dialog";
+import { CustomProviderResponse } from "@supabase/auth-js";
+import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 
 function CopyButton({ value }: { value: string }) {
   const [copied, setCopied] = useState(false);
@@ -201,15 +198,23 @@ export default function OIDCConnectionForm(props: {
               </DialogDescription>
             </DialogHeader>
 
-            <form onSubmit={handleSubmit(async (formData) => {
-              const {error} = await props.onCreateAction(formData);
-              if(error) toast.error("Unable to Create Provider", { description: error.message })
-              else {
-                useEventListener.RemoteDispatch<null>(props.refreshEvent, null);
-                setOpen(false);
-                reset();
-              }
-            })}>
+            <form
+              onSubmit={handleSubmit(async (formData) => {
+                const { error } = await props.onCreateAction(formData);
+                if (error)
+                  toast.error("Unable to Create Provider", {
+                    description: error.message,
+                  });
+                else {
+                  useEventListener.RemoteDispatch<null>(
+                    props.refreshEvent,
+                    null
+                  );
+                  setOpen(false);
+                  reset();
+                }
+              })}
+            >
               <div className="space-y-0">
                 <FieldSet>
                   <FieldLegend>General</FieldLegend>
