@@ -22,10 +22,10 @@ import {
   PieChartIcon,
   Settings2Icon,
   TerminalIcon,
-  TerminalSquareIcon,
+  TerminalSquareIcon, UserLock,
 } from "lucide-react";
 import { Code } from "@workspace/ui/components/typography";
-import { createServerClient } from "@/lib/supabase/server";
+import { createServerClient, createServiceRoleClient } from "@/lib/supabase/server";
 
 type AdminSidebarProps = {
   groups: readonly AdminSidebarGroupProps[];
@@ -65,10 +65,26 @@ const adminSidebar: AdminSidebarProps = {
       title: "Platform",
       items: [
         {
+          title: "Auth",
+          url: "",
+          icon: <UserLock />,
+          items: [
+            {
+              title: "Providers",
+              url: "/admin/dashboard/auth/providers"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      title: "Platform",
+      items: [
+        {
           title: "Playground",
           url: "#",
           icon: <TerminalSquareIcon />,
-          isActive: true,
+          // isActive: true,
           items: [
             {
               title: "History",
@@ -178,7 +194,7 @@ export async function AdminSidebar({
   ...props
 }: React.ComponentProps<typeof Sidebar>) {
 
-  const supabase = await createServerClient(process.env.SUPABASE_SECRET_KEY)
+  const supabase = await createServiceRoleClient();
   const orgs = await supabase.from("organizations").select();
 
 

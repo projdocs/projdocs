@@ -15,11 +15,15 @@ async function forwardToSupabaseAPI(
     );
   }
 
+
+
   const { path } = params;
   const apiPath = path.join("/");
 
   const url = new URL(process.env.SUPABASE_KONG_URL);
   url.pathname = apiPath;
+  const baseParams = new URL(request.url).searchParams
+  for (const key of baseParams.keys()) url.searchParams.set(key, baseParams.get(key)!);
 
   // start as anon
   let key = process.env.SUPABASE_PUBLISHABLE_KEY;
@@ -47,6 +51,7 @@ async function forwardToSupabaseAPI(
     const fetchOptions: RequestInit = {
       method,
       headers: forwardHeaders,
+      redirect: "manual",
     };
 
     // Include body for methods that support it
@@ -63,6 +68,15 @@ async function forwardToSupabaseAPI(
     }
 
     const response = await fetch(url, fetchOptions);
+
+    // Forward redirects so OAuth flows reach the provider
+    if (response.status >= 300 && response.status < 400) {
+      const location = response.headers.get("location");
+      if (location) {
+        return NextResponse.redirect(location, { status: response.status });
+      }
+    }
+
 
     // Get response body
     const responseText = await response.text();

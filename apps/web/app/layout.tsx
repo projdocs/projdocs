@@ -5,6 +5,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { cn } from "@workspace/ui/lib/utils"
 import { TooltipProvider } from "@workspace/ui/components/tooltip"
 import { LayoutProps } from "@/lib/types/layout"
+import { Toaster } from "@workspace/ui/components/sonner";
 
 const inter = Inter({ subsets: ["latin"], variable: "--font-sans" })
 
@@ -25,8 +26,9 @@ export default function ({ children }: LayoutProps) {
         inter.variable
       )}
     >
-      <body>
+      <body className={"w-dvw h-dvh"}>
         <ThemeProvider>
+          <Toaster />
           <TooltipProvider>{children}</TooltipProvider>
         </ThemeProvider>
       </body>

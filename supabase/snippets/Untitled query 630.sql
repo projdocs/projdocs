@@ -1,0 +1,1 @@
+update auth.custom_oauth_providers set pkce_enabled = FALSE;

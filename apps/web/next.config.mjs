@@ -2,7 +2,8 @@
 const nextConfig = {
   transpilePackages: ["@workspace/ui"],
   allowedDevOrigins: ["127.0.0.1", "localhost"],
-  devIndicators: false
+  devIndicators: false,
+  reactStrictMode: false,
 }
 
 export default nextConfig
