@@ -14,7 +14,7 @@ import {
   SidebarTrigger,
 } from "@packages/ui/components/sidebar";
 import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
-import { NavUser } from "@apps/web/components/nav-user";
+import { SidebarUser } from "@apps/web/components/sidebar-user";
 import { Tables } from "@packages/supabase/types.gen";
 import { JwtPayload } from "@supabase/auth-js";
 
@@ -58,8 +58,13 @@ export async function CustomSidebar({
       <SidebarFooter>
         <SidebarTrigger />
         {user && (
-          <NavUser
-            user={{ name: user.profile.full_name, email: user.account.email ?? user.account.phone ?? user.account.sub, avatar: null }}
+          <SidebarUser
+            user={{
+              name: user.profile.full_name,
+              email:
+                user.account.email ?? user.account.phone ?? user.account.sub,
+              avatar: user.account.user_metadata?.picture ?? user.account.user_metadata?.avatar_url,
+            }}
           />
         )}
       </SidebarFooter>
