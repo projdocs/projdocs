@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION public.is_member(org_id uuid)
     RETURNS boolean
     LANGUAGE plpgsql
     SECURITY definer
+    SET SEARCH_PATH = ''
 AS
 $function$
 begin

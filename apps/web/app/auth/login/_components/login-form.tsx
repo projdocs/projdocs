@@ -79,6 +79,13 @@ export function LoginForm(props: LoginFormProps) {
   const [providerLoading, setProviderLoading] = useState<string | null>(null);
   const params = useSearchParams();
 
+  useEffect(() => {
+    if (params.has("error"))
+      toast.error(`Authentication error: \`${params.get("error_code")}\``, {
+        description: params.get("error_description"),
+      });
+  }, []);
+
   return (
     <div className="w-full max-w-sm space-y-6">
       {params.has("code") ? (

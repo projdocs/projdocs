@@ -1,4 +1,12 @@
-import { nextJsConfig } from "@packages/eslint-config/next-js"
+import { nextJsConfig } from "@packages/eslint-config/next-js";
 
 /** @type {import("eslint").Linter.Config} */
-export default nextJsConfig
+export default [
+  ...nextJsConfig,
+  {
+    rules: {
+      "react/display-name": "off",
+      "react-hooks/exhaustive-deps": "off",
+    },
+  },
+];

@@ -1,6 +1,6 @@
 "use client";
 
-import { createColumnHelper } from "@tanstack/react-table";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
 import { CustomOAuthProvider, CustomProviderResponse } from "@supabase/auth-js";
 import { Switch } from "@packages/ui/components/switch";
 import { supabase } from "@apps/web/lib/supabase/client";
@@ -18,7 +18,8 @@ const EnabledToggle = (props: {
   const [clicked, setClicked] = useState(false);
 
   useEffect(() => {
-    setClicked(false)
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setClicked(false);
   }, [props.provider.enabled]);
 
   return (
@@ -37,33 +38,34 @@ const EnabledToggle = (props: {
         );
       }}
     />
-  )
-}
+  );
+};
 
-const newColumn = createColumnHelper<CustomOAuthProvider>();
+type Column = CustomOAuthProvider;
 
+const column = createColumnHelper<Column>();
 const columns = [
-  newColumn.accessor("name", {
+  column.accessor("name", {
     header: "Display",
-    cell: (info) => info.getValue(),
   }),
-  newColumn.accessor("issuer", {
+  column.accessor("issuer", {
     header: "Issuer",
-    cell: (info) => info.getValue(),
   }),
-  newColumn.accessor("enabled", {
+  column.accessor("enabled", {
     header: "Enabled",
     cell: (info) => (
       <div className={"flex h-full w-full flex-col"}>
-        <EnabledToggle checked={info.getValue()!} provider={info.row.original} />
+        <EnabledToggle
+          checked={info.getValue()!}
+          provider={info.row.original}
+        />
       </div>
     ),
   }),
-  newColumn.accessor("id", {
+  column.accessor("id", {
     header: "ID",
-    cell: (info) => <code>{info.getValue()}</code>,
   }),
-];
+] as ColumnDef<Column>[];
 
 export default function OIDCProvidersTable({
   refreshEvent,
@@ -98,7 +100,7 @@ export default function OIDCProvidersTable({
   );
 
   return (
-    <PaginatedDataTable<CustomOAuthProvider>
+    <PaginatedDataTable<Column>
       refreshEvent={refreshEvent}
       __disable_pagination
       columns={columns}

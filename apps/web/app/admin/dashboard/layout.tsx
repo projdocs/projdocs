@@ -3,22 +3,10 @@ import {
   CustomSidebar,
   CustomSidebarGroups,
 } from "@apps/web/components/custom-sidebar";
-import {
-  SidebarInset,
-  SidebarProvider,
-} from "@packages/ui/components/sidebar";
+import { SidebarInset, SidebarProvider } from "@packages/ui/components/sidebar";
 import { redirect } from "next/navigation";
 import { isAdmin } from "@apps/web/lib/is-admin";
-import {
-  BookOpenIcon,
-  BotIcon,
-  FrameIcon, LayoutDashboardIcon,
-  MapIcon,
-  PieChartIcon,
-  Settings2Icon,
-  TerminalSquareIcon,
-  UserLock,
-} from "lucide-react";
+import { DatabaseZapIcon, LayoutDashboardIcon, UserLock } from "lucide-react";
 import * as React from "react";
 
 const adminSidebar: CustomSidebarGroups = [
@@ -29,7 +17,7 @@ const adminSidebar: CustomSidebarGroups = [
         url: `/admin/dashboard`,
         icon: <LayoutDashboardIcon />,
       },
-    ]
+    ],
   },
   {
     title: "Platform",
@@ -42,6 +30,21 @@ const adminSidebar: CustomSidebarGroups = [
           {
             title: "Providers",
             url: "/admin/dashboard/auth/providers",
+          },
+        ],
+      },
+      {
+        title: "Storage",
+        url: "/admin/dashboard/storage",
+        icon: <DatabaseZapIcon />,
+        items: [
+          {
+            title: "Settings",
+            url: "/admin/dashboard/storage/settings",
+          },
+          {
+            title: "Browser",
+            url: "/admin/dashboard/storage/browser",
           },
         ],
       },

@@ -4,6 +4,7 @@ CREATE OR REPLACE FUNCTION triggers.profiles_before_actions()
  RETURNS trigger
  LANGUAGE plpgsql
  SECURITY DEFINER
+ SET SEARCH_PATH = ''
 AS $function$begin
 
   if tg_op = 'DELETE' then
@@ -18,7 +19,7 @@ AS $function$begin
 
   end if;
 
-  return coalesce(old, new);
+  return coalesce(new, old);
 
 end;$function$
 ;

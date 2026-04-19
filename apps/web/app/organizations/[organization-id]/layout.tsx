@@ -9,11 +9,11 @@ import { LayoutDashboardIcon } from "lucide-react";
 import { Tables } from "@packages/supabase/types.gen";
 import {
   Card,
-  CardDescription, CardFooter,
+  CardDescription,
+  CardFooter,
   CardHeader,
   CardTitle,
 } from "@packages/ui/components/card";
-import { Button } from "@packages/ui/components/button";
 import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/_components/select-org-button";
 
 const getItems = (props: { organization: Tables<"organizations"> }) =>
@@ -51,9 +51,7 @@ export default async function (
           <CardHeader>
             <CardTitle>{"Unable to load organization!"}</CardTitle>
             <CardDescription>
-              {
-                "An error occurred while loading the selected organization."
-              }
+              {"An error occurred while loading the selected organization."}
             </CardDescription>
           </CardHeader>
           <CardFooter className={"flex flex-row justify-center"}>
@@ -64,16 +62,14 @@ export default async function (
     );
 
   const user = await supabase.auth.getClaims();
-  if(user.error || !user.data?.claims)
+  if (user.error || !user.data?.claims)
     return (
       <div className="flex min-h-svh items-center justify-center p-4">
         <Card className={"w-full max-w-sm"}>
           <CardHeader>
             <CardTitle>{"Unable to load user!"}</CardTitle>
             <CardDescription>
-              {
-                "An error occurred while loading the current user."
-              }
+              {"An error occurred while loading the current user."}
             </CardDescription>
           </CardHeader>
           <CardFooter className={"flex flex-row justify-center"}>
@@ -83,17 +79,19 @@ export default async function (
       </div>
     );
 
-  const profile = await supabase.from("profiles").select().eq("user_id", user.data.claims.sub).single();
-  if(profile.error)
+  const profile = await supabase
+    .from("profiles")
+    .select()
+    .eq("user_id", user.data.claims.sub)
+    .single();
+  if (profile.error)
     return (
       <div className="flex min-h-svh items-center justify-center p-4">
         <Card className={"w-full max-w-sm"}>
           <CardHeader>
             <CardTitle>{"Unable to load profile!"}</CardTitle>
             <CardDescription>
-              {
-                "An error occurred while loading the current user's profile."
-              }
+              {"An error occurred while loading the current user's profile."}
             </CardDescription>
           </CardHeader>
           <CardFooter className={"flex flex-row justify-center"}>

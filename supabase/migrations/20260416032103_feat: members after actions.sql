@@ -4,13 +4,14 @@ CREATE OR REPLACE FUNCTION triggers.members_after_actions()
     RETURNS trigger
     LANGUAGE plpgsql
     SECURITY DEFINER
+    SET SEARCH_PATH = ''
 AS
 $function$
 declare
     _user       auth.users%rowtype := null;
     _full_name  text               := '';
-    _first_name person_name        := 'New'::person_name;
-    _last_name  person_name        := 'User'::person_name;
+    _first_name public.person_name := 'New'::public.person_name;
+    _last_name  public.person_name := 'User'::public.person_name;
 begin
 
     SELECT *
@@ -46,7 +47,7 @@ begin
         delete from public.profiles p where p.organization_id = old.organization_id and p.user_id = old.user_id;
     end if;
 
-    return coalesce(old, new);
+    return coalesce(new, old);
 
 end;
 $function$

@@ -20,6 +20,7 @@ import {
   Building,
   BuildingIcon,
   ChevronsUpDownIcon,
+  EyeIcon,
   PlusIcon,
 } from "lucide-react";
 import { Tables } from "@packages/supabase/types.gen";
@@ -90,23 +91,33 @@ export function OrganizationSwitcher({
                   key={org.id}
                   onClick={() => redirect(`/organizations/${org.id}`)}
                   className="gap-2 p-2"
+                  disabled={current.org?.id === org.id}
                 >
                   <div className="flex size-6 items-center justify-center rounded-md border">
                     <Building />
                   </div>
-                  {org.display}
+                  <span className={"flex flex-1"}>{org.display}</span>
+                  {current.org?.id === org.id && <EyeIcon />}
                 </DropdownMenuItem>
               ))
             )}
-            <DropdownMenuSeparator />
-            <DropdownMenuItem disabled={orgs === null} className="gap-2 p-2">
-              <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
-                <PlusIcon className="size-4" />
-              </div>
-              <div className="font-medium text-muted-foreground">
-                Add organization
-              </div>
-            </DropdownMenuItem>
+
+            {current.isAdmin && (
+              <>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem
+                  disabled={orgs === null}
+                  className="gap-2 p-2"
+                >
+                  <div className="flex size-6 items-center justify-center rounded-md border bg-transparent">
+                    <PlusIcon className="size-4" />
+                  </div>
+                  <div className="font-medium text-muted-foreground">
+                    Add organization
+                  </div>
+                </DropdownMenuItem>
+              </>
+            )}
           </DropdownMenuContent>
         </DropdownMenu>
       </SidebarMenuItem>

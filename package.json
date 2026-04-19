@@ -8,7 +8,8 @@
     "lint": "turbo lint",
     "format": "turbo format",
     "typecheck": "turbo typecheck",
-    "gen": "npm run gen --ws"
+    "gen": "npm run gen --ws",
+    "test": "vitest run"
   },
   "devDependencies": {
     "@packages/eslint-config": "*",
@@ -16,7 +17,8 @@
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "turbo": "^2.8.17",
-    "typescript": "5.9.3"
+    "typescript": "5.9.3",
+    "vitest": "4.1.4"
   },
   "packageManager": "npm@11.4.2",
   "engines": {

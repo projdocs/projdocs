@@ -12,7 +12,7 @@ port = 54321
 # endpoints. `public` and `graphql_public` schemas are included by default.
 schemas = ["public", "graphql_public"]
 # Extra schemas to add to the search_path of every request.
-extra_search_path = ["public", "extensions"]
+extra_search_path = ["public", "extensions", "triggers"]
 # The maximum number of rows returns from a view, table, or stored procedure. Limits payload size
 # for accidental or malicious requests.
 max_rows = 1000
@@ -107,16 +107,8 @@ port = 54324
 # sender_name = "Admin"
 
 [storage]
-enabled = false
-# The maximum file size allowed (e.g. "5MB", "500KB").
-file_size_limit = "50MiB"
-
-# Uncomment to configure local storage buckets
-# [storage.buckets.images]
-# public = false
-# file_size_limit = "50MiB"
-# allowed_mime_types = ["image/png", "image/jpeg"]
-# objects_path = "./images"
+enabled = true
+file_size_limit = "50MiB" # The maximum file size allowed (e.g. "5MB", "500KB").
 
 # Allow connections via S3 compatible clients
 [storage.s3_protocol]

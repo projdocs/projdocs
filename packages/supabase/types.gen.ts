@@ -1194,6 +1194,27 @@ export type Database = {
           },
         ]
       }
+      settings_storage: {
+        Row: {
+          data: Json
+          id: boolean
+          is_valid: boolean
+          type: Database["public"]["Enums"]["settings_storage_type"]
+        }
+        Insert: {
+          data?: Json
+          id?: boolean
+          is_valid?: boolean
+          type?: Database["public"]["Enums"]["settings_storage_type"]
+        }
+        Update: {
+          data?: Json
+          id?: boolean
+          is_valid?: boolean
+          type?: Database["public"]["Enums"]["settings_storage_type"]
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
@@ -1202,7 +1223,7 @@ export type Database = {
       is_member: { Args: { org_id: string }; Returns: boolean }
     }
     Enums: {
-      [_ in never]: never
+      settings_storage_type: "GOOGLE_DRIVE" | "BUILT_IN" | "S3"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -1349,7 +1370,9 @@ export const Constants = {
     },
   },
   public: {
-    Enums: {},
+    Enums: {
+      settings_storage_type: ["GOOGLE_DRIVE", "BUILT_IN", "S3"],
+    },
   },
 } as const
 
