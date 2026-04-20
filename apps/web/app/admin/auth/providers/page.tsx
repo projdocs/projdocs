@@ -1,10 +1,10 @@
-import OIDCConnectionForm from "@apps/web/app/admin/dashboard/auth/providers/_components/create-provider";
-import OIDCProvidersTable from "@apps/web/app/admin/dashboard/auth/providers/_components/providers-table";
-import { isAdmin } from "@apps/web/lib/is-admin";
 import { AuthError, CustomProviderResponse } from "@supabase/auth-js";
 import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
 import { v4 } from "uuid";
 import { ObjectPage } from "@apps/web/components/page";
+import OIDCConnectionForm from "@apps/web/app/admin/auth/providers/create-provider";
+import OIDCProvidersTable from "@apps/web/app/admin/auth/providers/providers-table";
+import { isAdmin } from "@apps/web/lib/utils-server";
 
 export default function () {
   const refreshEvent = v4();

@@ -1,41 +1,43 @@
 "use client";
 
 import { useRef, useState, useTransition } from "react";
-import { loginAction } from "@apps/web/app/admin/auth/actions";
-import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@packages/ui/components/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@packages/ui/components/dialog";
 import { Info, LockKeyhole } from "lucide-react";
 import { Label } from "@packages/ui/components/label";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@packages/ui/components/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@packages/ui/components/tooltip";
 import { Input } from "@packages/ui/components/input";
 import { Button } from "@packages/ui/components/button";
+import { useRouter } from "next/navigation";
 
-
-export default function LoginForm({isDev}: {
+export default function LoginForm({
+  isDev,
+  loginAction,
+}: {
   isDev: boolean;
+  loginAction: (formData: FormData) => Promise<{ error?: string }>;
 }) {
-
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const formRef = useRef<HTMLFormElement>(null);
 
-  function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
-    e.preventDefault();
-    setError(null);
-    const formData = new FormData(e.currentTarget);
-
-    startTransition(async () => {
-      const result = await loginAction(formData);
-      if (result?.error) {
-        setError(result.error);
-      }
-    });
-  }
-
   return (
     <Dialog open>
       <DialogContent showCloseButton={false}>
-        <DialogHeader className="space-y-1 text-center items-center">
-          <span className="inline-flex items-center justify-center rounded-full bg-primary/10 p-3 mb-2">
+        <DialogHeader className="items-center space-y-1 text-center">
+          <span className="mb-2 inline-flex items-center justify-center rounded-full bg-primary/10 p-3">
             <LockKeyhole className="h-6 w-6 text-primary" />
           </span>
           <DialogTitle className="text-2xl">Admin Login</DialogTitle>
@@ -44,7 +46,20 @@ export default function LoginForm({isDev}: {
           </DialogDescription>
         </DialogHeader>
 
-        <form ref={formRef} onSubmit={handleSubmit}>
+        <form
+          ref={formRef}
+          onSubmit={async (e) => {
+            e.preventDefault();
+            setError(null);
+            const formData = new FormData(e.currentTarget);
+
+            startTransition(async () => {
+              const result = await loginAction(formData);
+              if (result?.error) setError(result.error);
+              else router.push("/admin");
+            });
+          }}
+        >
           <div className="space-y-4">
             {/* Username field */}
             <div className="space-y-2">
@@ -53,12 +68,11 @@ export default function LoginForm({isDev}: {
                 <TooltipProvider delayDuration={200}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <Info className="h-3.5 w-3.5 text-muted-foreground cursor-help shrink-0" />
+                      <Info className="h-3.5 w-3.5 shrink-0 cursor-help text-muted-foreground" />
                     </TooltipTrigger>
                     <TooltipContent side="right" className="max-w-[200px]">
                       Dynamic admin users are a work in progress. Only the
-                      built-in `admin` account is available right
-                      now.
+                      built-in `admin` account is available right now.
                     </TooltipContent>
                   </Tooltip>
                 </TooltipProvider>
@@ -68,7 +82,7 @@ export default function LoginForm({isDev}: {
                 name="username"
                 value="admin"
                 disabled
-                className="bg-muted text-muted-foreground cursor-not-allowed"
+                className="cursor-not-allowed bg-muted text-muted-foreground"
               />
             </div>
 
@@ -83,13 +97,15 @@ export default function LoginForm({isDev}: {
                 autoComplete="current-password"
                 required
                 disabled={isPending}
-                defaultValue={isDev ? "pak-00000000-0000-0000-0000-000000000000" : ""}
+                defaultValue={
+                  isDev ? "pak-00000000-0000-0000-0000-000000000000" : ""
+                }
               />
             </div>
 
             {/* Error message */}
             {error && (
-              <p className="text-sm text-destructive font-medium">{error}</p>
+              <p className="text-sm font-medium text-destructive">{error}</p>
             )}
           </div>
 
@@ -101,6 +117,5 @@ export default function LoginForm({isDev}: {
         </form>
       </DialogContent>
     </Dialog>
-  )
+  );
 }
-

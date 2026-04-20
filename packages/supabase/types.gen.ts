@@ -1148,16 +1148,27 @@ export type Database = {
         Row: {
           display: string
           id: string
+          storage_provider_id: string | null
         }
         Insert: {
           display: string
           id?: string
+          storage_provider_id?: string | null
         }
         Update: {
           display?: string
           id?: string
+          storage_provider_id?: string | null
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "organizations_storage_provider_id_fkey"
+            columns: ["storage_provider_id"]
+            isOneToOne: false
+            referencedRelation: "storage_providers"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -1194,22 +1205,25 @@ export type Database = {
           },
         ]
       }
-      settings_storage: {
+      storage_providers: {
         Row: {
+          created_at: string
           data: Json
-          id: boolean
+          id: string
           is_valid: boolean
           type: Database["public"]["Enums"]["settings_storage_type"]
         }
         Insert: {
+          created_at?: string
           data?: Json
-          id?: boolean
+          id?: string
           is_valid?: boolean
           type?: Database["public"]["Enums"]["settings_storage_type"]
         }
         Update: {
+          created_at?: string
           data?: Json
-          id?: boolean
+          id?: string
           is_valid?: boolean
           type?: Database["public"]["Enums"]["settings_storage_type"]
         }
@@ -1220,6 +1234,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      get_user_count: { Args: never; Returns: number }
       is_member: { Args: { org_id: string }; Returns: boolean }
     }
     Enums: {

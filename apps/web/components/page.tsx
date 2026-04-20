@@ -1,5 +1,20 @@
 import { H2 } from "@packages/ui/components/typography";
 import { ReactNode } from "react";
+import { Card, CardDescription, CardHeader, CardTitle } from "@packages/ui/components/card";
+
+export const ErrorPage = (props: { title?: string; description?: string }) => (
+  <div className={"w-full h-full flex flex-col items-center justify-center"}>
+    <Card className={"w-full max-w-sm"}>
+      <CardHeader>
+        <CardTitle>{props.title ?? "Unexpected error!"}</CardTitle>
+        <CardDescription>
+          {props.description ??
+            "An unexpected error occurred while loading! Check the console for more details."}
+        </CardDescription>
+      </CardHeader>
+    </Card>
+  </div>
+);
 
 export const ObjectPage = (props: {
   title: string;

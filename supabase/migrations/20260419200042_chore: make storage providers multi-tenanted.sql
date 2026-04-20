@@ -10,3 +10,5 @@ ALTER TABLE public.settings_storage
 
 ALTER TABLE public.settings_storage
     DROP COLUMN _id;
+
+ALTER TABLE public.settings_storage RENAME to storage_providers;

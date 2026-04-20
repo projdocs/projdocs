@@ -8,9 +8,16 @@ import {
   PaginationState,
   SortingState,
   TableOptions,
-  useReactTable
+  useReactTable,
 } from "@tanstack/react-table";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@packages/ui/components/table";
 import { cn } from "@packages/ui/lib/utils";
 import {
   ChevronDownIcon,
@@ -19,11 +26,22 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   ChevronsUpDownIcon,
-  ChevronUpIcon, Loader2
+  ChevronUpIcon,
+  Loader2,
 } from "lucide-react";
 import { Label } from "@packages/ui/components/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@packages/ui/components/select";
-import { Pagination, PaginationContent, PaginationItem } from "@packages/ui/components/pagination";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@packages/ui/components/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationItem,
+} from "@packages/ui/components/pagination";
 import { Button } from "@packages/ui/components/button";
 import { useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
@@ -34,20 +52,18 @@ type PaginatedDataTableState<TData> = {
   rows: TData[];
 };
 
+export type PaginatedDataTableDataGetter<TData> = (props: {
+  pagination: PaginationState & { from: number; to: number };
+  abortSignal: AbortSignal;
+  sort: ColumnSort | null;
+}) => Promise<PaginatedDataTableState<TData>>;
+
 export function PaginatedDataTable<TData>(props: {
   columns: ColumnDef<TData>[];
-
   /* Custom event listener (on window) to listen for events to trigger refreshing the table's data */
   refreshEvent?: string;
-
-  getData: (props: {
-    pagination: PaginationState;
-    abortSignal: AbortSignal;
-    sort: ColumnSort | null;
-  }) => Promise<PaginatedDataTableState<TData>>;
-
+  getData: PaginatedDataTableDataGetter<TData>;
   __disable_pagination?: true;
-
 }) {
   const id = useId();
 
@@ -63,16 +79,19 @@ export function PaginatedDataTable<TData>(props: {
 
   const [sorting, setSorting] = useState<SortingState>(() => {
     const initialSortCol = props.columns
-      .filter((c) => !!c.id && (typeof c.enableSorting === "undefined" || c.enableSorting))
+      .filter(
+        (c) =>
+          !!c.id && (typeof c.enableSorting === "undefined" || c.enableSorting)
+      )
       .at(0);
 
     const initialSortState: SortingState = initialSortCol
       ? [
-        {
-          id: initialSortCol.id!,
-          desc: false,
-        },
-      ]
+          {
+            id: initialSortCol.id!,
+            desc: false,
+          },
+        ]
       : [];
 
     return initialSortState;
@@ -87,12 +106,16 @@ export function PaginatedDataTable<TData>(props: {
 
   const refresh = useOnceler<PaginatedDataTableState<TData>>(
     async (as) => {
-      if(state.rows.length === 0) setIsLoading(true);
+      if (state.rows.length === 0) setIsLoading(true);
       try {
         return await props.getData({
           abortSignal: as,
           sort: sorting[0] ?? null,
-          pagination,
+          pagination: {
+            ...pagination,
+            from: pagination.pageIndex * pagination.pageSize,
+            to: (pagination.pageIndex * pagination.pageSize) + (pagination.pageSize - 1),
+          },
         });
       } catch (error) {
         console.error(error);
@@ -106,7 +129,10 @@ export function PaginatedDataTable<TData>(props: {
       setState(next);
 
       // If total count shrank and current page is now out of range, clamp it.
-      const nextPageCount = Math.max(1, Math.ceil(next.count / pagination.pageSize));
+      const nextPageCount = Math.max(
+        1,
+        Math.ceil(next.count / pagination.pageSize)
+      );
       const maxIndex = nextPageCount - 1;
       if (pagination.pageIndex > maxIndex) {
         setPagination((p) => ({ ...p, pageIndex: maxIndex }));
@@ -122,7 +148,10 @@ export function PaginatedDataTable<TData>(props: {
     pagination.pageIndex,
   ]);
 
-  useEventListener(props.refreshEvent ?? `PaginatedDataTable-EL-${id}`, refresh.do);
+  useEventListener(
+    props.refreshEvent ?? `PaginatedDataTable-EL-${id}`,
+    refresh.do
+  );
 
   const table = useReactTable({
     data: state.rows, // already paginated
@@ -154,7 +183,10 @@ export function PaginatedDataTable<TData>(props: {
 
   const endRow = useMemo(() => {
     if (state.count === 0) return 0;
-    return Math.min((pagination.pageIndex + 1) * pagination.pageSize, state.count);
+    return Math.min(
+      (pagination.pageIndex + 1) * pagination.pageSize,
+      state.count
+    );
   }, [state.count, pagination.pageIndex, pagination.pageSize]);
 
   return (
@@ -163,15 +195,18 @@ export function PaginatedDataTable<TData>(props: {
       <div className="relative">
         <div
           className={cn(
-            isLoading && "opacity-60 pointer-events-none select-none",
-            "gap-2 flex flex-col"
+            isLoading && "pointer-events-none opacity-60 select-none",
+            "flex flex-col gap-2"
           )}
         >
-          <div className="rounded-md border overflow-hidden">
+          <div className="overflow-hidden rounded-md border">
             <Table>
-              <TableHeader className="bg-muted sticky top-0 z-10">
+              <TableHeader className="sticky top-0 z-10 bg-muted">
                 {table.getHeaderGroups().map((headerGroup) => (
-                  <TableRow key={headerGroup.id} className="hover:bg-transparent">
+                  <TableRow
+                    key={headerGroup.id}
+                    className="hover:bg-transparent"
+                  >
                     {headerGroup.headers.map((header) => {
                       const canSort = header.column.getCanSort();
                       const sorted = header.column.getIsSorted();
@@ -186,23 +221,34 @@ export function PaginatedDataTable<TData>(props: {
                             <div
                               className={cn(
                                 "flex h-full items-center gap-2 select-none",
-                                isLoading ? "cursor-not-allowed" : "cursor-pointer"
+                                isLoading
+                                  ? "cursor-not-allowed"
+                                  : "cursor-pointer"
                               )}
-                              onClick={isLoading ? undefined : header.column.getToggleSortingHandler()}
+                              onClick={
+                                isLoading
+                                  ? undefined
+                                  : header.column.getToggleSortingHandler()
+                              }
                               onKeyDown={
                                 isLoading
                                   ? undefined
                                   : (e) => {
-                                    if (e.key === "Enter" || e.key === " ") {
-                                      e.preventDefault();
-                                      header.column.getToggleSortingHandler()?.(e);
+                                      if (e.key === "Enter" || e.key === " ") {
+                                        e.preventDefault();
+                                        header.column.getToggleSortingHandler()?.(
+                                          e
+                                        );
+                                      }
                                     }
-                                  }
                               }
                               tabIndex={isLoading ? -1 : 0}
                               aria-disabled={isLoading}
                             >
-                              {flexRender(header.column.columnDef.header, header.getContext())}
+                              {flexRender(
+                                header.column.columnDef.header,
+                                header.getContext()
+                              )}
 
                               {sorted === "asc" ? (
                                 <ChevronUpIcon size={16} />
@@ -213,7 +259,10 @@ export function PaginatedDataTable<TData>(props: {
                               )}
                             </div>
                           ) : (
-                            flexRender(header.column.columnDef.header, header.getContext())
+                            flexRender(
+                              header.column.columnDef.header,
+                              header.getContext()
+                            )
                           )}
                         </TableHead>
                       );
@@ -225,17 +274,26 @@ export function PaginatedDataTable<TData>(props: {
               <TableBody>
                 {table.getRowModel().rows?.length ? (
                   table.getRowModel().rows.map((row) => (
-                    <TableRow key={row.id} data-state={row.getIsSelected() && "selected"}>
+                    <TableRow
+                      key={row.id}
+                      data-state={row.getIsSelected() && "selected"}
+                    >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>
-                          {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                          {flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
                         </TableCell>
                       ))}
                     </TableRow>
                   ))
                 ) : (
                   <TableRow>
-                    <TableCell colSpan={props.columns.length} className="h-24 text-center">
+                    <TableCell
+                      colSpan={props.columns.length}
+                      className="h-24 text-center"
+                    >
                       No results.
                     </TableCell>
                   </TableRow>
@@ -270,8 +328,11 @@ export function PaginatedDataTable<TData>(props: {
               </Select>
             </div>
 
-            <div className="text-muted-foreground flex grow justify-end text-sm whitespace-nowrap">
-              <p className="text-muted-foreground text-sm whitespace-nowrap" aria-live="polite">
+            <div className="flex grow justify-end text-sm whitespace-nowrap text-muted-foreground">
+              <p
+                className="text-sm whitespace-nowrap text-muted-foreground"
+                aria-live="polite"
+              >
                 <span className="text-foreground">
                   {startRow}-{endRow}
                 </span>{" "}
@@ -358,10 +419,7 @@ interface DataTableProps<TData> {
   data: TData[];
 }
 
-export function DataTable<TData>({
-                                   columns,
-                                   data,
-                                 }: DataTableProps<TData>) {
+export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
   const table = useReactTable<TData>({
     data,
     columns,
@@ -371,7 +429,7 @@ export function DataTable<TData>({
   return (
     <div className="overflow-hidden rounded-md border">
       <Table>
-        <TableHeader className="bg-muted sticky top-0 z-10">
+        <TableHeader className="sticky top-0 z-10 bg-muted">
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
@@ -380,9 +438,9 @@ export function DataTable<TData>({
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                        header.column.columnDef.header,
-                        header.getContext()
-                      )}
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 );
               })}
