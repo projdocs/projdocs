@@ -26,5 +26,9 @@ An open-source Document Management System (DMS).
 - Accepts: `sb_secret_[...]`
 - Description: a Supabase secret API key (e.g., `sb_secret_N7UND0UgjKTVK-Uodkm0Hg_xSvEMPvz`)
 
+### `SUPABASE_S3_ACCESS_KEY_ID`
+- Description: access key for built-in S3
 
+### `SUPABASE_S3_SECRET_KEY`
+- Description: secret key for built-in S3
 

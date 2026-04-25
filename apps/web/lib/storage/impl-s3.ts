@@ -1,12 +1,17 @@
-import { StorageError, StorageProvider, StorageResponse } from "@apps/web/lib/storage/type";
+import {
+  StorageError,
+  StorageResponse,
+} from "@apps/web/lib/storage/type";
 import {
   _Object as StorageObject,
   CommonPrefix,
+  HeadObjectCommand,
   ListObjectsV2Output,
   paginateListObjectsV2,
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
+import { StorageProviderBase } from "@apps/web/lib/storage/provider";
 
 export type S3StorageConnectionSettings = {
   url: string;
@@ -18,7 +23,7 @@ export type S3StorageConnectionSettings = {
   };
 };
 
-export class S3StorageProvider extends StorageProvider<CommonPrefix, StorageObject> {
+export class S3StorageProvider extends StorageProviderBase<StorageObject> {
   private readonly client: S3Client;
   private readonly bucket: string;
 
@@ -38,24 +43,61 @@ export class S3StorageProvider extends StorageProvider<CommonPrefix, StorageObje
     });
   }
 
-  async mkdir(path: string): Promise<StorageResponse<StorageObject>> {
+  async _mkdir(path: string): Promise<StorageResponse<StorageObject>> {
     const key = (path.endsWith("/") ? path : `${path}/`).replace(/^\/+/, "");
-    if (!S3StorageProvider.isValidFolderPath.test(key)) return ({
-      error: new StorageError("invalid path"),
-      data: null,
-    })
-    return this.safely(async () => ({
-      error: null,
-      data: await this.client.send(
+    if (!S3StorageProvider.isValidFolderPath.test(key))
+      return StorageResponse.Error(new StorageError("invalid path"));
+    return StorageResponse.Data(
+      await this.client.send(
         new PutObjectCommand({
           Bucket: this.bucket,
           Key: key,
           Body: "",
           ContentLength: 0,
         })
-      ),
-    }));
+      )
+    );
   }
+
+  async _test(): Promise<StorageResponse<boolean>> {
+    const key = ".connection-test";
+
+    try {
+      await this.client.send(
+        new HeadObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+        })
+      );
+
+      return StorageResponse.Data(true);
+    } catch (err: any) {
+      const isNotFound =
+        err?.$metadata?.httpStatusCode === 404 ||
+        err?.name === "NotFound" ||
+        err?.name === "NoSuchKey";
+
+      if (!isNotFound) {
+        return StorageResponse.Data(false);
+      }
+    }
+
+    try {
+      await this.client.send(
+        new PutObjectCommand({
+          Bucket: this.bucket,
+          Key: key,
+          Body: "",
+          ContentType: "text/plain",
+        })
+      );
+      return StorageResponse.Data(true);
+    } catch {
+      return StorageResponse.Data(false);
+    }
+  }
+
+
 
   async ls(path: string = "") {
     return this.safely(async () => {
@@ -75,10 +117,7 @@ export class S3StorageProvider extends StorageProvider<CommonPrefix, StorageObje
         folders.push(...(page.CommonPrefixes ?? []));
       }
 
-      return {
-        data: [...files, ...folders],
-        error: null,
-      };
+      return StorageResponse.Data([...files, ...folders]);
     });
   }
 }

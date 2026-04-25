@@ -1,43 +1,15 @@
-import { S3ServiceException } from "@aws-sdk/client-s3";
+import { Enums } from "@packages/supabase/types.gen";
+import { z } from "zod";
 
-export abstract class StorageProvider<
-  DirectoryType extends object,
-  FileType extends object,
-> {
-  abstract ls(
-    path: string
-  ): Promise<StorageResponse<ReadonlyArray<DirectoryType | FileType>>>;
+export const StorageProviderTypes = {
+  BUILT_IN: "Built-In (Supabase Storage)",
+  GOOGLE_DRIVE: "Google Drive API",
+  S3: "S3-Compatible Storage API",
+} satisfies {
+  [key in Enums<"settings_storage_type">]: string;
+};
 
-  abstract mkdir(path: string): Promise<StorageResponse<FileType>>;
-
-  async safely<T>(
-    f: () => Promise<StorageResponse<T>>
-  ): Promise<StorageResponse<T>> {
-    try {
-      return await f();
-    } catch (error) {
-      if (error instanceof S3ServiceException)
-        return {
-          error: new StorageError(
-            `S3 error: ${error.name} - ${error.message}`,
-            {
-              from: error,
-            }
-          ),
-          data: null,
-        };
-
-      return {
-        error: new StorageError("an unexpected error occurred", {
-          from: error,
-        }),
-        data: null,
-      };
-    }
-  }
-}
-
-export type StorageResponse<T> =
+type IStorageResponse<T> =
   | {
       data: T;
       error: null;
@@ -46,6 +18,48 @@ export type StorageResponse<T> =
       error: StorageError;
       data: null;
     };
+
+export class StorageResponse<T> {
+  private readonly _data: T | null;
+  private readonly _error: null | StorageError;
+
+  private constructor({ data, error }: IStorageResponse<T>) {
+    this._data = data;
+    this._error = error;
+  }
+
+  public get error() {
+    return this._error;
+  }
+
+  public get data() {
+    return this._data;
+  }
+
+  public toObject(): IStorageResponse<T> {
+    if (this._error !== null)
+      return {
+        data: null,
+        error: this._error,
+      };
+    return {
+      data: this._data as T,
+      error: null,
+    };
+  }
+
+  public static Data<DT>(data: DT): StorageResponse<DT> {
+    return new StorageResponse<DT>({ data, error: null });
+  }
+
+  public static Error(err: StorageError): StorageResponse<never> {
+    return new StorageResponse<never>({ error: err, data: null });
+  }
+
+  toString() {
+    return JSON.stringify(this.toObject());
+  }
+}
 
 export class StorageError extends Error {
   private readonly _title: string;
@@ -77,3 +91,52 @@ export class StorageError extends Error {
     return this._from;
   }
 }
+
+export const S3ConfigSchema = z
+  .object({
+    bucket: z.string().min(1),
+    accessKeyId: z.string().min(1),
+    secretKey: z.string().min(1),
+    endpoint: z.string().min(1),
+    region: z.string().min(1),
+  })
+  .strict();
+
+export type S3Config = z.infer<typeof S3ConfigSchema>;
+
+export const GoogleDriveConfigSchema = z
+  .object({
+    parentID: z.string().min(1),
+    jsonKey: z
+      .object({
+        type: z.literal("service_account"),
+        project_id: z.string().min(1),
+        private_key_id: z.string().min(1),
+        private_key: z
+          .string()
+          .regex(/^-----BEGIN PRIVATE KEY-----/, "Invalid private key format"),
+        client_email: z
+          .string()
+          .regex(
+            /^[^@]+@[^@]+\.iam\.gserviceaccount\.com$/,
+            "Invalid service account email"
+          ),
+        client_id: z.string().min(1),
+        auth_uri: z.literal("https://accounts.google.com/o/oauth2/auth"),
+        token_uri: z.literal("https://oauth2.googleapis.com/token"),
+        auth_provider_x509_cert_url: z.literal(
+          "https://www.googleapis.com/oauth2/v1/certs"
+        ),
+        client_x509_cert_url: z
+          .string()
+          .regex(
+            /^https:\/\/www\.googleapis\.com\/robot\/v1\/metadata\/x509\//,
+            "Invalid cert URL"
+          ),
+        universe_domain: z.literal("googleapis.com"),
+      })
+      .strict(),
+  })
+  .strict();
+
+export type GoogleDriveConfig = z.infer<typeof GoogleDriveConfigSchema>;

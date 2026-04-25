@@ -2,10 +2,6 @@ import { ObjectPage } from "@apps/web/components/page";
 import { StorageProviderDrawer } from "@apps/web/components/drawers/storage-provider";
 import StorageProvidersTable from "@apps/web/app/admin/storage/storage-providers-table";
 import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
-import { PaginatedDataTableDataGetter } from "@packages/ui/components/data-table";
-import { Database, Tables } from "@packages/supabase/types.gen";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { isAdmin, onServer } from "@apps/web/lib/utils-server";
 import { getSupabaseRows } from "@apps/web/lib/utils";
 
 // <Badge
@@ -15,9 +11,8 @@ import { getSupabaseRows } from "@apps/web/lib/utils";
 //   {storage.data?.is_valid ? "Connected" : "Invalid"}
 // </Badge>;
 
-
-
 export default async function () {
+
   return (
     <ObjectPage
       title={"Storage Providers"}
@@ -27,7 +22,15 @@ export default async function () {
       action={<StorageProviderDrawer />}
     >
       <StorageProvidersTable
-        getRowsAction={onServer(getSupabaseRows({ table: "storage_providers", supabase: createServiceRoleClient }))}
+        getRowsAction={async (props) => {
+          "use server";
+          const getRowsAction = getSupabaseRows({
+            table: "storage_providers",
+            supabase: createServiceRoleClient,
+            omitColumns: ["data"] // don't send to client; sensitive
+          });
+          return getRowsAction(props);
+        }}
       />
     </ObjectPage>
   );

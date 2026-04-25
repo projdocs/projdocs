@@ -70,7 +70,10 @@ export default async function ({ children }: LayoutProps) {
 
   return (
     <SidebarProvider>
-      <CustomSidebar groups={[...adminSidebar, ...orgs]} />
+      <CustomSidebar
+        groups={[...adminSidebar, ...orgs]}
+        organizations={organizations.data ?? []}
+      />
       <SidebarInset>
         <div className={"flex h-full w-full flex-col"}>{children}</div>
       </SidebarInset>

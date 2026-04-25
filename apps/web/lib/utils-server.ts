@@ -1,14 +1,6 @@
 "use server";
 import { cookies } from "next/headers";
 
-export async function onServer<T extends (...args: any[]) => any>(
-  fn: T
-): Promise<(...args: Parameters<T>) => Promise<Awaited<ReturnType<T>>>> {
-  return async (...args: Parameters<T>): Promise<Awaited<ReturnType<T>>> => {
-    return fn(...args);
-  };
-}
-
 export const isAdmin = async () => {
   if (process.env.ENABLE_PROJDOCS_ADMIN !== "1") {
     console.error(

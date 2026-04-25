@@ -39,12 +39,14 @@ export default async function (
   const params = await props.params;
   const supabase = await createServerClient();
 
-  const { data: organization, error: orgError } = await supabase
+  const { data: organizations, error: orgError } = await supabase
     .from("organizations")
-    .select()
-    .eq("id", params["organization-id"])
-    .single();
-  if (orgError)
+    .select();
+  const organization = organizations?.find(
+    (org) => org.id === params["organization-id"]
+  );
+
+  if (orgError || !organization)
     return (
       <div className="flex min-h-svh items-center justify-center p-4">
         <Card className={"w-full max-w-sm"}>
@@ -104,6 +106,7 @@ export default async function (
   return (
     <SidebarProvider>
       <CustomSidebar
+        organizations={organizations}
         organization={organization}
         groups={getItems({
           organization,

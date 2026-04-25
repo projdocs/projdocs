@@ -14,7 +14,7 @@ export default async function () {
     data: { providers },
     error,
   } = await (
-    await createServiceRoleClient()
+    await createServiceRoleClient({ __unsafe_ignore_admin_check: true })
   ).auth.admin.customProviders.listProviders();
 
   if (error)

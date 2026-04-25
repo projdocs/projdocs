@@ -1,0 +1,64 @@
+---
+title: Google Drive API
+description: Configure ProjDocs to use Google Drive API as the storage backend.
+---
+
+# Background
+
+Google Workspace customers can connect their existing
+
+# Setup
+
+## Obtain API Credentials
+
+1. Login to [Google Cloud Console](https://console.cloud.google.com/).
+
+2. Select an [existing project](https://console.cloud.google.com/cloud-resource-manager), or [create a new one](https://developers.google.com/workspace/guides/create-project). In this demonstration, the project-id is `projdocs-api-connection`.
+
+3. In your project, enable the [Google Drive API](https://console.cloud.google.com/marketplace/product/google/drive.googleapis.com).
+
+![Enable Google Drive API](./1-enable-api.png)
+
+4. Create a new service account.
+
+![Create Service Account](./2-create-service-account.png)
+
+![Configure Service Account](./3-configure-service-account.png)
+
+<Card>
+  When creating the service account, as shown in the above step, no optional permissions or principals are required.
+</Card>
+
+5. Create a JSON key for the service account.
+
+![Select Service Account](./4-select-service-account.png)
+
+![Create New Key](./5-create-new-key.png)
+
+![Create JSON Key](./6-create-json-key.png)
+
+![Open Downloaded Key](./7-open-downloaded-key.png)
+
+## Share Storage with Service Account
+
+Take note of the Service Account's email address. In the downloaded key file, this value is the `client_email` key.
+
+Now, create a new Shared Google Drive, or a Google Drive Folder, and share that with the Service Account's email address.
+
+![Share Storage Path](./10-share.png)
+
+## Upload API Credentials to ProjDocs
+
+Create a new storage provider in ProjDocs Admin (`/admin/storage`).
+
+For the type, select `Google Drive API`.
+
+For the `Service Account Key`, copy and paste the entire contents of the file downloaded earlier.
+
+Be sure to include the opening and closing brackets.
+
+![Bottom](./9-bottom.png)
+
+![Top](./8-top.png)
+
+

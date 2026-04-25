@@ -2,9 +2,11 @@ import { createServerClient as createClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Database } from "@packages/supabase/types.gen";
 import { isAdmin } from "@apps/web/lib/utils-server";
-
-export async function createServiceRoleClient() {
-  if (!(await isAdmin())) throw new Error("unauthorized");
+import "server-only";
+export async function createServiceRoleClient(props?: {
+  __unsafe_ignore_admin_check?: boolean;
+}) {
+  if (!(await isAdmin()) && !props?.__unsafe_ignore_admin_check) throw new Error("unauthorized");
   return createClient<Database>(
     process.env.SUPABASE_KONG_URL!,
     process.env.SUPABASE_SECRET_KEY!,

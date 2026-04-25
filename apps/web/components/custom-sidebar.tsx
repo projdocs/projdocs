@@ -13,7 +13,6 @@ import {
   SidebarRail,
   SidebarTrigger,
 } from "@packages/ui/components/sidebar";
-import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
 import { SidebarUser } from "@apps/web/components/sidebar-user";
 import { Tables } from "@packages/supabase/types.gen";
 import { JwtPayload } from "@supabase/auth-js";
@@ -23,19 +22,18 @@ export type CustomSidebarGroups = readonly SidebarGroups[];
 export async function CustomSidebar({
   groups,
   organization,
+  organizations,
   user,
   ...props
 }: React.ComponentProps<typeof Sidebar> & {
   groups: CustomSidebarGroups;
   organization?: Tables<"organizations">;
+  organizations: readonly Tables<"organizations">[];
   user?: {
     account: JwtPayload;
     profile: Tables<"profiles">;
   };
 }) {
-  const supabase = await createServiceRoleClient();
-  const orgs = await supabase.from("organizations").select();
-
   return (
     <Sidebar collapsible="icon" {...props}>
       <SidebarHeader>
@@ -45,7 +43,7 @@ export async function CustomSidebar({
               ? { isAdmin: false, org: organization }
               : { isAdmin: true, org: null }
           }
-          orgs={orgs.data}
+          orgs={organizations}
         />
       </SidebarHeader>
 
@@ -63,7 +61,9 @@ export async function CustomSidebar({
               name: user.profile.full_name,
               email:
                 user.account.email ?? user.account.phone ?? user.account.sub,
-              avatar: user.account.user_metadata?.picture ?? user.account.user_metadata?.avatar_url,
+              avatar:
+                user.account.user_metadata?.picture ??
+                user.account.user_metadata?.avatar_url,
             }}
           />
         )}

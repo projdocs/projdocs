@@ -36,68 +36,82 @@ AS $function$BEGIN
     return extensions.jsonb_matches_schema(
       instance := _data,
       schema := '{
-        "type": "object",
-        "required": [
-          "type",
-          "project_id",
-          "private_key_id",
-          "private_key",
-          "client_email",
-          "client_id",
-          "auth_uri",
-          "token_uri",
-          "auth_provider_x509_cert_url",
-          "client_x509_cert_url",
-          "universe_domain"
-        ],
-        "additionalProperties": false,
-        "properties": {
-          "type": {
-            "type": "string",
-            "const": "service_account"
-          },
-          "project_id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "private_key_id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "private_key": {
-            "type": "string",
-            "pattern": "^-----BEGIN PRIVATE KEY-----"
-          },
-          "client_email": {
-            "type": "string",
-            "pattern": "^[^@]+@[^@]+\\.iam\\.gserviceaccount\\.com$"
-          },
-          "client_id": {
-            "type": "string",
-            "minLength": 1
-          },
-          "auth_uri": {
-            "type": "string",
-            "const": "https://accounts.google.com/o/oauth2/auth"
-          },
-          "token_uri": {
-            "type": "string",
-            "const": "https://oauth2.googleapis.com/token"
-          },
-          "auth_provider_x509_cert_url": {
-            "type": "string",
-            "const": "https://www.googleapis.com/oauth2/v1/certs"
-          },
-          "client_x509_cert_url": {
-            "type": "string",
-            "pattern": "^https://www\\.googleapis\\.com/robot/v1/metadata/x509/"
-          },
-          "universe_domain": {
-            "type": "string",
-            "const": "googleapis.com"
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "jsonKey",
+            "parentID"
+          ],
+          "properties": {
+            "parentID": {
+              "type": "string",
+              "minLength": 1
+            },
+            "jsonKey": {
+              "type": "object",
+              "required": [
+                "type",
+                "project_id",
+                "private_key_id",
+                "private_key",
+                "client_email",
+                "client_id",
+                "auth_uri",
+                "token_uri",
+                "auth_provider_x509_cert_url",
+                "client_x509_cert_url",
+                "universe_domain"
+              ],
+              "additionalProperties": false,
+              "properties": {
+                "type": {
+                  "type": "string",
+                  "const": "service_account"
+                },
+                "project_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "private_key_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "private_key": {
+                  "type": "string",
+                  "pattern": "^-----BEGIN PRIVATE KEY-----"
+                },
+                "client_email": {
+                  "type": "string",
+                  "pattern": "^[^@]+@[^@]+\\.iam\\.gserviceaccount\\.com$"
+                },
+                "client_id": {
+                  "type": "string",
+                  "minLength": 1
+                },
+                "auth_uri": {
+                  "type": "string",
+                  "const": "https://accounts.google.com/o/oauth2/auth"
+                },
+                "token_uri": {
+                  "type": "string",
+                  "const": "https://oauth2.googleapis.com/token"
+                },
+                "auth_provider_x509_cert_url": {
+                  "type": "string",
+                  "const": "https://www.googleapis.com/oauth2/v1/certs"
+                },
+                "client_x509_cert_url": {
+                  "type": "string",
+                  "pattern": "^https://www\\.googleapis\\.com/robot/v1/metadata/x509/"
+                },
+                "universe_domain": {
+                  "type": "string",
+                  "const": "googleapis.com"
+                }
+              }
+            }
           }
-        }
-      }'
+        }'
     );
   ELSIF _type = 'BUILT_IN'::public.settings_storage_type THEN
     RETURN TRUE;
