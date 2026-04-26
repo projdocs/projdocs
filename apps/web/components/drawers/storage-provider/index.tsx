@@ -133,7 +133,11 @@ const GoogleDriveStorageProviderForm = ({
           <Button
             type={"button"}
             variant={"outline"}
-            onClick={() => fileRef.current?.click()}
+            onClick={(e) => {
+              e.preventDefault();
+              e.stopPropagation();
+              fileRef.current?.click();
+            }}
           >
             {fileRef.current?.files?.item(0)?.name ? "Replace" : "Upload"}
           </Button>

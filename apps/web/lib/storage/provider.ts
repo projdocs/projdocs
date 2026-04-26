@@ -1,12 +1,12 @@
 import { StorageError, StorageResponse } from "@apps/web/lib/storage/type";
 import { S3ServiceException } from "@aws-sdk/client-s3";
 
-export abstract class StorageProviderBase<FileType extends object> {
-  abstract _mkdir(path: string): Promise<StorageResponse<FileType>>;
+export abstract class StorageProviderBase {
+  abstract _mkdir(path: string): Promise<StorageResponse<string>>;
 
   abstract _test(): Promise<StorageResponse<boolean>>;
 
-  public async mkdir(path: string): Promise<StorageResponse<FileType>> {
+  public async mkdir(path: string): Promise<StorageResponse<string>> {
     return await this.safely(async () => {
       return await this._mkdir(path);
     });

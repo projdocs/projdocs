@@ -5,7 +5,7 @@ import { StorageProviderBase } from "@apps/web/lib/storage/provider";
 
 type FileType = drive_v3.Schema$File;
 
-export class GoogleDriveStorageProvider extends StorageProviderBase<FileType> {
+export class GoogleDriveStorageProvider extends StorageProviderBase {
   private readonly client: drive_v3.Drive;
   private readonly driveID: string;
 
@@ -71,7 +71,7 @@ export class GoogleDriveStorageProvider extends StorageProviderBase<FileType> {
   //   });
   // }
 
-  async _mkdir(path: string): Promise<StorageResponse<FileType>> {
+  async _mkdir(path: string): Promise<StorageResponse<string>> {
     const segments = path.replace(/^\//, "").split("/");
     let folder: FileType = { id: this.driveID };
 
@@ -105,6 +105,6 @@ export class GoogleDriveStorageProvider extends StorageProviderBase<FileType> {
       }
     }
 
-    return StorageResponse.Data(folder);
+    return StorageResponse.Data(folder.id!);
   }
 }

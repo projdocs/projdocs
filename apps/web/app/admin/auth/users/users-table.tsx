@@ -1,21 +1,11 @@
 "use client";
 
 import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
-import {
-  AuthError,
-  CustomOAuthProvider,
-  Pagination,
-  User,
-} from "@supabase/auth-js";
-import { supabase } from "@apps/web/lib/supabase/client";
+import { User } from "@supabase/auth-js";
 import {
   PaginatedDataTable,
   PaginatedDataTableDataGetter,
 } from "@packages/ui/components/data-table";
-
-type GetDataResponse =
-  | { data: { users: User[]; aud: string } & Pagination; error: null }
-  | { data: { users: [] }; error: AuthError };
 
 type Column = User;
 

@@ -25,7 +25,7 @@ export const ObjectPage = (props: {
   <div className={"flex w-full h-full flex-col gap-8 p-8"}>
     <div className={"flex flex-row items-center justify-between"}>
       <div className={"flex flex-col"}>
-        <H2>{props.title}</H2>
+        <H2 className={"pb-0"}>{props.title}</H2>
         {props.description && (
           <p className={"text-muted-foreground"}>{props.description}</p>
         )}

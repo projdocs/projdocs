@@ -1148,24 +1148,24 @@ export type Database = {
         Row: {
           display: string
           id: string
-          storage_provider_id: string | null
+          storage_link_id: string | null
         }
         Insert: {
           display: string
           id?: string
-          storage_provider_id?: string | null
+          storage_link_id?: string | null
         }
         Update: {
           display?: string
           id?: string
-          storage_provider_id?: string | null
+          storage_link_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "organizations_storage_provider_id_fkey"
-            columns: ["storage_provider_id"]
+            foreignKeyName: "organizations_storage_link_fkey"
+            columns: ["storage_link_id"]
             isOneToOne: false
-            referencedRelation: "storage_providers"
+            referencedRelation: "storage_links"
             referencedColumns: ["id"]
           },
         ]
@@ -1201,6 +1201,32 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      storage_links: {
+        Row: {
+          id: string
+          key: string | null
+          storage_provider_id: string
+        }
+        Insert: {
+          id?: string
+          key?: string | null
+          storage_provider_id?: string
+        }
+        Update: {
+          id?: string
+          key?: string | null
+          storage_provider_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "storage_link_storage_provider_id_fkey"
+            columns: ["storage_provider_id"]
+            isOneToOne: false
+            referencedRelation: "storage_providers"
             referencedColumns: ["id"]
           },
         ]

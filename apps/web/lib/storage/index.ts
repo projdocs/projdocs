@@ -10,7 +10,7 @@ export class StorageProvider {
     from: Tables<"storage_providers">
   ):
     | { error: string; provider: null }
-    | { error: null; provider: StorageProviderBase<object> } => {
+    | { error: null; provider: StorageProviderBase } => {
     if (!from.is_valid) return { error: "provider is invalid", provider: null };
     switch (from.type) {
       case "BUILT_IN":

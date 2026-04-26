@@ -21,7 +21,7 @@ import { Button } from "@packages/ui/components/button";
 
 export type AdminSidebarMenuSubitem = Pick<
   AdminSidebarMenuItem,
-  "title" | "url"
+  "title" | "url" | "icon"
 >;
 
 export type AdminSidebarMenuItem = {
@@ -50,7 +50,11 @@ export function CustomSidebarGroup(props: SidebarGroups) {
           <Collapsible
             key={`${index}-${item.url}`}
             asChild
-            defaultOpen={item.url === pathname || ( item.items !== undefined && !!item.items.find(item => item.url === pathname) )}
+            defaultOpen={
+              item.url === pathname ||
+              (item.items !== undefined &&
+                !!item.items.find((item) => item.url === pathname))
+            }
             className="group/collapsible"
           >
             <SidebarMenuItem>
@@ -86,7 +90,8 @@ export function CustomSidebarGroup(props: SidebarGroups) {
                               "w-full justify-start disabled:bg-secondary"
                             }
                           >
-                            <span>{item.title}</span>
+                            {item.icon}
+                            <span className={"pl-1"}>{item.title}</span>
                           </Button>
                         </SidebarMenuSubItem>
                       ))}

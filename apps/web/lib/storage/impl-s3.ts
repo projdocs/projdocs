@@ -1,9 +1,5 @@
+import { StorageError, StorageResponse } from "@apps/web/lib/storage/type";
 import {
-  StorageError,
-  StorageResponse,
-} from "@apps/web/lib/storage/type";
-import {
-  _Object as StorageObject,
   CommonPrefix,
   HeadObjectCommand,
   ListObjectsV2Output,
@@ -23,7 +19,7 @@ export type S3StorageConnectionSettings = {
   };
 };
 
-export class S3StorageProvider extends StorageProviderBase<StorageObject> {
+export class S3StorageProvider extends StorageProviderBase {
   private readonly client: S3Client;
   private readonly bucket: string;
 
@@ -43,20 +39,19 @@ export class S3StorageProvider extends StorageProviderBase<StorageObject> {
     });
   }
 
-  async _mkdir(path: string): Promise<StorageResponse<StorageObject>> {
+  async _mkdir(path: string): Promise<StorageResponse<string>> {
     const key = (path.endsWith("/") ? path : `${path}/`).replace(/^\/+/, "");
     if (!S3StorageProvider.isValidFolderPath.test(key))
       return StorageResponse.Error(new StorageError("invalid path"));
-    return StorageResponse.Data(
-      await this.client.send(
-        new PutObjectCommand({
-          Bucket: this.bucket,
-          Key: key,
-          Body: "",
-          ContentLength: 0,
-        })
-      )
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: "",
+        ContentLength: 0,
+      })
     );
+    return StorageResponse.Data(key);
   }
 
   async _test(): Promise<StorageResponse<boolean>> {
@@ -96,8 +91,6 @@ export class S3StorageProvider extends StorageProviderBase<StorageObject> {
       return StorageResponse.Data(false);
     }
   }
-
-
 
   async ls(path: string = "") {
     return this.safely(async () => {

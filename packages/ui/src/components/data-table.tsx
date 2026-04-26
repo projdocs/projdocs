@@ -47,7 +47,7 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 
-type PaginatedDataTableState<TData> = {
+export type PaginatedDataTableState<TData> = {
   count: number;
   rows: TData[];
 };
@@ -58,13 +58,17 @@ export type PaginatedDataTableDataGetter<TData> = (props: {
   sort: ColumnSort | null;
 }) => Promise<PaginatedDataTableState<TData>>;
 
-export function PaginatedDataTable<TData>(props: {
+type PaginatedDataTableProps<TData> = {
   columns: ColumnDef<TData>[];
   /* Custom event listener (on window) to listen for events to trigger refreshing the table's data */
   refreshEvent?: string;
   getData: PaginatedDataTableDataGetter<TData>;
   __disable_pagination?: true;
-}) {
+};
+
+export function usePaginatedDataTable<TData>(
+  props: PaginatedDataTableProps<TData>
+) {
   const id = useId();
 
   const [state, setState] = useState<PaginatedDataTableState<TData>>({
@@ -114,7 +118,9 @@ export function PaginatedDataTable<TData>(props: {
           pagination: {
             ...pagination,
             from: pagination.pageIndex * pagination.pageSize,
-            to: (pagination.pageIndex * pagination.pageSize) + (pagination.pageSize - 1),
+            to:
+              pagination.pageIndex * pagination.pageSize +
+              (pagination.pageSize - 1),
           },
         });
       } catch (error) {
@@ -189,9 +195,40 @@ export function PaginatedDataTable<TData>(props: {
     );
   }, [state.count, pagination.pageIndex, pagination.pageSize]);
 
+  return {
+    state,
+    pageCount,
+    setSorting,
+    setPagination,
+    sorting,
+    pagination,
+    isLoading,
+    id,
+    table,
+    startRow,
+    endRow,
+    canNextPage,
+    canPreviousPage,
+  };
+}
+
+export function PaginatedDataTable<TData>(
+  props: PaginatedDataTableProps<TData>
+) {
+  const {
+    state,
+    pageCount,
+    isLoading,
+    id,
+    canPreviousPage,
+    canNextPage,
+    table,
+    startRow,
+    endRow,
+  } = usePaginatedDataTable(props);
+
   return (
     <div className="space-y-4 md:w-full" aria-busy={isLoading}>
-      {/* Wrap EVERYTHING we want to dim/disable */}
       <div className="relative">
         <div
           className={cn(

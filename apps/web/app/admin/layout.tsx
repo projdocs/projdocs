@@ -6,9 +6,10 @@ import {
 import { SidebarInset, SidebarProvider } from "@packages/ui/components/sidebar";
 import {
   BuildingIcon,
-  DatabaseZapIcon,
+  DatabaseZapIcon, FingerprintIcon,
   LayoutDashboardIcon,
   UserLock,
+  UsersIcon,
 } from "lucide-react";
 import * as React from "react";
 import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
@@ -34,10 +35,12 @@ const adminSidebar: CustomSidebarGroups = [
           {
             title: "Users",
             url: "/admin/auth/users",
+            icon: <UsersIcon />,
           },
           {
             title: "Identity Providers",
             url: "/admin/auth/providers",
+            icon: <FingerprintIcon />
           },
         ],
       },
@@ -64,6 +67,18 @@ export default async function ({ children }: LayoutProps) {
           title: org.display,
           url: `/admin/organizations/${org.id}`,
           icon: <BuildingIcon />,
+          items: [
+            {
+              title: "Storage",
+              url: `/admin/organizations/${org.id}/storage`,
+              icon: <DatabaseZapIcon />,
+            },
+            {
+              title: "Members",
+              url: `/admin/organizations/${org.id}/members`,
+              icon: <UsersIcon />,
+            },
+          ],
         })),
       },
     ];
