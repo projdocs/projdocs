@@ -1,0 +1,23 @@
+name: "Pre-Deploy"
+on:
+  pull_request:
+    branches:
+      - production
+
+jobs:
+  test-supabase:
+    name: Test Supabase
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v2
+        with:
+          version: 2.84.2
+
+      - run: supabase db start
+
+      - run: supabase test db
+
+      - run: supabase stop --no-backup
