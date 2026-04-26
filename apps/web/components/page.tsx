@@ -1,9 +1,14 @@
-import { H2 } from "@packages/ui/components/typography";
+import { H1 } from "@packages/ui/components/typography";
 import { ReactNode } from "react";
-import { Card, CardDescription, CardHeader, CardTitle } from "@packages/ui/components/card";
+import {
+  Card,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@packages/ui/components/card";
 
 export const ErrorPage = (props: { title?: string; description?: string }) => (
-  <div className={"w-full h-full flex flex-col items-center justify-center"}>
+  <div className={"flex h-full w-full flex-col items-center justify-center"}>
     <Card className={"w-full max-w-sm"}>
       <CardHeader>
         <CardTitle>{props.title ?? "Unexpected error!"}</CardTitle>
@@ -22,10 +27,10 @@ export const ObjectPage = (props: {
   action?: ReactNode;
   children?: ReactNode;
 }) => (
-  <div className={"flex w-full h-full flex-col gap-8 p-8"}>
+  <div className={"flex h-full w-full flex-col gap-8 p-8"}>
     <div className={"flex flex-row items-center justify-between"}>
       <div className={"flex flex-col"}>
-        <H2 className={"pb-0"}>{props.title}</H2>
+        <H1 className={"pb-0"}>{props.title}</H1>
         {props.description && (
           <p className={"text-muted-foreground"}>{props.description}</p>
         )}

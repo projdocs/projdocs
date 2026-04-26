@@ -5,7 +5,13 @@ import {
   CustomSidebarGroups,
 } from "@apps/web/components/custom-sidebar";
 import { createServerClient } from "@apps/web/lib/supabase/server";
-import { LayoutDashboardIcon } from "lucide-react";
+import {
+  FolderHeartIcon,
+  FolderIcon,
+  LayoutDashboardIcon,
+  UserIcon,
+  UserStarIcon,
+} from "lucide-react";
 import { Tables } from "@packages/supabase/types.gen";
 import {
   Card,
@@ -24,6 +30,36 @@ const getItems = (props: { organization: Tables<"organizations"> }) =>
           title: "Dashboard",
           url: `/organizations/${props.organization.id}`,
           icon: <LayoutDashboardIcon />,
+        },
+      ],
+    },
+    {
+      title: "Clients",
+      items: [
+        {
+          title: "My Clients",
+          url: `/organizations/${props.organization.id}/clients/favorites`,
+          icon: <UserStarIcon />,
+        },
+        {
+          title: "All Clients",
+          url: `/organizations/${props.organization.id}/clients`,
+          icon: <UserIcon />,
+        },
+      ],
+    },
+    {
+      title: "Projects",
+      items: [
+        {
+          title: "My Projects",
+          url: `/organizations/${props.organization.id}/projects/favorites`,
+          icon: <FolderHeartIcon />,
+        },
+        {
+          title: "All Projects",
+          url: `/organizations/${props.organization.id}/projects`,
+          icon: <FolderIcon />,
         },
       ],
     },

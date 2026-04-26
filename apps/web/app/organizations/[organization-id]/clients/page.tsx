@@ -1,21 +1,43 @@
-import { H1 } from "@packages/ui/components/typography";
+"use client";
 
+import { ObjectPage } from "@apps/web/components/page";
+import { PaginatedDataTable } from "@packages/ui/components/data-table";
+import { Tables } from "@packages/supabase/types.gen";
+import { ColumnDef, createColumnHelper } from "@tanstack/react-table";
+import { getSupabaseRows } from "@apps/web/lib/utils";
+import { supabase } from "@apps/web/lib/supabase/client";
+import { use } from "react";
 
+type Column = Tables<"clients">;
+const column = createColumnHelper<Column>();
+const columns = [
+  column.accessor("id", { header: "ID" }),
+] as ColumnDef<Column>[];
 
-export default async function(props: {
+export default function (props: {
   params: Promise<{
     "organization-id": string;
-  }>;
+  }>
 }) {
 
-  const params = await props.params;
+  const params = use(props.params);
 
   return (
-    <div className={"flex w-full flex-col p-8"}>
-
-      <H1>{"Clients"}</H1>
-
-    </div>
-  )
-
+    <ObjectPage title={"Clients"}>
+      <PaginatedDataTable
+        columns={columns}
+        getData={getSupabaseRows({
+          supabase,
+          table: "clients",
+          // filters: [
+          //   {
+          //     column: "organization_id",
+          //     operator: "eq",
+          //     value: params["organization-id"]
+          //   }
+          // ]
+        })}
+      />
+    </ObjectPage>
+  );
 }
