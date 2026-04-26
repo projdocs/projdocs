@@ -14,7 +14,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@packages/ui/components/card";
-import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/_components/select-org-button";
+import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/select-org-button";
 
 const getItems = (props: { organization: Tables<"organizations"> }) =>
   [
@@ -119,13 +119,6 @@ export default async function (
       <SidebarInset>
         <div className="flex h-dvh w-full flex-col overflow-scroll">
           {props.children}
-
-          {/*<div className="grid auto-rows-min gap-4 md:grid-cols-3">*/}
-          {/*  <div className="aspect-video rounded-xl bg-muted/50" />*/}
-          {/*  <div className="aspect-video rounded-xl bg-muted/50" />*/}
-          {/*  <div className="aspect-video rounded-xl bg-muted/50" />*/}
-          {/*</div>*/}
-          {/*<div className="min-h-screen flex-1 rounded-xl bg-muted/50 md:min-h-min" />*/}
         </div>
       </SidebarInset>
     </SidebarProvider>
