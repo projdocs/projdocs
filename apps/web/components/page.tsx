@@ -22,7 +22,7 @@ export const ErrorPage = (props: { title?: string; description?: string }) => (
 );
 
 export const ObjectPage = (props: {
-  title: string;
+  title?: string;
   description?: string;
   action?: ReactNode;
   children?: ReactNode;
@@ -30,7 +30,7 @@ export const ObjectPage = (props: {
   <div className={"flex h-full w-full flex-col gap-8 p-8"}>
     <div className={"flex flex-row items-center justify-between"}>
       <div className={"flex flex-col"}>
-        <H1 className={"pb-0"}>{props.title}</H1>
+        {props.title && <H1 className={"pb-0"}>{props.title}</H1>}
         {props.description && (
           <p className={"text-muted-foreground"}>{props.description}</p>
         )}

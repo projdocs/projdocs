@@ -1180,27 +1180,27 @@ export type Database = {
         Row: {
           auto_add_members: boolean
           display: string
+          folder_id: string | null
           id: string
-          storage_link_id: string | null
         }
         Insert: {
           auto_add_members?: boolean
           display: string
+          folder_id?: string | null
           id?: string
-          storage_link_id?: string | null
         }
         Update: {
           auto_add_members?: boolean
           display?: string
+          folder_id?: string | null
           id?: string
-          storage_link_id?: string | null
         }
         Relationships: [
           {
-            foreignKeyName: "organizations_storage_link_fkey"
-            columns: ["storage_link_id"]
+            foreignKeyName: "organizations_folder_id_fkey"
+            columns: ["folder_id"]
             isOneToOne: false
-            referencedRelation: "storage_links"
+            referencedRelation: "storage_folders"
             referencedColumns: ["id"]
           },
         ]
@@ -1272,25 +1272,35 @@ export type Database = {
           },
         ]
       }
-      storage_links: {
+      storage_folders: {
         Row: {
           id: string
-          key: string | null
+          parent_id: string | null
           storage_provider_id: string
+          value: string
         }
         Insert: {
           id?: string
-          key?: string | null
-          storage_provider_id?: string
+          parent_id?: string | null
+          storage_provider_id: string
+          value: string
         }
         Update: {
           id?: string
-          key?: string | null
+          parent_id?: string | null
           storage_provider_id?: string
+          value?: string
         }
         Relationships: [
           {
-            foreignKeyName: "storage_link_storage_provider_id_fkey"
+            foreignKeyName: "storage_objects_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "storage_folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_objects_storage_provider_id_fkey"
             columns: ["storage_provider_id"]
             isOneToOne: false
             referencedRelation: "storage_providers"
