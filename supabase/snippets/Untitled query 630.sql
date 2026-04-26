@@ -1,12 +1,5 @@
-ALTER TABLE public.settings_storage
-    RENAME COLUMN id TO _id;
+SELECT
 
-ALTER TABLE public.settings_storage
-    DROP CONSTRAINT settings_storage_pkey,
-    DROP CONSTRAINT settings_storage_id_check;
+  'https://lh3.googleusercontent.com/a/ACg8ocLoN81wvLoQbRy4opB4FqmPqSlKcnEOfnax9GcqIcPMVkwZk89u=s96-c'
 
-ALTER TABLE public.settings_storage
-    ADD COLUMN id uuid primary key not null default gen_random_uuid();
-
-ALTER TABLE public.settings_storage
-    DROP COLUMN _id;
+  ~ '^https?://' AS matches;

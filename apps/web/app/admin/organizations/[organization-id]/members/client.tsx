@@ -61,6 +61,21 @@ const addColumns = [
 type DisplayColumn = Tables<"profiles">;
 const displayColumn = createColumnHelper<DisplayColumn>();
 const displayColumns = [
+  displayColumn.accessor("profile_picture_url", {
+    header: "",
+    size: 1,
+    minSize: 1,
+    enableSorting: false,
+    cell: (info) => (
+      <Avatar>
+        <AvatarImage src={info.getValue() ?? undefined} />
+        <AvatarFallback>
+          {info.row.original.first_name.at(0)}
+          {info.row.original.last_name.at(0)}
+        </AvatarFallback>
+      </Avatar>
+    ),
+  }),
   displayColumn.accessor("first_name", { header: "First Name" }),
   displayColumn.accessor("last_name", { header: "Last Name" }),
   displayColumn.accessor("id", { header: "ID" }),

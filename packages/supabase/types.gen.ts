@@ -1118,19 +1118,51 @@ export type Database = {
   }
   public: {
     Tables: {
+      clients: {
+        Row: {
+          created_at: string
+          id: string
+          number: number
+          organization_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          number?: number
+          organization_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          number?: number
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           id: string
+          is_admin: boolean
           organization_id: string
           user_id: string
         }
         Insert: {
           id?: string
+          is_admin?: boolean
           organization_id: string
           user_id: string
         }
         Update: {
           id?: string
+          is_admin?: boolean
           organization_id?: string
           user_id?: string
         }
@@ -1177,6 +1209,7 @@ export type Database = {
           id: string
           last_name: string
           organization_id: string
+          profile_picture_url: string | null
           user_id: string
         }
         Insert: {
@@ -1185,6 +1218,7 @@ export type Database = {
           id?: string
           last_name: string
           organization_id: string
+          profile_picture_url?: string | null
           user_id: string
         }
         Update: {
@@ -1193,11 +1227,41 @@ export type Database = {
           id?: string
           last_name?: string
           organization_id?: string
+          profile_picture_url?: string | null
           user_id?: string
         }
         Relationships: [
           {
             foreignKeyName: "profiles_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      projects: {
+        Row: {
+          created_at: string
+          id: string
+          number: number
+          organization_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          number?: number
+          organization_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          number?: number
+          organization_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
@@ -1233,6 +1297,7 @@ export type Database = {
       }
       storage_providers: {
         Row: {
+          __is_migration_locked: boolean
           created_at: string
           data: Json
           id: string
@@ -1240,6 +1305,7 @@ export type Database = {
           type: Database["public"]["Enums"]["settings_storage_type"]
         }
         Insert: {
+          __is_migration_locked?: boolean
           created_at?: string
           data?: Json
           id?: string
@@ -1247,6 +1313,7 @@ export type Database = {
           type?: Database["public"]["Enums"]["settings_storage_type"]
         }
         Update: {
+          __is_migration_locked?: boolean
           created_at?: string
           data?: Json
           id?: string
