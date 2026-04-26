@@ -11,6 +11,16 @@ jobs:
     steps:
       - uses: actions/checkout@v6
 
+      - name: Check migrations are append-only
+        run: |
+          git fetch origin ${{ github.base_ref }} --depth=1
+          CHANGED=$(git diff --name-only --diff-filter=MDR origin/${{ github.base_ref }}...HEAD -- supabase/migrations/)
+          if [ -n "$CHANGED" ]; then
+            echo "Migration files must not be modified, deleted, or renamed:"
+            echo "$CHANGED"
+            exit 1
+          fi
+
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
         with:
