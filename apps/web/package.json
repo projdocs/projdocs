@@ -14,24 +14,28 @@
     "dockerize": "docker build -f apps/web/Dockerfile . -t projdocs/web:local --build-arg=VERSION=v0.0.0"
   },
   "dependencies": {
-    "@packages/ui": "*",
+    "@aws-sdk/client-s3": "3.1032.0",
+    "@mdx-js/loader": "^3.1.1",
+    "@mdx-js/react": "^3.1.1",
+    "@next/mdx": "^16.2.4",
     "@packages/supabase": "*",
+    "@packages/ui": "*",
+    "@types/mdx": "^2.0.13",
+    "googleapis": "171.4.0",
     "lucide-react": "^1.8.0",
     "next": "16.2.4",
     "next-themes": "^0.4.6",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
-    "uuid": "^13.0.0",
-    "@aws-sdk/client-s3": "3.1032.0",
-    "googleapis": "171.4.0"
+    "uuid": "^14.0.0"
   },
   "devDependencies": {
+    "@packages/eslint-config": "*",
+    "@packages/typescript-config": "*",
     "@tailwindcss/postcss": "^4.1.18",
     "@types/node": "^25.1.0",
     "@types/react": "^19.2.10",
     "@types/react-dom": "^19.2.3",
-    "@packages/eslint-config": "*",
-    "@packages/typescript-config": "*",
     "eslint": "^9.39.2",
     "typescript": "^5.9.3"
   }
