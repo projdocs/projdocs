@@ -213,7 +213,10 @@ export function usePaginatedDataTable<TData>(
 }
 
 export function PaginatedDataTable<TData>(
-  props: PaginatedDataTableProps<TData>
+  props: PaginatedDataTableProps<TData> & {
+    onRowClick?: (row: TData) => unknown | Promise<unknown>;
+    onRowDoubleClick?: (row: TData) => unknown | Promise<unknown>;
+  }
 ) {
   const {
     state,
@@ -314,6 +317,16 @@ export function PaginatedDataTable<TData>(
                     <TableRow
                       key={row.id}
                       data-state={row.getIsSelected() && "selected"}
+                      onClick={
+                        !props.onRowClick
+                          ? undefined
+                          : async () => await props.onRowClick!(row.original)
+                      }
+                      onDoubleClick={
+                        !props.onRowDoubleClick
+                          ? undefined
+                          : async () => await props.onRowDoubleClick!(row.original)
+                      }
                     >
                       {row.getVisibleCells().map((cell) => (
                         <TableCell key={cell.id}>

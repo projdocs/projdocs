@@ -6,7 +6,7 @@ import {
   CardTitle,
 } from "@packages/ui/components/card";
 import { H2 } from "@packages/ui/components/typography";
-import { OrgCard } from "@apps/web/app/organizations/_components/org-card";
+import { OrgCard } from "@apps/web/app/organizations/org-card";
 import { redirect } from "next/navigation";
 
 export default async function () {
