@@ -24,36 +24,54 @@ export default async function (props: {
     return <ErrorPage />;
   }
 
-  const members = await supabase.from("members").select().eq("organization_id", org.data.id);
-  if(members.error){
+  const members = await supabase
+    .from("members")
+    .select()
+    .eq("organization_id", org.data.id);
+  if (members.error) {
     console.error(members.error);
     return <ErrorPage />;
   }
 
   return (
     <OrganizationMembersPage
-      organization={org.data}
+      initialOrganization={org.data}
       getUsersAction={getUsersAction}
       initialMembers={members.data}
+      toggleMemberAutoAddAction={async (auto) => {
+        "use server";
+        const supabase = await createServiceRoleClient();
+        const { data, error } = await supabase
+          .from("organizations")
+          .update({ auto_add_members: auto })
+          .eq("id", org.data.id)
+          .select()
+          .single();
+        if (error) throw new Error(`Unable to create user: ${error.message}`);
+        return data;
+      }}
       getProfilesAction={async (props) => {
         "use server";
         return getSupabaseRows({
           supabase: createServiceRoleClient,
           table: "profiles",
-          filters: [{ column: "organization_id", operator: "eq", value: org.data.id }]
+          filters: [
+            { column: "organization_id", operator: "eq", value: org.data.id },
+          ],
         })(props);
       }}
       createMemberAction={async (user) => {
         "use server";
-
         const supabase = await createServiceRoleClient();
-        const {data, error} = await supabase.from("members").insert({
-          organization_id: org.data.id,
-          user_id: user.id,
-        }).select().single();
-
-        if(error) throw new Error(`Unable to create user: ${error.message}`)
-
+        const { data, error } = await supabase
+          .from("members")
+          .insert({
+            organization_id: org.data.id,
+            user_id: user.id,
+          })
+          .select()
+          .single();
+        if (error) throw new Error(`Unable to create user: ${error.message}`);
         return data;
       }}
     />

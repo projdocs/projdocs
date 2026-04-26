@@ -1,14 +1,10 @@
 do
 $$
     declare
-        org_id uuid := gen_random_uuid();
-        nrb_id uuid := '2b3e539a-60a2-44d5-8e33-2d1522298bd8'::uuid;
+        org_id uuid := '2300999D-4D91-4588-BE88-FFED0F29B90C'::uuid;
     begin
-        insert into public.organizations (id, display)
-        values (org_id, 'Lumon Industries, Corp.');
-
-        insert into public.members(user_id, organization_id)
-        values (nrb_id, org_id);
+        insert into public.organizations (id, display, auto_add_members)
+        values (org_id, 'Lumon Industries, Corp.', true);
     end;
 $$;
 

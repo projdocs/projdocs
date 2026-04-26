@@ -82,12 +82,17 @@ const displayColumns = [
 ] as ColumnDef<DisplayColumn>[];
 
 export const OrganizationMembersPage = (props: {
-  organization: Tables<"organizations">;
+  initialOrganization: Tables<"organizations">;
   getUsersAction: PaginatedDataTableDataGetter<AddColumn>;
   getProfilesAction: PaginatedDataTableDataGetter<DisplayColumn>;
   initialMembers: readonly Tables<"members">[];
   createMemberAction: (user: AddColumn) => Promise<Tables<"members">>;
+  toggleMemberAutoAddAction: (auto: boolean) => Promise<Tables<"organizations">>;
 }) => {
+  const [organization, setOrganization] = useState<Tables<"organizations">>(
+    props.initialOrganization
+  );
+
   const [members, setMembers] = useState<readonly Tables<"members">[]>(
     props.initialMembers
   );
@@ -100,7 +105,7 @@ export const OrganizationMembersPage = (props: {
   return (
     <ObjectPage
       title={"Members"}
-      description={`${props.organization.display} • ${props.organization.id}`}
+      description={`${organization.display} • ${organization.id}`}
       action={
         <ButtonGroup>
           <DropdownMenu>
@@ -184,11 +189,11 @@ export const OrganizationMembersPage = (props: {
                       disabled={exists}
                       onClick={async () => {
                         toast.promise(props.createMemberAction(user), {
-                          loading: `Adding user to ${props.organization.display}`,
+                          loading: `Adding user to ${organization.display}`,
                           success: (member: Tables<"members">) => {
                             setMembers((members) => [...members, member]);
                             return {
-                              message: `Added user to ${props.organization.display}`,
+                              message: `Added user to ${organization.display}`,
                             };
                           },
                           error: "An unexpected error occurred!",
@@ -253,11 +258,21 @@ export const OrganizationMembersPage = (props: {
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-[300px]">
               <DropdownMenuGroup>
-                <DropdownMenuItem>
+                <DropdownMenuItem onClick={async () => toast.promise(props.toggleMemberAutoAddAction(!organization.auto_add_members), {
+                  loading: "Toggling auto-add members...",
+                  success: (organization: Tables<"organizations">) => {
+                    setOrganization(organization);
+                    return ({ message: "Updated organization!" })
+                  },
+                  error: "Unable to update organization!"
+                })}>
                   <div className={"flex w-full flex-col gap-1"}>
-                    <div className={"flex flex-row items-center gap-2"}>
+                    <div className={"flex w-full flex-row items-center gap-2"}>
                       <UserCogIcon />
                       <p>{"Automatically Add Members"}</p>
+                      <span className={"flex flex-grow-1 justify-end"}>
+                        <Checkbox checked={organization.auto_add_members} />
+                      </span>
                     </div>
                     <p className={"text-muted-foreground"}>
                       {

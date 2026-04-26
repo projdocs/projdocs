@@ -1178,16 +1178,19 @@ export type Database = {
       }
       organizations: {
         Row: {
+          auto_add_members: boolean
           display: string
           id: string
           storage_link_id: string | null
         }
         Insert: {
+          auto_add_members?: boolean
           display: string
           id?: string
           storage_link_id?: string | null
         }
         Update: {
+          auto_add_members?: boolean
           display?: string
           id?: string
           storage_link_id?: string | null
