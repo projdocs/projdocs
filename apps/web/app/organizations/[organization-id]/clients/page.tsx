@@ -7,7 +7,7 @@ import { use } from "react";
 import { useRouter } from "next/navigation";
 import { ObjectPage } from "@packages/ui/components/page";
 import {
-  CLIENT_COLUMNS,
+  ClientColumns,
   CLIENTS_TABLE_REFRESH_EVENT,
 } from "@apps/web/app/organizations/[organization-id]/clients/cols";
 import { Tables } from "@packages/supabase";
@@ -26,7 +26,7 @@ export default function(props: {
     <ObjectPage title={"Clients"}>
       <PaginatedDataTable
         refreshEvent={CLIENTS_TABLE_REFRESH_EVENT}
-        columns={CLIENT_COLUMNS}
+        columns={ClientColumns}
         onRowClick={(row) =>
           router.push(
             `/organizations/${params["organization-id"]}/clients/${row.id}`,

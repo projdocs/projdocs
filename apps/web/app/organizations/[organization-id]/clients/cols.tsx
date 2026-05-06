@@ -55,10 +55,15 @@ const FavoriteButton = ({row}: {row: Column}) => {
   )
 }
 
-export const ClientColumn = createColumnHelper<Column>();
-export const CLIENT_COLUMNS = [
-  ClientColumn.accessor("id", { header: "ID" }),
-  ClientColumn.accessor("__actions" as any, {
+export const column = createColumnHelper<Column>();
+export const ClientColumns = [
+  column.accessor("number", {
+    maxSize: 50,
+    header: "No.",
+  }),
+  column.accessor("name", { header: "Name" }),
+  column.accessor("id", { header: "ID" }),
+  column.accessor("__actions" as any, {
     header: "",
     enableSorting: false,
     enableResizing: false,

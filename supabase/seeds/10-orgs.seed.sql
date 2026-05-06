@@ -5,6 +5,11 @@ $$
     begin
         insert into public.organizations (id, display, auto_add_members)
         values (org_id, 'Lumon Industries, Corp.', true);
+
+        -- clients
+        insert into public.clients (organization_id, name)
+        values (org_id, 'Lumon Corp.'),
+               (org_id, 'Dunder Mifflin Co.');
     end;
 $$;
 
