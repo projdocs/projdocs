@@ -47,6 +47,8 @@ import { useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 
+
+
 export type PaginatedDataTableState<TData> = {
   count: number;
   rows: TData[];
@@ -67,46 +69,46 @@ type PaginatedDataTableProps<TData> = {
 };
 
 export function usePaginatedDataTable<TData>(
-  props: PaginatedDataTableProps<TData>
+  props: PaginatedDataTableProps<TData>,
 ) {
   const id = useId();
 
-  const [state, setState] = useState<PaginatedDataTableState<TData>>({
+  const [ state, setState ] = useState<PaginatedDataTableState<TData>>({
     rows: [],
     count: 0,
   });
 
-  const [pagination, setPagination] = useState<PaginationState>({
+  const [ pagination, setPagination ] = useState<PaginationState>({
     pageIndex: 0,
     pageSize: 5,
   });
 
-  const [sorting, setSorting] = useState<SortingState>(() => {
+  const [ sorting, setSorting ] = useState<SortingState>(() => {
     const initialSortCol = props.columns
       .filter(
         (c) =>
-          !!c.id && (typeof c.enableSorting === "undefined" || c.enableSorting)
+          !!c.id && (typeof c.enableSorting === "undefined" || c.enableSorting),
       )
       .at(0);
 
     const initialSortState: SortingState = initialSortCol
       ? [
-          {
-            id: initialSortCol.id!,
-            desc: false,
-          },
-        ]
+        {
+          id: initialSortCol.id!,
+          desc: false,
+        },
+      ]
       : [];
 
     return initialSortState;
   });
 
-  const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [ isLoading, setIsLoading ] = useState<boolean>(false);
 
   const pageCount = useMemo(() => {
     if (pagination.pageSize <= 0) return 0;
     return Math.max(1, Math.ceil(state.count / pagination.pageSize));
-  }, [state.count, pagination.pageSize]);
+  }, [ state.count, pagination.pageSize ]);
 
   const refresh = useOnceler<PaginatedDataTableState<TData>>(
     async (as) => {
@@ -137,13 +139,13 @@ export function usePaginatedDataTable<TData>(
       // If total count shrank and current page is now out of range, clamp it.
       const nextPageCount = Math.max(
         1,
-        Math.ceil(next.count / pagination.pageSize)
+        Math.ceil(next.count / pagination.pageSize),
       );
       const maxIndex = nextPageCount - 1;
       if (pagination.pageIndex > maxIndex) {
         setPagination((p) => ({ ...p, pageIndex: maxIndex }));
       }
-    }
+    },
   );
 
   // handle data fetching
@@ -156,7 +158,7 @@ export function usePaginatedDataTable<TData>(
 
   useEventListener(
     props.refreshEvent ?? `PaginatedDataTable-EL-${id}`,
-    refresh.do
+    refresh.do,
   );
 
   const table = useReactTable({
@@ -185,15 +187,15 @@ export function usePaginatedDataTable<TData>(
   const startRow = useMemo(() => {
     if (state.count === 0) return 0;
     return pagination.pageIndex * pagination.pageSize + 1;
-  }, [state.count, pagination.pageIndex, pagination.pageSize]);
+  }, [ state.count, pagination.pageIndex, pagination.pageSize ]);
 
   const endRow = useMemo(() => {
     if (state.count === 0) return 0;
     return Math.min(
       (pagination.pageIndex + 1) * pagination.pageSize,
-      state.count
+      state.count,
     );
-  }, [state.count, pagination.pageIndex, pagination.pageSize]);
+  }, [ state.count, pagination.pageIndex, pagination.pageSize ]);
 
   return {
     state,
@@ -216,7 +218,7 @@ export function PaginatedDataTable<TData>(
   props: PaginatedDataTableProps<TData> & {
     onRowClick?: (row: TData) => unknown | Promise<unknown>;
     onRowDoubleClick?: (row: TData) => unknown | Promise<unknown>;
-  }
+  },
 ) {
   const {
     state,
@@ -236,7 +238,7 @@ export function PaginatedDataTable<TData>(
         <div
           className={cn(
             isLoading && "pointer-events-none opacity-60 select-none",
-            "flex flex-col gap-2"
+            "flex flex-col gap-2",
           )}
         >
           <div className="overflow-hidden rounded-md border">
@@ -263,7 +265,7 @@ export function PaginatedDataTable<TData>(
                                 "flex h-full items-center gap-2 select-none",
                                 isLoading
                                   ? "cursor-not-allowed"
-                                  : "cursor-pointer"
+                                  : "cursor-pointer",
                               )}
                               onClick={
                                 isLoading
@@ -274,20 +276,20 @@ export function PaginatedDataTable<TData>(
                                 isLoading
                                   ? undefined
                                   : (e) => {
-                                      if (e.key === "Enter" || e.key === " ") {
-                                        e.preventDefault();
-                                        header.column.getToggleSortingHandler()?.(
-                                          e
-                                        );
-                                      }
+                                    if (e.key === "Enter" || e.key === " ") {
+                                      e.preventDefault();
+                                      header.column.getToggleSortingHandler()?.(
+                                        e,
+                                      );
                                     }
+                                  }
                               }
                               tabIndex={isLoading ? -1 : 0}
                               aria-disabled={isLoading}
                             >
                               {flexRender(
                                 header.column.columnDef.header,
-                                header.getContext()
+                                header.getContext(),
                               )}
 
                               {sorted === "asc" ? (
@@ -301,7 +303,7 @@ export function PaginatedDataTable<TData>(
                           ) : (
                             flexRender(
                               header.column.columnDef.header,
-                              header.getContext()
+                              header.getContext(),
                             )
                           )}
                         </TableHead>
@@ -332,7 +334,7 @@ export function PaginatedDataTable<TData>(
                         <TableCell key={cell.id}>
                           {flexRender(
                             cell.column.columnDef.cell,
-                            cell.getContext()
+                            cell.getContext(),
                           )}
                         </TableCell>
                       ))}
@@ -368,8 +370,9 @@ export function PaginatedDataTable<TData>(
                 <SelectTrigger id={id} className="w-fit whitespace-nowrap">
                   <SelectValue placeholder="Select number of results" />
                 </SelectTrigger>
-                <SelectContent className="[&_*[role=option]]:pr-8 [&_*[role=option]]:pl-2 [&_*[role=option]>span]:right-2 [&_*[role=option]>span]:left-auto">
-                  {[5, 10, 25, 50].map((pageSize) => (
+                <SelectContent
+                  className="[&_*[role=option]]:pr-8 [&_*[role=option]]:pl-2 [&_*[role=option]>span]:right-2 [&_*[role=option]>span]:left-auto">
+                  {[ 5, 10, 25, 50 ].map((pageSize) => (
                     <SelectItem key={pageSize} value={pageSize.toString()}>
                       {pageSize}
                     </SelectItem>
@@ -452,7 +455,8 @@ export function PaginatedDataTable<TData>(
 
         {/* Overlay goes OUTSIDE the disabled wrapper so it still shows/captures clicks */}
         {isLoading ? (
-          <div className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background/60 backdrop-blur-[1px]">
+          <div
+            className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background/60 backdrop-blur-[1px]">
             <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 shadow-sm">
               <Loader2 className="h-4 w-4 animate-spin" />
               <span className="text-sm">Loading…</span>
@@ -488,9 +492,9 @@ export function DataTable<TData>({ columns, data }: DataTableProps<TData>) {
                     {header.isPlaceholder
                       ? null
                       : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext()
-                        )}
+                        header.column.columnDef.header,
+                        header.getContext(),
+                      )}
                   </TableHead>
                 );
               })}

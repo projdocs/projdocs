@@ -35,23 +35,23 @@ export default function(props: {
         getData={async r => {
           const res = await getSupabaseRows({
             supabase,
-            table: "favorites",
-            select: "id, client:clients(*)",
+            table: "clients",
+            select: "*, favorites!inner(*)",
             filters: [
               {
-                column: "client_id",
+                column: "favorites.client_id",
                 operator: "not.is",
-                value: null,
-              },
+                value: null
+              }
             ],
           })(r);
           return ({
             count: res.count,
             rows: res.rows.map(r => {
-              const row = (r as Tables<"favorites"> & { client: Tables<"clients"> });
+              const row = (r as Tables<"clients"> & { favorites: Tables<"favorites">[] });
               return {
-                ...row.client,
-                favorite_id: row.id,
+                ...row,
+                favorite_id: row.favorites?.at(0)?.id ?? null,
               };
             }),
           });

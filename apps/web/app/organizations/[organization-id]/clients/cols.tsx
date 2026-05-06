@@ -58,8 +58,10 @@ const FavoriteButton = ({row}: {row: Column}) => {
 export const column = createColumnHelper<Column>();
 export const ClientColumns = [
   column.accessor("number", {
+    id: "number",
     maxSize: 50,
     header: "No.",
+    enableSorting: true,
   }),
   column.accessor("name", { header: "Name" }),
   column.accessor("id", { header: "ID" }),
