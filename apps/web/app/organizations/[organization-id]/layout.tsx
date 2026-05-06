@@ -1,9 +1,9 @@
 import { LayoutProps } from "@apps/web/lib/types/layout";
 import { SidebarInset, SidebarProvider } from "@packages/ui/components/sidebar";
 import {
-  CustomSidebar,
+  ProjDocsSidebar,
   CustomSidebarGroups,
-} from "@apps/web/components/custom-sidebar";
+} from "../../../components/proj-docs-sidebar";
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import {
   FolderHeartIcon,
@@ -141,7 +141,7 @@ export default async function (
 
   return (
     <SidebarProvider>
-      <CustomSidebar
+      <ProjDocsSidebar
         organizations={organizations}
         organization={organization}
         groups={getItems({

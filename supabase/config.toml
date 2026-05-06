@@ -140,6 +140,7 @@ max_indexes = 5
 # [storage.vector.buckets.documents-openai]
 
 [auth]
+external_url = "http://127.0.0.1:54321/auth/v1"
 enabled = true
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
 # in emails.

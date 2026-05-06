@@ -1,6 +1,7 @@
 "use client";
 
 import { PaginatedDataTable } from "@packages/ui/components/data-table";
+import { Tables } from "@packages/supabase/types.gen";
 import { getSupabaseRows } from "@packages/supabase/lib/utils";
 import { supabase } from "@apps/web/lib/supabase/client";
 import { use } from "react";
@@ -10,7 +11,6 @@ import {
   CLIENT_COLUMNS,
   CLIENTS_TABLE_REFRESH_EVENT,
 } from "@apps/web/app/organizations/[organization-id]/clients/cols";
-import { Tables } from "@packages/supabase";
 
 
 
@@ -23,7 +23,7 @@ export default function(props: {
   const router = useRouter();
 
   return (
-    <ObjectPage title={"Clients"}>
+    <ObjectPage title={"My Clients"}>
       <PaginatedDataTable
         refreshEvent={CLIENTS_TABLE_REFRESH_EVENT}
         columns={CLIENT_COLUMNS}
@@ -35,16 +35,23 @@ export default function(props: {
         getData={async r => {
           const res = await getSupabaseRows({
             supabase,
-            table: "clients",
-            select: "*, favorites(*)",
+            table: "favorites",
+            select: "id, client:clients(*)",
+            filters: [
+              {
+                column: "client_id",
+                operator: "not.is",
+                value: null,
+              },
+            ],
           })(r);
           return ({
             count: res.count,
             rows: res.rows.map(r => {
-              const row = (r as Tables<"clients"> & { favorites: Tables<"favorites">[] });
+              const row = (r as Tables<"favorites"> & { client: Tables<"clients"> });
               return {
-                ...row,
-                favorite_id: row.favorites?.at(0)?.id ?? null,
+                ...row.client,
+                favorite_id: row.id,
               };
             }),
           });

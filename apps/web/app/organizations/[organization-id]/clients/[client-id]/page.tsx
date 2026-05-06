@@ -1,6 +1,6 @@
-import { ErrorPage, ObjectPage } from "@apps/web/components/page";
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { Button } from "@packages/ui/components/button";
+import { ErrorPage, ObjectPage } from "@packages/ui/components/page";
 
 export default async function (props: {
   params: Promise<{

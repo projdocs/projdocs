@@ -1147,6 +1147,42 @@ export type Database = {
           },
         ]
       }
+      favorites: {
+        Row: {
+          client_id: string | null
+          id: string
+          project_id: string | null
+          user_id: string
+        }
+        Insert: {
+          client_id?: string | null
+          id?: string
+          project_id?: string | null
+          user_id: string
+        }
+        Update: {
+          client_id?: string | null
+          id?: string
+          project_id?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "favorites_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "favorites_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           id: string
