@@ -1,3 +1,4 @@
+-- NRB
 INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at",
                             "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token",
                             "recovery_sent_at", "email_change_token_new", "email_change", "email_change_sent_at",
@@ -28,7 +29,7 @@ VALUES ('00000000-0000-0000-0000-000000000000', '2b3e539a-60a2-44d5-8e33-2d15222
     "email_verified": true,
     "phone_verified": false
   }', null, '2026-04-15 18:22:50.453439+00', '2026-04-16 00:56:30.227538+00', null, null, '', '', null,
-         '', '0', null, '', null, 'false', null, 'false');
+        '', '0', null, '', null, 'false', null, 'false');
 
 INSERT INTO "auth"."identities" ("provider_id", "user_id", "identity_data", "provider", "last_sign_in_at", "created_at",
                                  "updated_at", "id")
@@ -47,4 +48,4 @@ VALUES ('108660080613718165112', '2b3e539a-60a2-44d5-8e33-2d1522298bd8', '{
   "email_verified": true,
   "phone_verified": false
 }', 'custom:dc6c374d-51bc-434c-8edb-8f6b8c2231c6', '2026-04-15 18:22:50.462526+00', '2026-04-15 18:22:50.462554+00',
-        '2026-04-16 00:56:29.797256+00',  'd3e7b226-2275-40f8-9a2f-a2c7cf9f09c6');
+        '2026-04-16 00:56:29.797256+00', 'd3e7b226-2275-40f8-9a2f-a2c7cf9f09c6');
