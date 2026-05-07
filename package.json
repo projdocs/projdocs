@@ -11,6 +11,20 @@
     "gen": "npm run gen --ws",
     "test": "vitest run"
   },
+  "overrides": {
+    "@monaco-editor/react": {
+      "monaco-editor": {
+        "dompurify": "^3.4.2"
+      }
+    },
+    "@packages/ui": {
+      "@monaco-editor/react": {
+        "monaco-editor": {
+          "dompurify": "^3.4.2"
+        }
+      }
+    }
+  },
   "devDependencies": {
     "@packages/eslint-config": "*",
     "@packages/typescript-config": "*",
