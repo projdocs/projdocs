@@ -19,9 +19,9 @@ export default async function () {
       <div className="flex min-h-svh items-center justify-center p-4">
         <Card className={"w-full max-w-sm"}>
           <CardHeader>
-            <CardTitle>{"Unexpected error!"}</CardTitle>
+            <CardTitle>{"Unable to Load Organizations!"}</CardTitle>
             <CardDescription>
-              {"An unexpected error occurred while loading organizations!"}
+              {`An unexpected error occurred while loading organizations: ${orgs.error.message}!`}
             </CardDescription>
           </CardHeader>
         </Card>

@@ -1189,28 +1189,25 @@ export type Database = {
       members: {
         Row: {
           id: string
-          is_admin: boolean
-          organization_id: string
+          permissions_id: string
           user_id: string
         }
         Insert: {
           id?: string
-          is_admin?: boolean
-          organization_id: string
+          permissions_id: string
           user_id: string
         }
         Update: {
           id?: string
-          is_admin?: boolean
-          organization_id?: string
+          permissions_id?: string
           user_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "members_organization_id_fkey"
-            columns: ["organization_id"]
+            foreignKeyName: "members_permissions_id_fkey"
+            columns: ["permissions_id"]
             isOneToOne: false
-            referencedRelation: "organizations"
+            referencedRelation: "permissions"
             referencedColumns: ["id"]
           },
         ]
@@ -1240,6 +1237,44 @@ export type Database = {
             columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "storage_folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      permissions: {
+        Row: {
+          __is_default_role: boolean
+          clients: Database["public"]["Enums"]["permission_levels"]
+          display: string
+          id: string
+          organization: Database["public"]["Enums"]["permission_levels"]
+          organization_id: string | null
+          projects: Database["public"]["Enums"]["permission_levels"]
+        }
+        Insert: {
+          __is_default_role?: boolean
+          clients?: Database["public"]["Enums"]["permission_levels"]
+          display: string
+          id?: string
+          organization?: Database["public"]["Enums"]["permission_levels"]
+          organization_id?: string | null
+          projects?: Database["public"]["Enums"]["permission_levels"]
+        }
+        Update: {
+          __is_default_role?: boolean
+          clients?: Database["public"]["Enums"]["permission_levels"]
+          display?: string
+          id?: string
+          organization?: Database["public"]["Enums"]["permission_levels"]
+          organization_id?: string | null
+          projects?: Database["public"]["Enums"]["permission_levels"]
+        }
+        Relationships: [
+          {
+            foreignKeyName: "permissions_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
         ]
@@ -1380,9 +1415,9 @@ export type Database = {
     }
     Functions: {
       get_user_count: { Args: never; Returns: number }
-      is_member: { Args: { org_id: string }; Returns: boolean }
     }
     Enums: {
+      permission_levels: "NONE" | "VIEW" | "EDIT" | "DELETE"
       settings_storage_type: "GOOGLE_DRIVE" | "BUILT_IN" | "S3"
     }
     CompositeTypes: {
@@ -1531,6 +1566,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      permission_levels: ["NONE", "VIEW", "EDIT", "DELETE"],
       settings_storage_type: ["GOOGLE_DRIVE", "BUILT_IN", "S3"],
     },
   },

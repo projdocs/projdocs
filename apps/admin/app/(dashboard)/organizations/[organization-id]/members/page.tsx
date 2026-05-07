@@ -28,8 +28,9 @@ export default async function (props: {
 
   const members = await supabase
     .from("members")
-    .select()
-    .eq("organization_id", org.data.id);
+    .select("*, permissions!inner(*)")
+    .eq("permissions.organization_id", org.data.id);
+
   if (members.error) {
     console.error(members.error);
     return <ErrorPage />;

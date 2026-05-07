@@ -39,9 +39,11 @@ export default function(props: {
             select: "*, favorites!inner(*)",
             filters: [
               {
+                // @ts-expect-error PostgREST table join
                 column: "favorites.client_id",
+                // @ts-expect-error PostgREST table join
+                value: null,
                 operator: "not.is",
-                value: null
               }
             ],
           })(r);
