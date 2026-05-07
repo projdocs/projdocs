@@ -42,6 +42,7 @@ CREATE OR REPLACE FUNCTION private.organizations_before_actions()
     RETURNS trigger
     LANGUAGE plpgsql
     SET SEARCH_PATH = ''
+    SECURITY DEFINER
 AS
 $$
 declare
@@ -111,6 +112,7 @@ CREATE OR REPLACE FUNCTION private.organizations_after_actions()
     RETURNS trigger
     LANGUAGE plpgsql
     SET SEARCH_PATH = ''
+    SECURITY DEFINER
 AS
 $function$
 begin

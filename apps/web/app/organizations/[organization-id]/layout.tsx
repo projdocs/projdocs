@@ -1,26 +1,13 @@
 import { LayoutProps } from "@apps/web/lib/types/layout";
 import { SidebarInset, SidebarProvider } from "@packages/ui/components/sidebar";
-import {
-  ProjDocsSidebar,
-  CustomSidebarGroups,
-} from "../../../components/proj-docs-sidebar";
+import { CustomSidebarGroups, ProjDocsSidebar } from "../../../components/proj-docs-sidebar";
 import { createServerClient } from "@apps/web/lib/supabase/server";
-import {
-  FolderHeartIcon,
-  FolderIcon,
-  LayoutDashboardIcon,
-  UserIcon,
-  UserStarIcon,
-} from "lucide-react";
+import { FolderHeartIcon, FolderIcon, LayoutDashboardIcon, UserIcon, UserStarIcon } from "lucide-react";
 import { Tables } from "@packages/supabase/types.gen";
-import {
-  Card,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@packages/ui/components/card";
-import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/select-org-button";
+import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@packages/ui/components/card";
+import { MobileSidebarTrigger, SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/client-side";
+
+
 
 const getItems = (props: { organization: Tables<"organizations"> }) =>
   [
@@ -65,12 +52,12 @@ const getItems = (props: { organization: Tables<"organizations"> }) =>
     },
   ] satisfies CustomSidebarGroups;
 
-export default async function (
+export default async function(
   props: LayoutProps<
     Promise<{
       "organization-id": string;
     }>
-  >
+  >,
 ) {
   const params = await props.params;
   const supabase = await createServerClient();
@@ -79,7 +66,7 @@ export default async function (
     .from("organizations")
     .select();
   const organization = organizations?.find(
-    (org) => org.id === params["organization-id"]
+    (org) => org.id === params["organization-id"],
   );
 
   if (orgError || !organization)
@@ -153,8 +140,18 @@ export default async function (
         }}
       />
       <SidebarInset>
-        <div className="flex h-dvh w-full flex-col overflow-scroll">
-          {props.children}
+        <div className="flex h-dvh w-full flex-col">
+          <div className="flex-1 overflow-y-auto">
+            {props.children}
+          </div>
+          <MobileSidebarTrigger
+            user={{
+              name: profile.data.full_name,
+              email: user.data.claims.email ?? user.data.claims.phone ?? user.data.claims.sub,
+              avatar: user.data.claims.user_metadata?.picture ??
+                user.data.claims.user_metadata?.avatar_url,
+            }}
+          />
         </div>
       </SidebarInset>
     </SidebarProvider>

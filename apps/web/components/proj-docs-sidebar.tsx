@@ -1,31 +1,30 @@
 import * as React from "react";
 
-import {
-  CustomSidebarGroup,
-  SidebarGroups,
-} from "@apps/web/components/custom-sidebar-group";
+import { CustomSidebarGroup, SidebarGroups } from "@apps/web/components/custom-sidebar-group";
 import { OrganizationSwitcher } from "@apps/web/components/organization-switcher";
 import {
   Sidebar,
   SidebarContent,
   SidebarFooter,
-  SidebarHeader,
+  SidebarHeader, SidebarMenu, SidebarMenuItem,
   SidebarRail,
   SidebarTrigger,
 } from "@packages/ui/components/sidebar";
-import { SidebarUser } from "@apps/web/components/sidebar-user";
+import { SidebarUserDropdown } from "./sidebar-user-dropdown";
 import { Tables } from "@packages/supabase/types.gen";
 import { JwtPayload } from "@supabase/auth-js";
+
+
 
 export type CustomSidebarGroups = readonly SidebarGroups[];
 
 export async function ProjDocsSidebar({
-  groups,
-  organization,
-  organizations,
-  user,
-  ...props
-}: React.ComponentProps<typeof Sidebar> & {
+                                        groups,
+                                        organization,
+                                        organizations,
+                                        user,
+                                        ...props
+                                      }: React.ComponentProps<typeof Sidebar> & {
   groups: CustomSidebarGroups;
   organization?: Tables<"organizations">;
   organizations: readonly Tables<"organizations">[];
@@ -56,16 +55,18 @@ export async function ProjDocsSidebar({
       <SidebarFooter>
         <SidebarTrigger />
         {user && (
-          <SidebarUser
-            user={{
-              name: user.profile.full_name,
-              email:
-                user.account.email ?? user.account.phone ?? user.account.sub,
-              avatar:
-                user.account.user_metadata?.picture ??
-                user.account.user_metadata?.avatar_url,
-            }}
-          />
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarUserDropdown
+                user={{
+                  name: user.profile.full_name,
+                  email: user.account.email ?? user.account.phone ?? user.account.sub,
+                  avatar: user.account.user_metadata?.picture ??
+                    user.account.user_metadata?.avatar_url
+                }}
+              />
+            </SidebarMenuItem>
+          </SidebarMenu>
         )}
       </SidebarFooter>
       <SidebarRail />
