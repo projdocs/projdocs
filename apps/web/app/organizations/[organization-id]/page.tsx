@@ -1,6 +1,6 @@
 import { H1 } from "@packages/ui/components/typography";
 import { createServerClient } from "@apps/web/lib/supabase/server";
-import { ErrorPage } from "@apps/web/components/page";
+import { ErrorPage } from "@packages/ui/components/page";
 
 export default async function Page(props: {
   params: Promise<{

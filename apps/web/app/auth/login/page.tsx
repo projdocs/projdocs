@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@packages/ui/components/card";
+import { ErrorPage } from "@packages/ui/components/page";
 
 export default async function () {
 
@@ -17,7 +18,15 @@ export default async function () {
     await createServiceRoleClient({ __unsafe_ignore_admin_check: true })
   ).auth.admin.customProviders.listProviders();
 
-  if (error)
+  if (error) {
+
+    if(error.name === "AuthRetryableFetchError" && error.message === "fetch failed") return (
+     <ErrorPage
+       title={"Unable to Connect to Backend"}
+       description={"The backend service is unavailable. Please try again later."}
+     />
+    )
+
     // unable to list providers
     return (
       <Card className={"w-full max-w-sm"}>
@@ -31,6 +40,7 @@ export default async function () {
         </CardHeader>
       </Card>
     );
+  }
   else if (providers.length < 1)
     // no providers configured
     return (

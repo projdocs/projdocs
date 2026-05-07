@@ -1,17 +1,16 @@
-import Link from "next/link"
-import { Button } from "@packages/ui/components/button"
-import { Badge } from "@packages/ui/components/badge"
+import Link from "next/link";
+import { Button } from "@packages/ui/components/button";
+import { Badge } from "@packages/ui/components/badge";
 import {
-  FileText,
-  Server,
-  Users,
-  Plug,
-  ShieldCheck,
-  Cloud,
   ArrowRight,
   CheckCircle2,
-} from "lucide-react"
-import Favicon from "@packages/ui/branding/favicon/no-bg";
+  Cloud,
+  FileText,
+  Plug,
+  Server,
+  ShieldCheck,
+  Users,
+} from "lucide-react";
 import Logo from "@packages/ui/branding/logo/logo";
 
 // Brand icon — not available in lucide-react v1+
@@ -25,7 +24,7 @@ function GithubIcon({ className }: { className?: string }) {
     >
       <path d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0 1 12 6.844a9.59 9.59 0 0 1 2.504.337c1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.02 10.02 0 0 0 22 12.017C22 6.484 17.522 2 12 2z" />
     </svg>
-  )
+  );
 }
 
 const features = [
@@ -65,21 +64,21 @@ const features = [
     description:
       "Let us handle the infrastructure. Get automatic updates, backups, and uptime SLAs without lifting a finger.",
   },
-]
+];
 
 const selfHostBenefits = [
   "No licensing fees, ever",
   "Full data ownership",
   "Deploy on-prem or any cloud",
   "Active open-source community",
-]
+];
 
 const managedBenefits = [
   "Zero infrastructure overhead",
   "Automatic updates & backups",
   "Priority support",
   "SLA-backed uptime",
-]
+];
 
 export default function LandingPage() {
   return (
@@ -88,17 +87,22 @@ export default function LandingPage() {
       <header className="sticky top-0 z-50 border-b bg-background/80 backdrop-blur">
         <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
           <div className="flex items-center gap-2">
-
-            <Logo className={"h-[30px] mb-10"} />
+            <Logo className={"mb-10 h-[30px]"} />
 
             {/*<Favicon width={25} height={25} />*/}
             {/*<span className="text-lg font-semibold tracking-tight">ProjDocs</span>*/}
           </div>
           <nav className="hidden items-center gap-6 text-sm text-muted-foreground sm:flex">
-            <a href="#features" className="transition-colors hover:text-foreground">
+            <a
+              href="#features"
+              className="transition-colors hover:text-foreground"
+            >
               Features
             </a>
-            <a href="#hosting" className="transition-colors hover:text-foreground">
+            <a
+              href="#hosting"
+              className="transition-colors hover:text-foreground"
+            >
               Hosting
             </a>
             <a
@@ -134,8 +138,8 @@ export default function LandingPage() {
             <span className="text-primary">on your terms</span>
           </h1>
           <p className="max-w-xl text-lg text-muted-foreground">
-            ProjDocs is an open-source DMS built for teams that want control. Self-host
-            for free or let us manage it — your documents, your rules.
+            ProjDocs is an open-source DMS built for teams that want control.
+            Self-host for free or let us manage it — your documents, your rules.
           </p>
           <div className="flex flex-wrap justify-center gap-3">
             <Button size="lg" asChild>
@@ -192,7 +196,8 @@ export default function LandingPage() {
                 Choose how you run it
               </h2>
               <p className="mt-3 text-muted-foreground">
-                Self-host with full control or let us handle the ops — both are first-class options.
+                Self-host with full control or let us handle the ops — both are
+                first-class options.
               </p>
             </div>
             <div className="grid gap-6 md:grid-cols-2">
@@ -209,7 +214,8 @@ export default function LandingPage() {
                   </span>
                 </p>
                 <p className="mb-6 text-sm text-muted-foreground">
-                  Download, deploy, and run ProjDocs on any infrastructure you own.
+                  Download, deploy, and run ProjDocs on any infrastructure you
+                  own.
                 </p>
                 <ul className="mb-8 space-y-2.5">
                   {selfHostBenefits.map((b) => (
@@ -244,7 +250,8 @@ export default function LandingPage() {
                   </span>
                 </p>
                 <p className="mb-6 text-sm text-muted-foreground">
-                  We run and maintain your ProjDocs instance so you can focus on your work.
+                  We run and maintain your ProjDocs instance so you can focus on
+                  your work.
                 </p>
                 <ul className="mb-8 space-y-2.5">
                   {managedBenefits.map((b) => (
@@ -271,13 +278,14 @@ export default function LandingPage() {
               Ready to take control of your documents?
             </h2>
             <p className="text-muted-foreground">
-              Join teams that trust ProjDocs for secure, flexible document management.
-              Free to start, always open source.
+              Join teams that trust ProjDocs for secure, flexible document
+              management. Free to start, always open source.
             </p>
             <div className="flex flex-wrap justify-center gap-3">
               <Button size="lg" asChild>
                 <Link href="/auth/register">
-                  Create a free account <ArrowRight className="ml-1.5 h-4 w-4" />
+                  Create a free account{" "}
+                  <ArrowRight className="ml-1.5 h-4 w-4" />
                 </Link>
               </Button>
               <Button size="lg" variant="outline" asChild>
@@ -306,12 +314,15 @@ export default function LandingPage() {
               <GithubIcon className="h-4 w-4" />
               GitHub
             </a>
-            <Link href="/auth/login" className="transition-colors hover:text-foreground">
+            <Link
+              href="/auth/login"
+              className="transition-colors hover:text-foreground"
+            >
               Sign in
             </Link>
           </div>
         </div>
       </footer>
     </div>
-  )
+  );
 }

@@ -1,1 +1,1 @@
-create type storage_object_types as enum ('FILE', 'FOLDER');
+alter table public.members drop column organization_id;

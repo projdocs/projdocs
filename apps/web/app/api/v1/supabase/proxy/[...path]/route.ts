@@ -19,13 +19,21 @@ async function forwardToSupabaseAPI(
 
   const baseParams = new URL(request.url).searchParams;
   baseParams.forEach((value, key) => {
-    url.searchParams.set(key, value);
+    url.searchParams.set(
+      key,
+      key === "apikey" ? process.env.SUPABASE_PUBLISHABLE_KEY! : value
+    );
   });
 
   try {
     const headers = new Headers(request.headers);
     headers.set("apikey", process.env.SUPABASE_PUBLISHABLE_KEY!);
-    headers.delete("x-api-key");
+    if (!headers.has("Authorization")) {
+      headers.set(
+        "Authorization",
+        `Bearer ${process.env.SUPABASE_PUBLISHABLE_KEY!}`
+      );
+    }
 
     const fetchOptions: RequestInit = {
       method,

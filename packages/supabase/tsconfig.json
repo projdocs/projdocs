@@ -5,8 +5,10 @@
     "paths": {
       "@packages/supabase/*": [
         "./*"
-      ]
-    }
+      ],
+    },
+    "module": "ESNext",
+    "moduleResolution": "bundler"
   },
   "include": [
     ".",
