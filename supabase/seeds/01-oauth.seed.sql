@@ -6,7 +6,7 @@ INSERT INTO "auth"."custom_oauth_providers" ("id", "provider_type", "identifier"
                                              "jwks_uri", "created_at", "updated_at")
 VALUES ('c08312ed-b5d9-48f9-8eb1-b966faa00f3e', 'oidc', 'custom:dc6c374d-51bc-434c-8edb-8f6b8c2231c6', 'Google',
         '124781446178-h5qrasikq30um1fpk7fs4a9m97cvbeg7.apps.googleusercontent.com',
-        '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', ARRAY ['124781446178-h5qrasikq30um1fpk7fs4a9m97cvbeg7.apps.googleusercontent.com'], ARRAY ['openid','profile','email'], 'true', '{}', '{}', 'true',
+        (select s.decrypted_secret from vault.decrypted_secrets s where s.name = 'google_oauth_api_secret'), ARRAY ['124781446178-h5qrasikq30um1fpk7fs4a9m97cvbeg7.apps.googleusercontent.com'], ARRAY ['openid','profile','email'], 'true', '{}', '{}', 'true',
         'false', 'https://accounts.google.com', null, 'false',
         '{
           "issuer": "https://accounts.google.com",
