@@ -43,7 +43,7 @@ import {
   PaginationItem,
 } from "@packages/ui/components/pagination";
 import { Button } from "@packages/ui/components/button";
-import { useEffect, useId, useMemo, useState } from "react";
+import { ComponentProps, HTMLAttributes, useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 
@@ -218,6 +218,7 @@ export function PaginatedDataTable<TData>(
   props: PaginatedDataTableProps<TData> & {
     onRowClick?: (row: TData) => unknown | Promise<unknown>;
     onRowDoubleClick?: (row: TData) => unknown | Promise<unknown>;
+    className?: ComponentProps<"div">["className"];
   },
 ) {
   const {
@@ -233,7 +234,7 @@ export function PaginatedDataTable<TData>(
   } = usePaginatedDataTable(props);
 
   return (
-    <div className="space-y-4 md:w-full" aria-busy={isLoading}>
+    <div className={cn("space-y-4 md:w-full", props.className)} aria-busy={isLoading}>
       <div className="relative">
         <div
           className={cn(

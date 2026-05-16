@@ -9,18 +9,18 @@ import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { useState } from "react";
 import { DateTime } from "luxon";
 import { ClickToCopyID } from "@packages/ui/components/id-value";
+import { useRouter } from "next/navigation";
 import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@packages/ui/components/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@packages/ui/components/tooltip";
 import { P } from "@packages/ui/components/typography";
-import { useRouter } from "next/navigation";
 
 
 
-export const CLIENTS_TABLE_REFRESH_EVENT = "clients:refresh";
-type Column = Tables<"clients"> & {
+export const PROJECTS_TABLE_REFRESH_EVENT = "projects:refresh";
+type Column = Tables<"projects"> & {
   favorite_id: string | null;
   links: readonly (Tables<"clients_projects"> & {
-    project: Tables<"projects">
+    client: Tables<"clients">
   })[];
 };
 
@@ -43,16 +43,16 @@ const FavoriteButton = ({ row }: { row: Column }) => {
           if (error) toast.error("Unable to Remove Favorite!", {
             description: error.message,
           });
-          else useEventListener.RemoteDispatch(CLIENTS_TABLE_REFRESH_EVENT, null as unknown);
+          else useEventListener.RemoteDispatch(PROJECTS_TABLE_REFRESH_EVENT, null as unknown);
         } else {
           const { error } = await supabase().from("favorites").insert({
             user_id: NIL, // set in trigger
-            client_id: row.id,
+            project_id: row.id,
           }).select().single();
           if (error) toast.error("Unable to Add Favorite!", {
             description: error.message,
           });
-          else useEventListener.RemoteDispatch(CLIENTS_TABLE_REFRESH_EVENT, null as unknown);
+          else useEventListener.RemoteDispatch(PROJECTS_TABLE_REFRESH_EVENT, null as unknown);
         }
       }}
     >
@@ -65,7 +65,8 @@ const FavoriteButton = ({ row }: { row: Column }) => {
   );
 };
 
-export const ProjectsRow = ({ row: { original: { links } } }: {
+
+export const ClientsRow = ({ row: { original: { links } } }: {
   row: {
     original: Column
   }
@@ -73,19 +74,19 @@ export const ProjectsRow = ({ row: { original: { links } } }: {
   const router = useRouter();
   return (
     <AvatarGroup>
-      {links.slice(0, 2).map(({ project }) => (
-        <Tooltip key={project.id}>
-          <TooltipTrigger key={project.id} className={"cursor-pointer"}>
+      {links.slice(0, 2).map(({ client }) => (
+        <Tooltip key={client.id}>
+          <TooltipTrigger key={client.id} className={"cursor-pointer"}>
             <Avatar className={"hover:outline-accent-foreground hover:outline-1"} onClick={(e) => {
               e.stopPropagation();
               e.preventDefault();
-              router.push(`/organizations/${project.organization_id}/projects/${project.id}`)
-            }} key={project.id}>
-              <AvatarFallback>{project.display.trim().at(0)}</AvatarFallback>
+              router.push(`/organizations/${client.organization_id}/clients/${client.id}`);
+            }} key={client.id}>
+              <AvatarFallback>{client.name.trim().at(0)}</AvatarFallback>
             </Avatar>
           </TooltipTrigger>
           <TooltipContent>
-            <P>{project.display}</P>
+            <P>{client.name}</P>
           </TooltipContent>
         </Tooltip>
       ))}
@@ -93,21 +94,22 @@ export const ProjectsRow = ({ row: { original: { links } } }: {
         <AvatarGroupCount>+{links.length - 2}</AvatarGroupCount>
       )}
     </AvatarGroup>
-  )
-}
+  );
+};
+
 
 export const column = createColumnHelper<Column>();
-export const ClientColumns = [
+export const ProjectColumns = [
   column.accessor("number", {
     id: "number",
     maxSize: 50,
     header: "No.",
     enableSorting: true,
   }),
-  column.accessor("name", { header: "Name" }),
+  column.accessor("display", { header: "Name" }),
   column.accessor("links", {
     header: "Projects",
-    cell: ProjectsRow,
+    cell: ClientsRow,
   }),
   column.accessor("created_at", {
     header: "Created",
