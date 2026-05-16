@@ -1,7 +1,13 @@
 import { S3ServiceException } from "@aws-sdk/client-s3";
-import { StorageResponse } from "@packages/shared/utilities/storage/type";
+import { StorageError, StorageResponse } from "@packages/shared/utilities/storage/type";
 
-export abstract class StorageProviderBase {
+export type StorageProviderImplUpload = {
+  mimeType: string;
+  body: Buffer;
+  name: string;
+}
+
+export abstract class StorageProviderImpl {
   abstract _mkdir(path: string): Promise<StorageResponse<string>>;
 
   abstract _test(): Promise<StorageResponse<boolean>>;
@@ -14,6 +20,14 @@ export abstract class StorageProviderBase {
 
   public async test(): Promise<StorageResponse<boolean>> {
     return await this.safely(() => this._test());
+  }
+
+  abstract _upload(props: StorageProviderImplUpload): Promise<StorageResponse<string>>;
+
+  public async upload(props: StorageProviderImplUpload): Promise<StorageResponse<string>> {
+    return await this.safely(async () => {
+      return await this._upload(props);
+    });
   }
 
   async safely<T>(

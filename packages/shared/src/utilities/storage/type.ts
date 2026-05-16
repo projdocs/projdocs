@@ -11,13 +11,13 @@ export const StorageProviderTypes = {
 
 type IStorageResponse<T> =
   | {
-      data: T;
-      error: null;
-    }
+  data: T;
+  error: null;
+}
   | {
-      error: StorageError;
-      data: null;
-    };
+  error: StorageError;
+  data: null;
+};
 
 export class StorageResponse<T> {
   private readonly _data: T | null;
@@ -36,6 +36,24 @@ export class StorageResponse<T> {
     return this._data;
   }
 
+  public static Data<DT>(data: DT): StorageResponse<DT> {
+    return new StorageResponse<DT>({ data, error: null });
+  }
+
+  public static Error(err: StorageError): StorageResponse<never> {
+    return new StorageResponse<never>({ error: err, data: null });
+  }
+
+  public toResponse(status: number = 500): Response {
+    return Response.json(this.toObject(), {
+      status,
+    });
+  }
+
+  public toString() {
+    return JSON.stringify(this.toObject());
+  }
+
   public toObject(): IStorageResponse<T> {
     if (this._error !== null)
       return {
@@ -46,18 +64,6 @@ export class StorageResponse<T> {
       data: this._data as T,
       error: null,
     };
-  }
-
-  public static Data<DT>(data: DT): StorageResponse<DT> {
-    return new StorageResponse<DT>({ data, error: null });
-  }
-
-  public static Error(err: StorageError): StorageResponse<never> {
-    return new StorageResponse<never>({ error: err, data: null });
-  }
-
-  toString() {
-    return JSON.stringify(this.toObject());
   }
 }
 
@@ -71,7 +77,7 @@ export class StorageError extends Error {
     props?: {
       description?: string | object;
       from?: unknown;
-    }
+    },
   ) {
     super();
     this._title = title;
@@ -119,19 +125,19 @@ export const GoogleDriveConfigSchema = z
           .string()
           .regex(
             /^[^@]+@[^@]+\.iam\.gserviceaccount\.com$/,
-            "Invalid service account email"
+            "Invalid service account email",
           ),
         client_id: z.string().min(1),
         auth_uri: z.literal("https://accounts.google.com/o/oauth2/auth"),
         token_uri: z.literal("https://oauth2.googleapis.com/token"),
         auth_provider_x509_cert_url: z.literal(
-          "https://www.googleapis.com/oauth2/v1/certs"
+          "https://www.googleapis.com/oauth2/v1/certs",
         ),
         client_x509_cert_url: z
           .string()
           .regex(
             /^https:\/\/www\.googleapis\.com\/robot\/v1\/metadata\/x509\//,
-            "Invalid cert URL"
+            "Invalid cert URL",
           ),
         universe_domain: z.literal("googleapis.com"),
       })

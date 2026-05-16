@@ -7,7 +7,9 @@ import {
   PutObjectCommand,
   S3Client,
 } from "@aws-sdk/client-s3";
-import { StorageProviderBase } from "@packages/shared/utilities/storage/provider";
+import { StorageProviderImpl, StorageProviderImplUpload } from "@packages/shared/utilities/storage/provider";
+
+
 
 export type S3StorageConnectionSettings = {
   url: string;
@@ -19,7 +21,8 @@ export type S3StorageConnectionSettings = {
   };
 };
 
-export class S3StorageProvider extends StorageProviderBase {
+export class S3StorageProvider extends StorageProviderImpl {
+
   private readonly client: S3Client;
   private readonly bucket: string;
 
@@ -39,6 +42,19 @@ export class S3StorageProvider extends StorageProviderBase {
     });
   }
 
+  async _upload(props: StorageProviderImplUpload): Promise<StorageResponse<string>> {
+    const key = props.name;
+    await this.client.send(
+      new PutObjectCommand({
+        Bucket: this.bucket,
+        Key: key,
+        Body: props.body,
+        ContentType: props.mimeType,
+      }),
+    );
+    return StorageResponse.Data(key);
+  }
+
   async _mkdir(path: string): Promise<StorageResponse<string>> {
     const key = (path.endsWith("/") ? path : `${path}/`).replace(/^\/+/, "");
     if (!S3StorageProvider.isValidFolderPath.test(key))
@@ -49,7 +65,7 @@ export class S3StorageProvider extends StorageProviderBase {
         Key: key,
         Body: "",
         ContentLength: 0,
-      })
+      }),
     );
     return StorageResponse.Data(key);
   }
@@ -62,7 +78,7 @@ export class S3StorageProvider extends StorageProviderBase {
         new HeadObjectCommand({
           Bucket: this.bucket,
           Key: key,
-        })
+        }),
       );
 
       return StorageResponse.Data(true);
@@ -84,7 +100,7 @@ export class S3StorageProvider extends StorageProviderBase {
           Key: key,
           Body: "",
           ContentType: "text/plain",
-        })
+        }),
       );
       return StorageResponse.Data(true);
     } catch {
@@ -104,13 +120,13 @@ export class S3StorageProvider extends StorageProviderBase {
           Bucket: this.bucket,
           Prefix: path,
           Delimiter: "/",
-        }
+        },
       )) {
         files.push(...(page.Contents ?? []));
         folders.push(...(page.CommonPrefixes ?? []));
       }
 
-      return StorageResponse.Data([...files, ...folders]);
+      return StorageResponse.Data([ ...files, ...folders ]);
     });
   }
 }

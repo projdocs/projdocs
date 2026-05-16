@@ -2,6 +2,8 @@ import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 import { isAdmin } from "@apps/web/lib/utils-server";
 
+
+
 export async function updateSession(request: NextRequest) {
   let supabaseResponse = NextResponse.next({
     request,
@@ -20,20 +22,20 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet, headers) {
           cookiesToSet.forEach(({ name, value }) =>
-            request.cookies.set(name, value)
+            request.cookies.set(name, value),
           );
           supabaseResponse = NextResponse.next({
             request,
           });
           cookiesToSet.forEach(({ name, value, options }) =>
-            supabaseResponse.cookies.set(name, value, options)
+            supabaseResponse.cookies.set(name, value, options),
           );
-          Object.entries(headers).forEach(([key, value]) =>
-            supabaseResponse.headers.set(key, value)
+          Object.entries(headers).forEach(([ key, value ]) =>
+            supabaseResponse.headers.set(key, value),
           );
         },
       },
-    }
+    },
   );
 
   // Do not run code between createServerClient and
@@ -46,6 +48,15 @@ export async function updateSession(request: NextRequest) {
   const user = data?.claims;
 
   if (!user) {
+
+    if (request.nextUrl.pathname.startsWith("/api/v1/projects")) {
+      return NextResponse.json({
+        error: "Unauthorized",
+      }, {
+        status: 401,
+      });
+    }
+
     if (request.nextUrl.pathname.startsWith("/organizations")) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
