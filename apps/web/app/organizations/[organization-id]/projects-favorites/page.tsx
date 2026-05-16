@@ -8,9 +8,9 @@ import { use } from "react";
 import { useRouter } from "next/navigation";
 import { ObjectPage } from "@packages/ui/components/page";
 import {
-  ClientColumns,
-  CLIENTS_TABLE_REFRESH_EVENT,
-} from "@apps/web/app/organizations/[organization-id]/clients/cols";
+  ProjectColumns,
+  PROJECTS_TABLE_REFRESH_EVENT,
+} from "@apps/web/app/organizations/[organization-id]/projects/cols";
 
 
 
@@ -23,25 +23,25 @@ export default function(props: {
   const router = useRouter();
 
   return (
-    <ObjectPage title={"My Clients"}>
+    <ObjectPage title={"My Projects"}>
       <PaginatedDataTable
         className={"pb-8"}
-        refreshEvent={CLIENTS_TABLE_REFRESH_EVENT}
-        columns={ClientColumns}
+        refreshEvent={PROJECTS_TABLE_REFRESH_EVENT}
+        columns={ProjectColumns}
         onRowClick={(row) =>
           router.push(
-            `/organizations/${params["organization-id"]}/clients/${row.id}`,
+            `/organizations/${params["organization-id"]}/projects/${row.id}`,
           )
         }
         getData={async r => {
           const res = await getSupabaseRows({
             supabase,
-            table: "clients",
-            select: "*, favorites!inner(*), links:clients_projects(*, project:projects(*))",
+            table: "projects",
+            select: "*, favorites!inner(*), links:clients_projects(*, client:clients(*))",
             filters: [
               {
                 // @ts-expect-error PostgREST table join
-                column: "favorites.client_id",
+                column: "favorites.project_id",
                 // @ts-expect-error PostgREST table join
                 value: null,
                 operator: "not.is",
@@ -51,9 +51,9 @@ export default function(props: {
           return ({
             count: res.count,
             rows: res.rows.map(r => {
-              const row = (r as Tables<"clients"> & {
+              const row = (r as Tables<"projects"> & {
                 favorites: Tables<"favorites">[]; links: readonly (Tables<"clients_projects"> & {
-                  project: Tables<"projects">
+                  client: Tables<"clients">
                 })[];
               });
               return {
