@@ -1,6 +1,6 @@
 "use client";
 
-import { ChangeEvent, ReactNode, useState } from "react";
+import { ChangeEvent, ReactNode, useEffect, useState } from "react";
 import {
   Dialog,
   DialogContent,
@@ -82,6 +82,10 @@ export const CreateFolderDialog = ({ trigger, ...props }: Props) => {
     }
     setOpen(next);
   }
+
+  useEffect(() => {
+    setName("");
+  }, [open]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
