@@ -6,7 +6,7 @@ import { v4 } from "uuid";
 
 
 
-type Ctx = RouteContext<"/api/v1/projects/[id]/files">;
+type Ctx = RouteContext<"/api/v1/folders/[id]/upload">;
 type RouteHandler = (request: Request, ctx: Ctx) => Promise<Response>;
 
 const upload = async (request: Request, ctx: Ctx, file?: Tables<"files">): Promise<Response> => {
@@ -20,18 +20,18 @@ const upload = async (request: Request, ctx: Ctx, file?: Tables<"files">): Promi
     .Error(new StorageError(`file(id="${file.id}") does not belong to project(id="${params.id}")`))
     .toResponse(400);
 
-  // load the project
+  // load the folder
   const supabase = await createServerClient();
-  const project = await supabase.from("projects").select().eq("id", params.id).maybeSingle();
-  if (project.error) return StorageResponse
-    .Error(new StorageError(`unable to load project(id="${params.id}")`))
+  const folder = await supabase.from("folders").select().eq("id", params.id).maybeSingle();
+  if (folder.error) return StorageResponse
+    .Error(new StorageError(`unable to load folder(id="${params.id}")`))
     .toResponse(500);
-  if (project.data === null) return StorageResponse
-    .Error(new StorageError(`project(id="${params.id}") does not exist or is inaccessible`))
+  if (folder.data === null) return StorageResponse
+    .Error(new StorageError(`folder(id="${params.id}") does not exist or is inaccessible`))
     .toResponse(404);
 
   // manually check permissions
-  const member = await supabase.from("members").select("*, permissions:permissions_id!inner(*, organization:organization_id(*))").eq("permissions_id.organization_id", project.data.organization_id).single();
+  const member = await supabase.from("members").select("*, permissions:permissions_id!inner(*, organization:organization_id(*))").eq("permissions_id.organization_id", folder.data.organization_id).single();
   if (member.error) return StorageResponse.Error(new StorageError("unable to check permissions")).toResponse(500);
   if (member.data.permissions.projects !== "EDIT" && member.data.permissions.projects !== "DELETE") return StorageResponse.Error(new StorageError("insufficient privileges to create files")).toResponse(403);
 
@@ -64,7 +64,7 @@ const upload = async (request: Request, ctx: Ctx, file?: Tables<"files">): Promi
   // create the file
   if (file === undefined) {
     const newFile = await supabaseAdmin.from("files").insert({
-      project_id: project.data.id,
+      folders_id: folder.data.id,
     }).select().single();
     if (newFile.error) return StorageResponse.Error(new StorageError("file uploaded to storage provider, but an error occurred while creating file row")).toResponse();
     file = newFile.data;

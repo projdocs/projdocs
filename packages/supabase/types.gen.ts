@@ -1120,6 +1120,7 @@ export type Database = {
     Tables: {
       clients: {
         Row: {
+          __full_text_search: unknown
           created_at: string
           id: string
           name: string
@@ -1127,6 +1128,7 @@ export type Database = {
           organization_id: string
         }
         Insert: {
+          __full_text_search?: unknown
           created_at?: string
           id?: string
           name: string
@@ -1134,6 +1136,7 @@ export type Database = {
           organization_id: string
         }
         Update: {
+          __full_text_search?: unknown
           created_at?: string
           id?: string
           name?: string
@@ -1235,28 +1238,28 @@ export type Database = {
       files: {
         Row: {
           created_at: string
+          folders_id: string
           id: string
           number: number
-          project_id: string
         }
         Insert: {
           created_at?: string
+          folders_id: string
           id?: string
           number?: number
-          project_id: string
         }
         Update: {
           created_at?: string
+          folders_id?: string
           id?: string
           number?: number
-          project_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "files_project_id_fkey"
-            columns: ["project_id"]
+            foreignKeyName: "files_folders_id_fkey"
+            columns: ["folders_id"]
             isOneToOne: false
-            referencedRelation: "projects"
+            referencedRelation: "folders"
             referencedColumns: ["id"]
           },
         ]
@@ -1293,6 +1296,75 @@ export type Database = {
             columns: ["storage_uploads_id"]
             isOneToOne: false
             referencedRelation: "storage_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folders: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          id: string
+          member_id: string | null
+          name: string
+          organization_id: string | null
+          parent_id: string | null
+          project_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          name: string
+          organization_id?: string | null
+          parent_id?: string | null
+          project_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          id?: string
+          member_id?: string | null
+          name?: string
+          organization_id?: string | null
+          parent_id?: string | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1440,6 +1512,7 @@ export type Database = {
       }
       projects: {
         Row: {
+          __full_text_search: unknown
           created_at: string
           display: string
           id: string
@@ -1447,6 +1520,7 @@ export type Database = {
           organization_id: string
         }
         Insert: {
+          __full_text_search?: unknown
           created_at?: string
           display?: string
           id?: string
@@ -1454,6 +1528,7 @@ export type Database = {
           organization_id: string
         }
         Update: {
+          __full_text_search?: unknown
           created_at?: string
           display?: string
           id?: string
@@ -1531,11 +1606,24 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      search_table: {
+        Args: {
+          _limit?: number
+          _query: string
+          _table: Database["public"]["Enums"]["searchable_tables"]
+        }
+        Returns: {
+          display: string
+          id: string
+          number: number
+          rank: number
+        }[]
+      }
     }
     Enums: {
       permission_levels: "NONE" | "VIEW" | "EDIT" | "DELETE"
       permission_scopes: "ORGANIZATION" | "CLIENTS" | "PROJECTS"
+      searchable_tables: "CLIENTS" | "PROJECTS"
       settings_storage_type: "GOOGLE_DRIVE" | "BUILT_IN" | "S3"
     }
     CompositeTypes: {
@@ -1686,6 +1774,7 @@ export const Constants = {
     Enums: {
       permission_levels: ["NONE", "VIEW", "EDIT", "DELETE"],
       permission_scopes: ["ORGANIZATION", "CLIENTS", "PROJECTS"],
+      searchable_tables: ["CLIENTS", "PROJECTS"],
       settings_storage_type: ["GOOGLE_DRIVE", "BUILT_IN", "S3"],
     },
   },

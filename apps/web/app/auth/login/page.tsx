@@ -58,18 +58,20 @@ export default async function () {
   else
     // show providers
     return (
-      <LoginForm
-        supabase={{
-          url: process.env.SUPABASE_KONG_URL!,
-          publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY!,
-        }}
-        providers={providers
-          .filter((p) => p.enabled)
-          .map((p) => ({
-            id: p.id,
-            identifier: p.identifier,
-            name: p.name,
-          }))}
-      />
+      <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
+        <LoginForm
+          supabase={{
+            url: process.env.SUPABASE_KONG_URL!,
+            publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY!,
+          }}
+          providers={providers
+            .filter((p) => p.enabled)
+            .map((p) => ({
+              id: p.id,
+              identifier: p.identifier,
+              name: p.name,
+            }))}
+        />
+      </div>
     );
 }

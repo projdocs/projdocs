@@ -41,9 +41,9 @@ create policy "select"
     for select
     to authenticated
     using (((SELECT private.can_current_user('VIEW'::public.permission_levels, 'PROJECTS'::public.permission_scopes,
-                                             clients_projects.organization_id) AS can_select_projects) AND
+                                             clients_projects.project_id) AS can_select_projects) AND
             (SELECT private.can_current_user('VIEW'::public.permission_levels, 'CLIENTS'::public.permission_scopes,
-                                             clients_projects.organization_id) AS can_select_clients)));
+                                             clients_projects.client_id) AS can_select_clients)));
 
 set check_function_bodies = off;
 CREATE OR REPLACE FUNCTION private.clients_projects_before_actions()

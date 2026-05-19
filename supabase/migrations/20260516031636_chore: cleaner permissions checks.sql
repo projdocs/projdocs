@@ -24,7 +24,7 @@ set check_function_bodies = off;
 CREATE OR REPLACE FUNCTION private.can_current_user(
     _level public.permission_levels,
     _scope public.permission_scopes,
-    _organization_id uuid
+    _id uuid
 )
     RETURNS boolean
     LANGUAGE plpgsql
@@ -42,19 +42,19 @@ begin
     if _scope = 'ORGANIZATION' then
         return _level = (select p.organization
                          from public.permissions p
-                         where p.organization_id = _organization_id
+                         where p.organization_id = _id
                            and p.id in
                                (select m.permissions_id from public.members m where m.user_id = (select auth.uid())));
     elsif _scope = 'CLIENTS' then
         return _level = (select p.clients
                          from public.permissions p
-                         where p.organization_id = _organization_id
+                         where p.organization_id = _id
                            and p.id in
                                (select m.permissions_id from public.members m where m.user_id = (select auth.uid())));
     elsif _scope = 'PROJECTS' then
         return _level = (select p.projects
                          from public.permissions p
-                         where p.organization_id = _organization_id
+                         where p.organization_id = _id
                            and p.id in
                                (select m.permissions_id from public.members m where m.user_id = (select auth.uid())));
     else
@@ -84,7 +84,7 @@ create policy "select"
     using ((SELECT private.can_current_user(
                            'VIEW',
                            'PROJECTS',
-                           organization_id
+                           id
                    ) AS can_select));
 
 drop policy "select" on public.clients;
@@ -96,7 +96,7 @@ create policy "select"
     using ((SELECT private.can_current_user(
                            'VIEW',
                            'CLIENTS',
-                           organization_id
+                           id
                    ) AS can_select));
 
 drop policy "select" on public.profiles;

@@ -3,10 +3,11 @@ set check_function_bodies = off;
 create or replace function private.can_current_user(
     _level public.permission_levels,
     _scope public.permission_scopes,
-    _organization_id uuid
+    _id uuid
 )
     returns boolean
     language plpgsql
+    security definer
     set search_path to ''
 as
 $function$
@@ -29,10 +30,18 @@ begin
              join public.members m
                   on m.permissions_id = p.id
                       and m.user_id = auth.uid()
-    where p.organization_id = _organization_id;
+    where p.organization_id = (select case _scope
+                                          when 'ORGANIZATION' then _id
+                                          when 'CLIENTS'
+                                              then (select c.organization_id from public.clients c where c.id = _id)
+                                          when 'PROJECTS'
+                                              then (select pr.organization_id from public.projects pr where pr.id = _id)
+                                          else null
+                                          end);
 
     if _has is null then
-        raise exception 'null permission unexpected for scope "%" in organization "%"', _scope, _organization_id;
+        raise warning 'null permission unexpected for scope "%"', _scope;
+        return false;
     end if;
 
     return case _level

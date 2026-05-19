@@ -50,6 +50,22 @@ VALUES ('108660080613718165112', '2b3e539a-60a2-44d5-8e33-2d1522298bd8', '{
 }', 'custom:dc6c374d-51bc-434c-8edb-8f6b8c2231c6', '2026-04-15 18:22:50.462526+00', '2026-04-15 18:22:50.462554+00',
         '2026-04-16 00:56:29.797256+00', 'd3e7b226-2275-40f8-9a2f-a2c7cf9f09c6');
 
+-- make NRB editor
+update public.members
+set permissions_id = (select p.id
+                      from public.permissions p
+                      where p.organization_id = '2300999D-4D91-4588-BE88-FFED0F29B90C'::uuid
+                        and p.__is_default_role = true
+                        and p.organization = 'DELETE'::public.permission_levels)
+where user_id = '2b3e539a-60a2-44d5-8e33-2d1522298bd8'::uuid
+  and permissions_id = (
+    select p.id
+    from public.permissions p
+    where p.organization_id = '2300999D-4D91-4588-BE88-FFED0F29B90C'::uuid
+      and p.__is_default_role = true
+      and p.organization = 'VIEW'::public.permission_levels
+    );
+
 -- test users
 INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at",
                             "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token",

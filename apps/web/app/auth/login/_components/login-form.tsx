@@ -19,6 +19,8 @@ import {
   useRouter,
   useSearchParams,
 } from "next/navigation";
+import { Field, FieldDescription, FieldGroup } from "@packages/ui/components/field";
+import Logo from "@packages/ui/branding/logo/logo";
 
 interface LoginFormProps {
   providers: Pick<CustomOAuthProvider, "id" | "identifier" | "name">[];
@@ -87,52 +89,66 @@ export function LoginForm(props: LoginFormProps) {
   }, []);
 
   return (
-    <div className="w-full max-w-sm space-y-6">
+    <div className="w-full max-w-sm md:max-w-4xl">
       {params.has("code") ? (
         <ExchangePKCECode params={params} {...props.supabase} />
       ) : (
-        <>
-          <div className="space-y-1 text-center">
-            <H1 className="text-2xl font-semibold tracking-tight">Sign in</H1>
-            <P className="text-sm text-muted-foreground">
-              {"Select an authentication provider to continue"}
-            </P>
-          </div>
+        <div className={"flex flex-col gap-6"}>
+          <Card className="overflow-hidden p-0">
+            <CardContent className="grid p-0 md:grid-cols-2">
+              <form className="p-6 md:p-8">
+                <FieldGroup>
+                  <div className="flex flex-col items-center gap-2 text-center">
+                    <h1 className="text-2xl font-bold">Welcome back</h1>
+                    <p className="text-balance text-muted-foreground">
+                      {"Select an authentication provider to continue"}
+                    </p>
+                  </div>
+                  <Field className="grid grid-cols-3 gap-4">
+                    {props.providers.map((provider) => (
+                      <Button
+                        key={provider.id}
+                        variant="outline"
+                        className="w-full capitalize"
+                        disabled={providerLoading === provider.identifier}
+                        onClick={async () => {
+                          setProviderLoading(provider.identifier);
 
-          <div className="space-y-2">
-            {props.providers.map((provider) => (
-              <Button
-                key={provider.id}
-                variant="outline"
-                className="w-full capitalize"
-                disabled={providerLoading === provider.identifier}
-                onClick={async () => {
-                  setProviderLoading(provider.identifier);
+                          const { error } = await createBrowserClient(
+                            props.supabase.url,
+                            props.supabase.publishableKey
+                          ).auth.signInWithOAuth({
+                            provider: provider.identifier as never,
+                            options: {
+                              redirectTo: window.location.href,
+                            },
+                          });
 
-                  const { error } = await createBrowserClient(
-                    props.supabase.url,
-                    props.supabase.publishableKey
-                  ).auth.signInWithOAuth({
-                    provider: provider.identifier as never,
-                    options: {
-                      redirectTo: window.location.href,
-                    },
-                  });
-
-                  if (error) {
-                    toast.error(error.message);
-                    console.error(error);
-                    setProviderLoading(null);
-                  }
-                }}
-              >
-                {providerLoading === provider.identifier
-                  ? "Redirecting…"
-                  : provider.name}
-              </Button>
-            ))}
-          </div>
-        </>
+                          if (error) {
+                            toast.error(error.message);
+                            console.error(error);
+                            setProviderLoading(null);
+                          }
+                        }}
+                      >
+                        {providerLoading === provider.identifier
+                          ? "Redirecting…"
+                          : provider.name}
+                      </Button>
+                    ))}
+                  </Field>
+                </FieldGroup>
+              </form>
+              <div className="relative hidden bg-muted md:block">
+                <Logo className={"absolute inset-0 w-full h-fit ml-10 object-cover"} />
+              </div>
+            </CardContent>
+          </Card>
+          <FieldDescription className="px-6 text-center">
+            By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+            and <a href="#">Privacy Policy</a>.
+          </FieldDescription>
+        </div>
       )}
     </div>
   );
