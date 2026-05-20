@@ -43,6 +43,13 @@ export default function(props: {
             supabase,
             table: "clients",
             select: "*, favorites(*), links:clients_projects(*, project:projects(*))",
+            filters: [
+              {
+                column: "organization_id",
+                operator: "eq",
+                value: params["organization-id"]
+              },
+            ]
           })(r);
           return ({
             count: res.count,

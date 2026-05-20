@@ -10,11 +10,13 @@ type Result<
   Omitted extends undefined | readonly (keyof Tables<Table>)[],
 > = Omitted extends [] ? Omit<Tables<Table>, Omitted[number]> : Tables<Table>;
 
-type Filter<Table extends keyof Database["public"]["Tables"], Column extends keyof Tables<Table>> = {
+export type Filter<Table extends keyof Database["public"]["Tables"], Column extends keyof Tables<Table>> = {
   column: Column;
   operator: `${"" | "not."}${"eq" | "neq" | "gt" | "gte" | "lt" | "lte" | "like" | "ilike" | "is" | "isdistinct" | "in" | "cs" | "cd" | "sl" | "sr" | "nxl" | "nxr" | "adj" | "ov" | "fts" | "plfts" | "phfts" | "wfts" | "match" | "imatch"}`;
   value: Tables<Table>[Column]
 };
+
+export type Filters<Table extends keyof Database["public"]["Tables"]> = readonly Filter<Table, keyof Tables<Table>>[];
 
 export const getSupabaseRows =
   <
@@ -23,7 +25,7 @@ export const getSupabaseRows =
   >(props: {
     table: Table;
     omitColumns?: Omitted;
-    filters?: readonly Filter<Table, keyof Tables<Table>>[];
+    filters?: Filters<Table>;
     select?: string;
     supabase:
       | (() => Promise<SupabaseClient<Database>>)

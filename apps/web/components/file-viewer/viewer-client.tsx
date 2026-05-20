@@ -4,14 +4,14 @@ import { ObjectFileViewerPrimitive } from "@apps/web/components/file-viewer/prim
 
 
 
-export const ProjectFileViewer = ({ project, ...props }: Omit<FileViewerProps, "items" | "organizationID"> & {
-  project: Tables<"projects">
+export const ClientFileViewer = ({ client, ...props }: Omit<FileViewerProps, "items" | "organizationID"> & {
+  client: Tables<"clients">
 }) => (
   <ObjectFileViewerPrimitive
     {...props}
-    organizationID={project.organization_id}
-    table={"projects"}
-    object={project}
-    column={"project_id"}
+    organizationID={client.organization_id}
+    table={"clients"}
+    object={client}
+    column={"client_id"}
   />
 );

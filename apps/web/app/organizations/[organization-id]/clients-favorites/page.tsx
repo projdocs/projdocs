@@ -40,9 +40,13 @@ export default function(props: {
             select: "*, favorites!inner(*), links:clients_projects(*, project:projects(*))",
             filters: [
               {
+                column: "organization_id",
+                operator: "eq",
+                value: params["organization-id"]
+              },
+              {
                 // @ts-expect-error PostgREST table join
                 column: "favorites.client_id",
-                // @ts-expect-error PostgREST table join
                 value: null,
                 operator: "not.is",
               },

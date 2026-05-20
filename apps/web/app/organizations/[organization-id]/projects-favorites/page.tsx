@@ -10,7 +10,8 @@ import { ObjectPage } from "@packages/ui/components/page";
 import {
   ProjectColumns,
   PROJECTS_TABLE_REFRESH_EVENT,
-} from "@apps/web/app/organizations/[organization-id]/projects/cols";
+} from "../../../../components/projects-table/cols";
+import { ProjectsTable } from "@apps/web/components/projects-table";
 
 
 
@@ -20,49 +21,20 @@ export default function(props: {
   }>;
 }) {
   const params = use(props.params);
-  const router = useRouter();
 
   return (
     <ObjectPage title={"My Projects"}>
-      <PaginatedDataTable
-        className={"pb-8"}
-        refreshEvent={PROJECTS_TABLE_REFRESH_EVENT}
-        columns={ProjectColumns}
-        onRowClick={(row) =>
-          router.push(
-            `/organizations/${params["organization-id"]}/projects/${row.id}`,
-          )
-        }
-        getData={async r => {
-          const res = await getSupabaseRows({
-            supabase,
-            table: "projects",
-            select: "*, favorites!inner(*), links:clients_projects(*, client:clients(*))",
-            filters: [
-              {
-                // @ts-expect-error PostgREST table join
-                column: "favorites.project_id",
-                // @ts-expect-error PostgREST table join
-                value: null,
-                operator: "not.is",
-              },
-            ],
-          })(r);
-          return ({
-            count: res.count,
-            rows: res.rows.map(r => {
-              const row = (r as Tables<"projects"> & {
-                favorites: Tables<"favorites">[]; links: readonly (Tables<"clients_projects"> & {
-                  client: Tables<"clients">
-                })[];
-              });
-              return {
-                ...row,
-                favorite_id: row.favorites?.at(0)?.id ?? null,
-              };
-            }),
-          });
-        }}
+      <ProjectsTable
+        organizationID={params["organization-id"]}
+        select={"*, favorites!inner(*), links:clients_projects(*, client:clients(*))"}
+        filters={[
+          {
+            // @ts-expect-error PostgREST table join
+            column: "favorites.project_id",
+            value: null,
+            operator: "not.is",
+          },
+        ]}
       />
     </ObjectPage>
   );
