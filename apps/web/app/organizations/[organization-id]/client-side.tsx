@@ -12,6 +12,7 @@ import { H1, H3 } from "@packages/ui/components/typography";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
 import { FileViewer } from "@apps/web/components/file-viewer";
 import { Tables } from "@packages/supabase";
+import { ObjectPage } from "@packages/ui/components/page";
 
 
 
@@ -68,9 +69,7 @@ export const DashboardPageBody = (props: {
   member: Tables<"members">;
   organizationID: string;
 }) => (
-  <div className={"flex w-full flex-col p-16"}>
-    <H1>{`Welcome back, ${props.user.first_name}!`}</H1>
-
+  <ObjectPage title={`Welcome back, ${props.user.first_name}!`}>
     <div className={"flex flex-col gap-4"}>
 
       <div className={"flex flex-row gap-2 justify-between items-center"}>
@@ -80,5 +79,5 @@ export const DashboardPageBody = (props: {
 
       <FileViewer.Member organizationID={props.organizationID} member={props.member} />
     </div>
-  </div>
+  </ObjectPage>
 )

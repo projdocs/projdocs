@@ -57,6 +57,13 @@ export const FolderPageBody = (props: {
     description={(
       <div className={"flex flex-row gap-2 py-2 items-center max-w-full"}>
         <p className={"text-muted-foreground"}>{"located in"}</p>
+        {props.folder.member && (
+          <ParentBadge
+            title={"My Files"}
+            icon={<></>}
+            path={`/organizations/${props.organizationID}`}
+          />
+        )}
         {props.folder.folder && (
           <ParentBadge
             title={props.folder.folder.name}
