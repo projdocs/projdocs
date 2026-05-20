@@ -6,6 +6,7 @@ import { FileViewerPrimitive } from "@apps/web/components/file-viewer/primitive"
 import { ProjectFileViewer } from "@apps/web/components/file-viewer/viewer-project";
 import { FileViewerSkeleton } from "@apps/web/components/file-viewer/skeleton";
 import { ClientFileViewer } from "@apps/web/components/file-viewer/viewer-client";
+import { MemberFileViewer } from "@apps/web/components/file-viewer/viewer-member";
 
 
 
@@ -20,3 +21,5 @@ FileViewer.Folder = FolderFileViewer;
 FileViewer.Project = ProjectFileViewer;
 
 FileViewer.Client = ClientFileViewer;
+
+FileViewer.Member = MemberFileViewer;

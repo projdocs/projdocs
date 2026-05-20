@@ -38,6 +38,8 @@ type Props = {
   client_id: string;
 }  | {
   folder_id: string;
+}| {
+  member_id: string;
 })
 
 const REFRESH_EVENT = "create-folder-dialog:folder:created";

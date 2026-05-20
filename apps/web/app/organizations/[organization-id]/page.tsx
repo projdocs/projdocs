@@ -1,6 +1,9 @@
-import { H1 } from "@packages/ui/components/typography";
+import { H1, H3 } from "@packages/ui/components/typography";
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
+import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
+import { FileViewer } from "@apps/web/components/file-viewer";
+import { DashboardPageBody } from "@apps/web/app/organizations/[organization-id]/client-side";
 
 export default async function Page(props: {
   params: Promise<{
@@ -14,17 +17,23 @@ export default async function Page(props: {
   const { data: { session }, error } = await supabase.auth.getSession();
 
   if(error || !session) return (
-    <ErrorPage />
+    <ErrorPage title={"Unable to Load Session"} description={error ? error.message : "No error was thrown, but no session was found!"} />
   )
 
   const user = await supabase.from("profiles").select().eq("user_id", session.user.id).eq("organization_id", params["organization-id"]).single();
   if(user.error) return (
-    <ErrorPage />
+    <ErrorPage title={"Unable to Load User"} description={"User error: " + user.error.message} />
   )
 
+  const member = await supabase.from("members").select("*, permission:permissions!inner(*)").eq("user_id", user.data.user_id).eq("permissions.organization_id", params["organization-id"]).single();
+  if(member.error) return (
+    <ErrorPage title={"Unable to Load User"} description={"Member error: " + member.error.message} />
+  )
   return (
-    <div className={"flex w-full flex-col p-16"}>
-      <H1>{`Welcome back, ${user.data.first_name}!`}</H1>
-    </div>
+    <DashboardPageBody
+      user={user.data}
+      member={member.data}
+      organizationID={params["organization-id"]}
+    />
   );
 }
