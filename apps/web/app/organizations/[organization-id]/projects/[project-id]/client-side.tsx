@@ -23,10 +23,9 @@ import { Spinner } from "@packages/ui/components/spinner";
 import { Project, SearchResult } from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/types";
 import { getProject } from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/utils";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@packages/ui/components/card";
-import { FileViewer } from "@apps/web/components/file-viewer";
-import { useRouter } from "next/navigation";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
 import { Separator } from "@packages/ui/components/separator";
+import { FileViewer } from "@apps/web/components/file-viewer";
 
 
 
