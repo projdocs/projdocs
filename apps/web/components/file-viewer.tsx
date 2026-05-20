@@ -13,7 +13,7 @@ import {
 } from "@tanstack/react-table";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
 import { AlertCircleIcon, ArrowDown, ArrowUp, ArrowUpDown, File, Folder } from "lucide-react";
-import { Dispatch, SetStateAction, useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Tables } from "@packages/supabase";
 import { supabase } from "@apps/web/lib/supabase/client";
 import { toast } from "sonner";
@@ -23,7 +23,7 @@ import { useDebouncedCallback } from "use-debounce";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
 import { useRouter } from "next/navigation";
-import { useLoadingDebouncer } from "@packages/ui/hooks/use-loading-debouncer";
+import { Separator } from "@packages/ui/components/separator";
 
 
 
@@ -31,6 +31,7 @@ export type FileView = {
   id: string;
   type: "FILE";
   name: string;
+  number: number;
   version: number;
   created_at: string;
   organization_id: string;
@@ -48,7 +49,7 @@ export type Viewable = FileView | FolderView;
 
 export type FileViewerProps = {
   items: ReadonlyArray<Viewable>;
-  onFolderClick?: (item: FolderView) => void;
+  organizationID: string;
 };
 
 function SortIcon({ sorted }: { sorted: false | "asc" | "desc" }) {
@@ -194,6 +195,7 @@ export const FileViewer = (props: FileViewerProps) => {
               }
             </TableBody>
           </Table>
+          <Separator />
           <ScrollBar orientation="vertical" />
         </ScrollArea>
       )}
@@ -206,40 +208,137 @@ FileViewer.Skeleton = () => {
   const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => columns.map(() => Math.floor(Math.random() * 40 + 40))), []);
 
   return (
-    <Table className={"w-full h-full"}>
-      <TableHeader>
-        <TableRow>
-          {columns.map((col, index, arr) => (
-            <TableHead key={index}>
-              <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
-            </TableHead>
-          ))}
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {skeletonWidths.map((row, i) => (
-          <TableRow key={i}>
-            {row.map((width, j) => (
-              <TableCell key={j}>
-                <Skeleton suppressHydrationWarning className="h-4" style={{ width: `${width}%` }} />
-              </TableCell>
+    <>
+      <Table className={"w-full h-full"}>
+        <TableHeader>
+          <TableRow>
+            {columns.map((col, index, arr) => (
+              <TableHead key={index}>
+                <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
+              </TableHead>
             ))}
           </TableRow>
-        ))}
-      </TableBody>
-    </Table>
+        </TableHeader>
+        <TableBody>
+          {skeletonWidths.map((row, i) => (
+            <TableRow key={i}>
+              {row.map((width, j) => (
+                <TableCell key={j}>
+                  <Skeleton suppressHydrationWarning className="h-4" style={{ width: `${width}%` }} />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Separator />
+    </>
   );
 };
 
+export type Folder = Tables<"folders"> & {
+  client: Tables<"clients"> | null;
+  project: Tables<"projects"> | null;
+  organization: Tables<"organizations"> | null;
+  member: Tables<"members"> | null;
+  folder: Tables<"folders"> | null;
+}
 
-FileViewer.Project = ({ project, ...props }: Omit<FileViewerProps, "items"> & {
+FileViewer.Folder = ({ folder, ...props }: Omit<FileViewerProps, "items"> & {
+  folder: Folder
+}) => {
+
+  const [ loading, setLoading ] = useState<boolean>(true);
+  const [ items, _setItems ] = useState<{
+    files: readonly Tables<"files">[];
+    folders: readonly Tables<"folders">[];
+  } | null | undefined>();
+  const setItems = useDebouncedCallback((_items: typeof items) => {
+    _setItems(_items);
+    setLoading(false);
+  }, 500);
+  const getItems = async () => {
+    setLoading(true);
+    const folders = await supabase()
+      .from("folders")
+      .select()
+      .eq("folder_id", folder.id);
+    const files = await supabase()
+      .from("files")
+      .select()
+      .eq("folder_id", folder.id);
+    if (folders.error || files.error) {
+      if (folders.error) toast.error("Unable to Load Folders!", {
+        description: folders.error.message,
+      });
+      if (files.error) toast.error("Unable to Load Files!", {
+        description: files.error.message,
+      });
+      setItems(null);
+    } else setItems({
+      folders: folders.data,
+      files: files.data,
+    });
+  };
+
+  useEffect(() => {(async () => await getItems())();}, []);
+  useEventListener(CreateFolderDialog.RefreshEvent, getItems);
+
+  return (
+    <div className="flex flex-col flex-1 h-full">
+      <Card className="relative h-full p-0 flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
+        {items !== undefined && loading && (
+          <div className="z-50 absolute inset-0 backdrop-blur-[2px] bg-background/20" />
+        )}
+        {items === undefined ? (
+          <FileViewer.Skeleton />
+        ) : items === null ? (
+          <div className={"flex flex-col items-center justify-center w-full h-full m-4 gap-2 bg-red-950"}>
+            <AlertCircleIcon className={"text-destructive"} />
+            <p className={"font-semibold text-destructive"}>{"Unable to Load Folder's Contents!"}</p>
+            <p>{"An unexpected error occurred while trying to load this folder's contents."}</p>
+            <Button className={"px-8 mt-8"} onClick={getItems}>
+              {"Retry"}
+            </Button>
+          </div>
+        ) : (
+          <FileViewer
+            {...props}
+            items={[
+              ...items.folders.map(folder => ({
+                type: "FOLDER" as const,
+                id: folder.id,
+                created_at: folder.created_at,
+                name: folder.name,
+                organization_id: props.organizationID,
+              })),
+              ...items.files.map(file => ({
+                type: "FILE" as const,
+                id: file.id,
+                created_at: file.created_at,
+                name: "TODO",
+                number: file.number,
+                version: -1,
+                organization_id: props.organizationID,
+              })),
+            ]}
+          />
+        )}
+      </Card>
+    </div>
+  );
+};
+
+FileViewer.Project = ({ project, ...props }: Omit<FileViewerProps, "items" | "organizationID"> & {
   project: Tables<"projects">
 }) => {
 
-
-  const [ loading, setLoading ] = useLoadingDebouncer(true);
+  const [ loading, setLoading ] = useState<boolean>(true);
   const [ folders, _setFolders ] = useState<readonly Tables<"folders">[] | null | undefined>();
-  const setFolders = useDebouncedCallback((folders: readonly Tables<"folders">[] | null) => _setFolders(folders), 1000);
+  const setFolders = useDebouncedCallback((folders: readonly Tables<"folders">[] | null) => {
+    _setFolders(folders);
+    setLoading(false);
+  }, 500);
   const getFolders = async () => {
     setLoading(true);
     await supabase()
@@ -256,7 +355,6 @@ FileViewer.Project = ({ project, ...props }: Omit<FileViewerProps, "items"> & {
           });
           setFolders(null);
         } else setFolders(data);
-        setLoading(false);
       });
   };
 
@@ -284,6 +382,7 @@ FileViewer.Project = ({ project, ...props }: Omit<FileViewerProps, "items"> & {
         ) : (
           <FileViewer
             {...props}
+            organizationID={project.organization_id}
             items={folders.map(folder => ({
               type: "FOLDER",
               id: folder.id,

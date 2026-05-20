@@ -26,6 +26,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@pack
 import { FileViewer } from "@apps/web/components/file-viewer";
 import { useRouter } from "next/navigation";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
+import { Separator } from "@packages/ui/components/separator";
 
 
 
@@ -144,7 +145,6 @@ export function ProjectPage(props: {
   project: Project;
 }) {
 
-  const router = useRouter();
   const [ project, setProject ] = useState<Project>({ ...props.project });
 
   return (
@@ -160,7 +160,6 @@ export function ProjectPage(props: {
         <div className="flex flex-col w-full lg:w-2/3 lg:h-full gap-2">
           <FileViewer.Project
             project={props.project}
-            onFolderClick={(folder) => router.push(`/organizations/_/folders/${folder.id}`)}
           />
         </div>
         <div className={"flex flex-col w-full lg:w-1/3 lg:h-full gap-4"}>
@@ -176,7 +175,12 @@ export function ProjectPage(props: {
                 project={project}
                 setProject={setProject}
               />
-              <CreateFolderDialog project_id={props.project.id} />
+
+              <div className={"flex flex-col gap-6"}>
+                <Separator />
+
+                <CreateFolderDialog project_id={props.project.id} />
+              </div>
             </CardContent>
           </Card>
         </div>

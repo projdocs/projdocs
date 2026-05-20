@@ -1238,26 +1238,26 @@ export type Database = {
       files: {
         Row: {
           created_at: string
-          folders_id: string
+          folder_id: string
           id: string
           number: number
         }
         Insert: {
           created_at?: string
-          folders_id: string
+          folder_id: string
           id?: string
           number?: number
         }
         Update: {
           created_at?: string
-          folders_id?: string
+          folder_id?: string
           id?: string
           number?: number
         }
         Relationships: [
           {
             foreignKeyName: "files_folders_id_fkey"
-            columns: ["folders_id"]
+            columns: ["folder_id"]
             isOneToOne: false
             referencedRelation: "folders"
             referencedColumns: ["id"]
@@ -1304,31 +1304,31 @@ export type Database = {
         Row: {
           client_id: string | null
           created_at: string
+          folder_id: string | null
           id: string
           member_id: string | null
           name: string
           organization_id: string | null
-          parent_id: string | null
           project_id: string | null
         }
         Insert: {
           client_id?: string | null
           created_at?: string
+          folder_id?: string | null
           id?: string
           member_id?: string | null
           name: string
           organization_id?: string | null
-          parent_id?: string | null
           project_id?: string | null
         }
         Update: {
           client_id?: string | null
           created_at?: string
+          folder_id?: string | null
           id?: string
           member_id?: string | null
           name?: string
           organization_id?: string | null
-          parent_id?: string | null
           project_id?: string | null
         }
         Relationships: [
@@ -1337,6 +1337,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
             referencedColumns: ["id"]
           },
           {
@@ -1351,13 +1358,6 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "folders_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "folders"
             referencedColumns: ["id"]
           },
           {

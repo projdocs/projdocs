@@ -1,0 +1,1 @@
+alter function private.profiles_after_actions() set search_path = '';

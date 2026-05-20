@@ -36,6 +36,8 @@ type Props = {
   organization_id: string;
 } | {
   client_id: string;
+}  | {
+  folder_id: string;
 })
 
 const REFRESH_EVENT = "create-folder-dialog:folder:created";
@@ -91,7 +93,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: Props) => {
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>
         {trigger ?? (
-          <Button variant="outline" size="sm">
+          <Button variant="outline">
             <FolderPlus className="h-4 w-4 mr-2" />
             New Folder
           </Button>
