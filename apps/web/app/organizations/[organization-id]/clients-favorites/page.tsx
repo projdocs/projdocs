@@ -25,6 +25,7 @@ export default function(props: {
   return (
     <ObjectPage title={"My Clients"}>
       <PaginatedDataTable
+        className={"pb-8"}
         refreshEvent={CLIENTS_TABLE_REFRESH_EVENT}
         columns={ClientColumns}
         onRowClick={(row) =>
@@ -36,21 +37,29 @@ export default function(props: {
           const res = await getSupabaseRows({
             supabase,
             table: "clients",
-            select: "*, favorites!inner(*)",
+            select: "*, favorites!inner(*), links:clients_projects(*, project:projects(*))",
             filters: [
+              {
+                column: "organization_id",
+                operator: "eq",
+                value: params["organization-id"]
+              },
               {
                 // @ts-expect-error PostgREST table join
                 column: "favorites.client_id",
-                // @ts-expect-error PostgREST table join
                 value: null,
                 operator: "not.is",
-              }
+              },
             ],
           })(r);
           return ({
             count: res.count,
             rows: res.rows.map(r => {
-              const row = (r as Tables<"clients"> & { favorites: Tables<"favorites">[] });
+              const row = (r as Tables<"clients"> & {
+                favorites: Tables<"favorites">[]; links: readonly (Tables<"clients_projects"> & {
+                  project: Tables<"projects">
+                })[];
+              });
               return {
                 ...row,
                 favorite_id: row.favorites?.at(0)?.id ?? null,

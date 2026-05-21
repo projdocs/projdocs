@@ -8,7 +8,7 @@ project_id = "projdocs"
 enabled = true
 port = 54321
 schemas = ["public"]
-extra_search_path = ["public", "private", "extensions"]
+extra_search_path = ["public", "private", "admin", "extensions"]
 max_rows = 1000
 
 [api.tls]
@@ -19,44 +19,29 @@ enabled = false
 # key_path = "../certs/my-key.pem"
 
 [db]
-# Port to use for the local database URL.
 port = 54322
-# Port used by db diff command to initialize the shadow database.
 shadow_port = 54320
-# Maximum amount of time to wait for health check when starting the local database.
 health_timeout = "2m"
-# The database major version to use. This has to be the same as your remote database's. Run `SHOW
-# server_version;` on the remote database to check.
 major_version = 17
+
+[db.vault]
+GOOGLE_OAUTH_CLIENT_ID = "env(GOOGLE_OAUTH_CLIENT_ID)"
+GOOGLE_OAUTH_CLIENT_SECRET = "env(GOOGLE_OAUTH_CLIENT_SECRET)"
+
+[db.seed]
+enabled = true
+sql_paths = ["./seeds/*.seed.sql"]
+
+[db.migrations]
+enabled = true
+schema_paths = []
 
 [db.pooler]
 enabled = false
-# Port to use for the local connection pooler.
 port = 54329
-# Specifies when a server connection can be reused by other clients.
-# Configure one of the supported pooler modes: `transaction`, `session`.
 pool_mode = "transaction"
-# How many server connections to allow per user/database pair.
 default_pool_size = 20
-# Maximum number of client connections allowed.
 max_client_conn = 100
-
-# [db.vault]
-# secret_key = "env(SECRET_VALUE)"
-
-[db.migrations]
-# If disabled, migrations will be skipped during a db push or reset.
-enabled = true
-# Specifies an ordered list of schema files that describe your database.
-# Supports glob patterns relative to supabase directory: "./schemas/*.sql"
-schema_paths = []
-
-[db.seed]
-# If enabled, seeds the database after migrations during a db reset.
-enabled = true
-# Specifies an ordered list of seed files to load during db reset.
-# Supports glob patterns relative to supabase directory: "./seeds/*.sql"
-sql_paths = ["./seeds/*.seed.sql"]
 
 [db.network_restrictions]
 # Enable management of network restrictions.

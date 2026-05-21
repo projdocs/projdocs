@@ -1,1 +1,0 @@
-alter table public.members drop column organization_id;

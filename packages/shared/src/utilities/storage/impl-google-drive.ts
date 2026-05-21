@@ -1,11 +1,14 @@
-import { StorageResponse } from "@packages/shared/utilities/storage/type";
+import { StorageError, StorageResponse } from "@packages/shared/utilities/storage/type";
 import { JWT } from "google-auth-library";
 import { drive_v3, google } from "googleapis";
-import { StorageProviderBase } from "@packages/shared/utilities/storage/provider";
+import { StorageProviderImpl, StorageProviderImplUpload } from "@packages/shared/utilities/storage/provider";
+
+
 
 type FileType = drive_v3.Schema$File;
 
-export class GoogleDriveStorageProvider extends StorageProviderBase {
+export class GoogleDriveStorageProvider extends StorageProviderImpl {
+
   private readonly client: drive_v3.Drive;
   private readonly driveID: string;
 
@@ -21,6 +24,22 @@ export class GoogleDriveStorageProvider extends StorageProviderBase {
       version: "v3",
       auth: auth,
     });
+  }
+
+  async _upload(props: StorageProviderImplUpload): Promise<StorageResponse<string>> {
+    const {data: { id }} = await this.client.files.create({
+      requestBody: {
+        driveId: this.driveID,
+        name: props.name,
+      },
+      media: {
+        mimeType: props.mimeType,
+        body: props.body,
+      },
+      fields: 'id'
+    });
+    if(!id) return StorageResponse.Error(new StorageError("'id' unexpectedly empty"))
+    return StorageResponse.Data(id);
   }
 
   async _test(): Promise<StorageResponse<boolean>> {

@@ -1,0 +1,6 @@
+{
+  "name": "@packages/go",
+  "scripts": {
+    "gen": "supabase gen types --local --lang=go > database/types.go"
+  }
+}

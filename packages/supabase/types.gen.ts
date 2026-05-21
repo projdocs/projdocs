@@ -1120,6 +1120,7 @@ export type Database = {
     Tables: {
       clients: {
         Row: {
+          __full_text_search: unknown
           created_at: string
           id: string
           name: string
@@ -1127,6 +1128,7 @@ export type Database = {
           organization_id: string
         }
         Insert: {
+          __full_text_search?: unknown
           created_at?: string
           id?: string
           name: string
@@ -1134,6 +1136,7 @@ export type Database = {
           organization_id: string
         }
         Update: {
+          __full_text_search?: unknown
           created_at?: string
           id?: string
           name?: string
@@ -1146,6 +1149,52 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      clients_projects: {
+        Row: {
+          client_id: string
+          created_at: string
+          id: string
+          organization_id: string
+          project_id: string
+        }
+        Insert: {
+          client_id: string
+          created_at?: string
+          id?: string
+          organization_id: string
+          project_id: string
+        }
+        Update: {
+          client_id?: string
+          created_at?: string
+          id?: string
+          organization_id?: string
+          project_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "clients_projects_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_projects_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_projects_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]
@@ -1186,6 +1235,140 @@ export type Database = {
           },
         ]
       }
+      files: {
+        Row: {
+          created_at: string
+          folder_id: string
+          id: string
+          number: number
+        }
+        Insert: {
+          created_at?: string
+          folder_id: string
+          id?: string
+          number?: number
+        }
+        Update: {
+          created_at?: string
+          folder_id?: string
+          id?: string
+          number?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_folders_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      files_versions: {
+        Row: {
+          created_at: string
+          files_id: string
+          id: string
+          storage_uploads_id: string
+        }
+        Insert: {
+          created_at?: string
+          files_id: string
+          id?: string
+          storage_uploads_id: string
+        }
+        Update: {
+          created_at?: string
+          files_id?: string
+          id?: string
+          storage_uploads_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_versions_files_id_fkey"
+            columns: ["files_id"]
+            isOneToOne: false
+            referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_versions_storage_uploads_id_fkey"
+            columns: ["storage_uploads_id"]
+            isOneToOne: false
+            referencedRelation: "storage_uploads"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      folders: {
+        Row: {
+          client_id: string | null
+          created_at: string
+          folder_id: string | null
+          id: string
+          member_id: string | null
+          name: string
+          organization_id: string | null
+          project_id: string | null
+        }
+        Insert: {
+          client_id?: string | null
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          member_id?: string | null
+          name: string
+          organization_id?: string | null
+          project_id?: string | null
+        }
+        Update: {
+          client_id?: string | null
+          created_at?: string
+          folder_id?: string | null
+          id?: string
+          member_id?: string | null
+          name?: string
+          organization_id?: string | null
+          project_id?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "folders_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "members"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       members: {
         Row: {
           id: string
@@ -1214,29 +1397,39 @@ export type Database = {
       }
       organizations: {
         Row: {
-          auto_add_members: boolean
+          default_permissions_id: string
           display: string
           folder_id: string | null
           id: string
+          storage_providers_id: string
         }
         Insert: {
-          auto_add_members?: boolean
+          default_permissions_id: string
           display: string
           folder_id?: string | null
           id?: string
+          storage_providers_id: string
         }
         Update: {
-          auto_add_members?: boolean
+          default_permissions_id?: string
           display?: string
           folder_id?: string | null
           id?: string
+          storage_providers_id?: string
         }
         Relationships: [
           {
-            foreignKeyName: "organizations_folder_id_fkey"
-            columns: ["folder_id"]
+            foreignKeyName: "organizations_default_permissions_id_fkey"
+            columns: ["default_permissions_id"]
             isOneToOne: false
-            referencedRelation: "storage_folders"
+            referencedRelation: "permissions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizations_storage_providers_id_fkey"
+            columns: ["storage_providers_id"]
+            isOneToOne: false
+            referencedRelation: "storage_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -1319,19 +1512,25 @@ export type Database = {
       }
       projects: {
         Row: {
+          __full_text_search: unknown
           created_at: string
+          display: string
           id: string
           number: number
           organization_id: string
         }
         Insert: {
+          __full_text_search?: unknown
           created_at?: string
+          display?: string
           id?: string
           number?: number
           organization_id: string
         }
         Update: {
+          __full_text_search?: unknown
           created_at?: string
+          display?: string
           id?: string
           number?: number
           organization_id?: string
@@ -1342,42 +1541,6 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
-      storage_folders: {
-        Row: {
-          id: string
-          parent_id: string | null
-          storage_provider_id: string
-          value: string
-        }
-        Insert: {
-          id?: string
-          parent_id?: string | null
-          storage_provider_id: string
-          value: string
-        }
-        Update: {
-          id?: string
-          parent_id?: string | null
-          storage_provider_id?: string
-          value?: string
-        }
-        Relationships: [
-          {
-            foreignKeyName: "storage_objects_parent_id_fkey"
-            columns: ["parent_id"]
-            isOneToOne: false
-            referencedRelation: "storage_folders"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "storage_objects_storage_provider_id_fkey"
-            columns: ["storage_provider_id"]
-            isOneToOne: false
-            referencedRelation: "storage_providers"
             referencedColumns: ["id"]
           },
         ]
@@ -1409,15 +1572,58 @@ export type Database = {
         }
         Relationships: []
       }
+      storage_uploads: {
+        Row: {
+          created_at: string
+          id: string
+          provider_id: string
+          storage_provider_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          provider_id: string
+          storage_provider_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          provider_id?: string
+          storage_provider_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "files_storage_provider_id_fkey"
+            columns: ["storage_provider_id"]
+            isOneToOne: false
+            referencedRelation: "storage_providers"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      get_user_count: { Args: never; Returns: number }
+      search_table: {
+        Args: {
+          _limit?: number
+          _query: string
+          _table: Database["public"]["Enums"]["searchable_tables"]
+        }
+        Returns: {
+          display: string
+          id: string
+          number: number
+          rank: number
+        }[]
+      }
     }
     Enums: {
       permission_levels: "NONE" | "VIEW" | "EDIT" | "DELETE"
+      permission_scopes: "ORGANIZATION" | "CLIENTS" | "PROJECTS"
+      searchable_tables: "CLIENTS" | "PROJECTS"
       settings_storage_type: "GOOGLE_DRIVE" | "BUILT_IN" | "S3"
     }
     CompositeTypes: {
@@ -1567,6 +1773,8 @@ export const Constants = {
   public: {
     Enums: {
       permission_levels: ["NONE", "VIEW", "EDIT", "DELETE"],
+      permission_scopes: ["ORGANIZATION", "CLIENTS", "PROJECTS"],
+      searchable_tables: ["CLIENTS", "PROJECTS"],
       settings_storage_type: ["GOOGLE_DRIVE", "BUILT_IN", "S3"],
     },
   },

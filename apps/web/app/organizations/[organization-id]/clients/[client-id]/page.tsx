@@ -1,8 +1,10 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
-import { Button } from "@packages/ui/components/button";
-import { ErrorPage, ObjectPage } from "@packages/ui/components/page";
+import { ErrorPage } from "@packages/ui/components/page";
+import { ClientPageBody } from "@apps/web/app/organizations/[organization-id]/clients/[client-id]/page-body";
 
-export default async function (props: {
+
+
+export default async function(props: {
   params: Promise<{
     "organization-id": string;
     "client-id": string;
@@ -16,12 +18,7 @@ export default async function (props: {
     .eq("id", params["client-id"])
     .eq("organization_id", params["organization-id"])
     .single();
+
   if (client.error) return <ErrorPage />;
-  return <ObjectPage description={client.data.id}
-  action={(
-    <Button variant={"outline"}>
-      {"Edit Client"}
-    </Button>
-  )}
-  />;
+  return <ClientPageBody client={client.data} />;
 }

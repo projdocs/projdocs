@@ -40,7 +40,7 @@ const getItems = (props: { organization: Tables<"organizations"> }) =>
       items: [
         {
           title: "My Projects",
-          url: `/organizations/${props.organization.id}/projects/favorites`,
+          url: `/organizations/${props.organization.id}/projects-favorites`,
           icon: <FolderHeartIcon />,
         },
         {

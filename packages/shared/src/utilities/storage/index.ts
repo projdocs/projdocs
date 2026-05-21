@@ -1,5 +1,5 @@
 import { Tables } from "@packages/supabase/types.gen";
-import { StorageProviderBase } from "@packages/shared/utilities/storage/provider";
+import { StorageProviderImpl } from "@packages/shared/utilities/storage/provider";
 import { BuiltInStorageProvider } from "@packages/shared/utilities/storage/impl-built-in";
 import { S3StorageProvider } from "@packages/shared/utilities/storage/impl-s3";
 import { GoogleDriveConfig, S3Config } from "@packages/shared/utilities/storage/type";
@@ -10,7 +10,7 @@ export class StorageProvider {
     from: Tables<"storage_providers">
   ):
     | { error: string; provider: null }
-    | { error: null; provider: StorageProviderBase } => {
+    | { error: null; provider: StorageProviderImpl } => {
     if (!from.is_valid) return { error: "provider is invalid", provider: null };
     switch (from.type) {
       case "BUILT_IN":
