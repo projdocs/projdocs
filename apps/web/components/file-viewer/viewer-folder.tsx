@@ -53,6 +53,7 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
 
   useEffect(() => {(async () => await getItems())();}, []);
   useEventListener(CreateFolderDialog.RefreshEvent, getItems);
+  useEventListener(FileViewerPrimitive.RefreshEvent, getItems);
 
   return (
     <div className="flex flex-col flex-1 h-full">

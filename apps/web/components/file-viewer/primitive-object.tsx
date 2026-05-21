@@ -48,6 +48,7 @@ export const ObjectFileViewerPrimitive = <T extends keyof Database["public"]["Ta
 
   useEffect(() => {(async () => await getFolders())();}, []);
   useEventListener(CreateFolderDialog.RefreshEvent, getFolders);
+  useEventListener(FileViewerPrimitive.RefreshEvent, getFolders);
 
   return (
     <div className="flex flex-col flex-1 h-full">

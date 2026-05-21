@@ -14,6 +14,8 @@ export const FileViewer = (props: FileViewerProps) => (
   <FileViewerPrimitive {...props} />
 );
 
+FileViewer.Primitive = FileViewerPrimitive;
+
 FileViewer.Skeleton = FileViewerSkeleton;
 
 FileViewer.Folder = FolderFileViewer;

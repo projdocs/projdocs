@@ -17,6 +17,8 @@
     "@aws-sdk/client-s3": "3.1032.0",
     "@packages/supabase": "*",
     "@packages/ui": "*",
+    "@tus/s3-store": "^2.0.4",
+    "@tus/server": "^2.4.1",
     "googleapis": "171.4.0",
     "lucide-react": "^1.8.0",
     "luxon": "^3.7.2",

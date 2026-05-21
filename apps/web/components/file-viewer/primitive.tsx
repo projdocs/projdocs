@@ -75,3 +75,5 @@ export const FileViewerPrimitive = (props: FileViewerProps) => {
     </>
   );
 };
+
+FileViewerPrimitive.RefreshEvent = "file-viewer:refresh";
