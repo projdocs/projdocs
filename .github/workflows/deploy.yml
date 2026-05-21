@@ -10,16 +10,23 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
 
       - name: Check migrations are append-only
         run: |
-          git fetch origin ${{ github.event.pull_request.base.sha }} --depth=1
-          CHANGED=$(git diff --name-only --diff-filter=MDR ${{ github.event.pull_request.base.sha }} HEAD -- supabase/migrations/)
-          if [ -n "$CHANGED" ]; then
-            echo "Migration files must not be modified, deleted, or renamed:"
-            echo "$CHANGED"
+          # Get list of changed files in supabase/migrations
+          git fetch origin ${{ github.base_ref }}
+
+          MODIFIED=$(git diff --name-only --diff-filter=MD origin/${{ github.base_ref }}...HEAD -- supabase/migrations/)
+
+          if [ -n "$MODIFIED" ]; then
+            echo "❌ The following migration files were modified or deleted:"
+            echo "$MODIFIED"
             exit 1
           fi
+
+          echo "✅ Only new migration files detected."
 
       - name: Setup Supabase CLI
         uses: supabase/setup-cli@v2
