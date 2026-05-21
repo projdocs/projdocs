@@ -27,6 +27,9 @@ jobs:
           version: 2.98.1
 
       - run: supabase db start
+        env:
+          GOOGLE_OAUTH_CLIENT_ID: not-set
+          GOOGLE_OAUTH_CLIENT_SECRET: not-set
 
       - run: supabase test db
 
