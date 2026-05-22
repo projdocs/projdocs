@@ -1,30 +1,9 @@
+import "server-only";
 import { createServerClient as createClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 import { Database } from "@packages/supabase/types.gen";
-import { isAdmin } from "@apps/web/lib/utils-server";
-import "server-only";
-export async function createServiceRoleClient(props?: {
-  __unsafe_ignore_admin_check?: boolean;
-}) {
-  if (!(await isAdmin()) && !props?.__unsafe_ignore_admin_check) throw new Error("unauthorized");
-  return createClient<Database>(
-    process.env.SUPABASE_KONG_URL!,
-    process.env.SUPABASE_SECRET_KEY!,
-    {
-      auth: {
-        persistSession: false,
-        autoRefreshToken: false,
-        detectSessionInUrl: false,
-      },
-      cookies: {
-        getAll() {
-          return [];
-        },
-        setAll() {},
-      },
-    }
-  );
-}
+
+
 
 export async function createServerClient() {
   const cookieStore = await cookies();
@@ -40,7 +19,7 @@ export async function createServerClient() {
         setAll(cookiesToSet) {
           try {
             cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
+              cookieStore.set(name, value, options),
             );
           } catch {
             // The `setAll` method was called from a Server Component.
@@ -49,6 +28,6 @@ export async function createServerClient() {
           }
         },
       },
-    }
+    },
   );
 }

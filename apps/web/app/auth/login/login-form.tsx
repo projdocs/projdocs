@@ -1,29 +1,20 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import type { AuthTokenResponse, CustomOAuthProvider } from "@supabase/auth-js";
+import type { AuthTokenResponse } from "@supabase/auth-js";
 import { Button } from "@packages/ui/components/button";
 import { createBrowserClient } from "@supabase/ssr";
-import { H1, P } from "@packages/ui/components/typography";
 import { toast } from "sonner";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@packages/ui/components/card";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@packages/ui/components/card";
 import { supabase } from "@apps/web/lib/supabase/client";
-import {
-  ReadonlyURLSearchParams,
-  useRouter,
-  useSearchParams,
-} from "next/navigation";
+import { ReadonlyURLSearchParams, useRouter, useSearchParams } from "next/navigation";
 import { Field, FieldDescription, FieldGroup } from "@packages/ui/components/field";
 import Logo from "@packages/ui/branding/logo/logo";
 
+
+
 interface LoginFormProps {
-  providers: Pick<CustomOAuthProvider, "id" | "identifier" | "name">[];
+  providers: ReadonlyArray<{ display: string; identifier: string }>;
   supabase: {
     url: string;
     publishableKey: string;
@@ -33,10 +24,10 @@ interface LoginFormProps {
 const ExchangePKCECode = (
   props: LoginFormProps["supabase"] & {
     params: ReadonlyURLSearchParams;
-  }
+  },
 ) => {
   const router = useRouter();
-  const [state, setState] = useState<AuthTokenResponse["error"]>();
+  const [ state, setState ] = useState<AuthTokenResponse["error"]>();
 
   // detect session code
   useEffect(() => {
@@ -78,7 +69,7 @@ const ExchangePKCECode = (
 };
 
 export function LoginForm(props: LoginFormProps) {
-  const [providerLoading, setProviderLoading] = useState<string | null>(null);
+  const [ providerLoading, setProviderLoading ] = useState<string | null>(null);
   const params = useSearchParams();
 
   useEffect(() => {
@@ -107,7 +98,7 @@ export function LoginForm(props: LoginFormProps) {
                   <Field className="grid grid-cols-3 gap-4">
                     {props.providers.map((provider) => (
                       <Button
-                        key={provider.id}
+                        key={provider.identifier}
                         variant="outline"
                         className="w-full capitalize"
                         disabled={providerLoading === provider.identifier}
@@ -116,7 +107,7 @@ export function LoginForm(props: LoginFormProps) {
 
                           const { error } = await createBrowserClient(
                             props.supabase.url,
-                            props.supabase.publishableKey
+                            props.supabase.publishableKey,
                           ).auth.signInWithOAuth({
                             provider: provider.identifier as never,
                             options: {
@@ -133,7 +124,7 @@ export function LoginForm(props: LoginFormProps) {
                       >
                         {providerLoading === provider.identifier
                           ? "Redirecting…"
-                          : provider.name}
+                          : provider.display}
                       </Button>
                     ))}
                   </Field>

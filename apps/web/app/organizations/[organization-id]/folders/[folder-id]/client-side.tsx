@@ -21,8 +21,10 @@ import { cn } from "@packages/ui/lib/utils";
 import { FileViewer } from "@apps/web/components/file-viewer";
 import { Folder } from "@apps/web/components/file-viewer/types";
 import { toast } from "sonner";
-import { StorageResponse } from "@packages/shared/utilities/storage/type";
-import { useEventListener } from "@packages/ui/hooks/use-event-listener";
+import { supabase } from "@apps/web/lib/supabase/client";
+import * as tus from "tus-js-client";
+import { Progress } from "@packages/ui/components/progress";
+import { OnSuccessPayload } from "tus-js-client";
 
 
 
@@ -49,6 +51,7 @@ const ParentBadge = ({ title, icon, path, className }: {
 export const FolderPageBody = (props: {
   folder: Folder;
   organizationID: string;
+  apiURL: string;
 }) => {
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -58,31 +61,60 @@ export const FolderPageBody = (props: {
     if (!file) return;
     e.target.value = "";
 
-    toast.promise(new Promise(async (resolve, reject) => {
-        const response = await fetch(`/api/v1/folders/${props.folder.id}/upload?mime-type=${encodeURIComponent(file.type || "application/octet-stream")}`, {
-          method: "POST",
-          body: file,
+    const toastId = toast.loading(`Uploading ${file.name}...`);
+
+    try {
+      const session = await supabase().auth.getSession();
+      if (session.error) throw new Error(`Authentication error: ${session.error.message}`);
+
+      const token = session.data.session?.access_token;
+      if (!token) throw new Error("No active session—please sign in again.");
+
+      const payload = await new Promise<OnSuccessPayload>((resolve, reject) => {
+        const upload = new tus.Upload(file, {
+          endpoint: `${props.apiURL}/v1/folders/${props.folder.id}/upload`,
+          retryDelays: [0, 1000, 3000, 5000],
+          metadata: {
+            filename: file.name,
+            filetype: file.type,
+          },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          onError(error) {
+            reject(error);
+          },
+          onProgress(bytesUploaded, bytesTotal) {
+            const percent = Math.floor((bytesUploaded / bytesTotal) * 100);
+            toast.loading(
+              <div className="flex flex-col gap-1 w-full min-w-[200px]">
+                <span className="text-sm">{file.name}</span>
+                <Progress value={percent} className="w-full" />
+                <span className="text-xs text-muted-foreground">{percent}%</span>
+              </div>,
+              { id: toastId },
+            );
+          },
+          onSuccess: resolve,
         });
 
-        console.log(await response.text())
-
-        if(response.ok) resolve(null);
-        else reject();
-      }),
-      {
-        loading: "Uploading file...",
-        success: (r) => {
-          console.log(r)
-          useEventListener.RemoteDispatch(FileViewer.Primitive.RefreshEvent, () => {});
-          return `File uploaded!`;
-        },
-        error: () => {
-          return ({
-            message: "Unable to upload file!",
-            description: "An unexpected server error occurred. Check the browser console for more details.",
-          });
-        },
+        upload.findPreviousUploads().then((previous) => {
+          if (previous.length > 0 && previous[0] !== undefined) {
+            upload.resumeFromPreviousUpload(previous[0]);
+          }
+          upload.start();
+        }).catch(reject);
       });
+
+      console.log(payload)
+
+      toast.success(`${file.name} uploaded successfully`, { id: toastId });
+    } catch (error) {
+      const message = error instanceof Error ? error.message : "Unknown error occurred";
+      toast.error(`Failed to upload ${file.name}: ${message}`, { id: toastId });
+    } finally {
+      setTimeout(() => toast.dismiss(toastId), 3000);
+    }
   };
 
 

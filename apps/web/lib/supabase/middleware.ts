@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { isAdmin } from "@apps/web/lib/utils-server";
 
 
 
@@ -60,23 +59,6 @@ export async function updateSession(request: NextRequest) {
     if (request.nextUrl.pathname.startsWith("/organizations")) {
       const url = request.nextUrl.clone();
       url.pathname = "/auth/login";
-      url.searchParams.set("next", request.url);
-      return NextResponse.redirect(url);
-    }
-  }
-
-  const wantsAdminPortal = request.nextUrl.pathname.startsWith("/admin");
-  const wantsAdminAuth = request.nextUrl.pathname.startsWith("/auth/admin");
-  if (wantsAdminPortal || wantsAdminAuth) {
-    const _isAdmin = await isAdmin();
-    if (_isAdmin && wantsAdminAuth) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin";
-      return NextResponse.redirect(url);
-    }
-    if (!_isAdmin && wantsAdminPortal) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/admin";
       url.searchParams.set("next", request.url);
       return NextResponse.redirect(url);
     }

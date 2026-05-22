@@ -1,1 +1,1 @@
-grant execute on function private.can_current_user to authenticated;
+select p.identifier, p.name from auth.custom_oauth_providers p;
