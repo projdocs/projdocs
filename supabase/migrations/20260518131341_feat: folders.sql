@@ -14,14 +14,12 @@ create table public.folders
     project_id      uuid                     null references public.projects (id) on update cascade on delete cascade,
     client_id       uuid                     null references public.clients (id) on update cascade on delete cascade,
     organization_id uuid                     null references public.organizations (id) on update cascade on delete cascade,
-    member_id       uuid                     null references public.members (id) on update cascade on delete cascade,
     constraint exactly_one_parent check (
         1 = (
             (folder_id is not null)::int +
             (project_id is not null)::int +
             (client_id is not null)::int +
-            (organization_id is not null)::int +
-            (member_id is not null)::int
+            (organization_id is not null)::int
             )
         )
 );
@@ -45,7 +43,6 @@ CREATE OR REPLACE FUNCTION private.check_folder_permissions(
     _organization_id uuid,
     _project_id uuid,
     _client_id uuid,
-    _member_id uuid,
     _folder_id uuid
 )
     RETURNS boolean
@@ -67,12 +64,8 @@ BEGIN
                WHEN (_client_id IS NOT NULL) THEN (SELECT private.can_current_user(_permission_level,
                                                                                   'CLIENTS'::public.permission_scopes,
                                                                                   _client_id))
-               WHEN (_member_id IS NOT NULL) THEN (
-                   _member_id IN (SELECT m.id
-                                 FROM public.members m
-                                 WHERE m.user_id = auth.uid())
-                   )
-               WHEN (_folder_id IS NOT NULL) THEN (select private.check_folder_permissions(_permission_level, _organization_id := f.organization_id, _project_id := f.project_id, _client_id := f.client_id, _member_id := f.member_id, _folder_id := f.folder_id) from public.folders f where f.id = _folder_id)
+
+               WHEN (_folder_id IS NOT NULL) THEN (select private.check_folder_permissions(_permission_level, _organization_id := f.organization_id, _project_id := f.project_id, _client_id := f.client_id, _folder_id := f.folder_id) from public.folders f where f.id = _folder_id)
                ELSE false
         END;
 
@@ -82,17 +75,17 @@ $function$
 
 create policy "select" on public.folders
     as permissive for select to authenticated
-    using ((select private.check_folder_permissions('VIEW'::public.permission_levels, organization_id, project_id, client_id, member_id, folder_id) as can_select));
+    using ((select private.check_folder_permissions('VIEW'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_select));
 
 create policy "insert" on public.folders
     as permissive for insert to authenticated
-    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, member_id, folder_id) as can_insert));
+    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_insert));
 
 create policy "update" on public.folders
     as permissive for update to authenticated
-    using ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, member_id, folder_id) as can_update))
-    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, member_id, folder_id) as can_update));
+    using ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update))
+    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update));
 
 create policy "delete" on public.folders
     as permissive for delete to authenticated
-    using ((select private.check_folder_permissions('DELETE'::public.permission_levels, organization_id, project_id, client_id, member_id, folder_id) as can_delete));
+    using ((select private.check_folder_permissions('DELETE'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_delete));

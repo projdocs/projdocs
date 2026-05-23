@@ -39,12 +39,6 @@ begin
                                                               from public.clients c
                                                               where c.id = folder.client_id)
                                                 into organization);
-        when folder.member_id is not null then (select *
-                                                from public.organizations o
-                                                where o.id = (select p.organization_id
-                                                              from public.permissions p
-                                                                       join public.members m on m.permissions_id = p.id and m.id = folder.member_id)
-                                                into organization);
         end case;
 
     if organization.id is null then
