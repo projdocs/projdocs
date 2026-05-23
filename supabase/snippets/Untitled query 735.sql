@@ -1,1 +1,0 @@
-select p.identifier, p.name from auth.custom_oauth_providers p;

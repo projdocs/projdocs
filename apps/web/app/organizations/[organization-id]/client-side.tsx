@@ -68,13 +68,17 @@ export const DashboardPageBody = (props: {
   user: Tables<"profiles">;
   member: Tables<"members">;
   organizationID: string;
+  apiURL: string;
 }) => (
   <ObjectPage title={`Welcome back, ${props.user.first_name}!`}>
     <div className={"flex flex-col gap-4"}>
 
       <div className={"flex flex-row gap-2 justify-between items-center"}>
         <H3>{"My Files"}</H3>
-        <CreateFolderDialog member_id={props.member.id} />
+        <CreateFolderDialog
+          member_id={props.member.id}
+          apiURL={props.apiURL}
+        />
       </div>
 
       <FileViewer.Member organizationID={props.organizationID} member={props.member} />

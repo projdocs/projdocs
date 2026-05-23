@@ -16,6 +16,7 @@ import { FolderPlus } from "lucide-react";
 import { supabase } from "@apps/web/lib/supabase/client";
 import { toast } from "sonner";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
+import { type } from "node:os";
 
 
 
@@ -30,15 +31,16 @@ function validateFolderName(name: string): string | null {
 
 type Props = {
   trigger?: ReactNode;
+  apiURL: string;
 } & ({
   project_id: string;
 } | {
   organization_id: string;
 } | {
   client_id: string;
-}  | {
+} | {
   folder_id: string;
-}| {
+} | {
   member_id: string;
 })
 
@@ -62,18 +64,61 @@ export const CreateFolderDialog = ({ trigger, ...props }: Props) => {
       return;
     }
 
+
     setLoading(true);
+    const toastID = toast.loading("Creating folder...");
     try {
-      await supabase().from("folders").insert({
-        name: name.trim(),
-        ...props,
-      }).then(({ error }) => {
-        if (error) toast.error("Unable to Create Folder!", {
-          description: error.message,
-        });
-        else useEventListener.RemoteDispatch(REFRESH_EVENT, () => {});
+
+      const auth = (await supabase().auth.getSession()).data?.session?.access_token;
+      if(!auth) throw "Unable to detect authorization token!";
+
+      let endpoint: {
+        name: string;
+        id: string;
+      } | undefined = undefined;
+      if ("organization_id" in props) endpoint = {
+        name: "organizations",
+        id: props.organization_id
+      };
+      if ("folder_id" in props) endpoint = {
+        name: "folders",
+        id: props.folder_id
+      };
+      if ("member_id" in props) endpoint = {
+        name: "members",
+        id: props.member_id
+      };
+      if ("client_id" in props) endpoint = {
+        name: "clients",
+        id: props.client_id
+      };
+      if ("project_id" in props) endpoint = {
+        name: "projects",
+        id: props.project_id
+      };
+      if (endpoint === undefined) throw "Unable to determine api endpoint!";
+
+
+      const response = await fetch(`${props.apiURL}/v1/${endpoint.name}/${endpoint.id}/folders`, {
+        method: "POST",
+        body: JSON.stringify({ name }),
+        headers: {
+          Authorization: `Bearer ${auth}`
+        }
       });
+      const { error, data } = await response.json();
+      if(!response.ok) {
+        throw error;
+      } else {
+        useEventListener.RemoteDispatch(REFRESH_EVENT, () => {});
+        console.log(data)
+      }
+
+      toast.success("Folder created!", { id: toastID });
       setOpen(false);
+    } catch (e) {
+      console.error(e);
+      toast.error("Unable to Create Folder!", { id: toastID, description: typeof e === "string" ? e : "Check the browser console for more details." })
     } finally {
       setLoading(false);
     }
@@ -89,7 +134,7 @@ export const CreateFolderDialog = ({ trigger, ...props }: Props) => {
 
   useEffect(() => {
     setName("");
-  }, [open]);
+  }, [ open ]);
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>

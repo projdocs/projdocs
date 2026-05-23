@@ -142,6 +142,7 @@ function ClientCombobox(props: {
 
 export function ProjectPage(props: {
   project: Project;
+  apiURL: string;
 }) {
 
   const [ project, setProject ] = useState<Project>({ ...props.project });
@@ -178,7 +179,7 @@ export function ProjectPage(props: {
               <div className={"flex flex-col gap-6"}>
                 <Separator />
 
-                <CreateFolderDialog project_id={props.project.id} />
+                <CreateFolderDialog apiURL={props.apiURL} project_id={props.project.id} />
               </div>
             </CardContent>
           </Card>

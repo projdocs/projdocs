@@ -24,7 +24,6 @@ import { toast } from "sonner";
 import { supabase } from "@apps/web/lib/supabase/client";
 import * as tus from "tus-js-client";
 import { Progress } from "@packages/ui/components/progress";
-import { OnSuccessPayload } from "tus-js-client";
 
 
 
@@ -70,10 +69,10 @@ export const FolderPageBody = (props: {
       const token = session.data.session?.access_token;
       if (!token) throw new Error("No active session—please sign in again.");
 
-      const payload = await new Promise<OnSuccessPayload>((resolve, reject) => {
+      const uploadID = await new Promise<string | undefined>((resolve, reject) => {
         const upload = new tus.Upload(file, {
           endpoint: `${props.apiURL}/v1/folders/${props.folder.id}/upload`,
-          retryDelays: [0, 1000, 3000, 5000],
+          retryDelays: [ 0, 1000, 3000, 5000 ],
           metadata: {
             filename: file.name,
             filetype: file.type,
@@ -95,7 +94,7 @@ export const FolderPageBody = (props: {
               { id: toastId },
             );
           },
-          onSuccess: resolve,
+          onSuccess: () => resolve(upload.url?.split("/")?.pop()?.split("+")?.at(0)),
         });
 
         upload.findPreviousUploads().then((previous) => {
@@ -106,7 +105,7 @@ export const FolderPageBody = (props: {
         }).catch(reject);
       });
 
-      console.log(payload)
+      console.log(uploadID);
 
       toast.success(`${file.name} uploaded successfully`, { id: toastId });
     } catch (error) {
@@ -178,7 +177,7 @@ export const FolderPageBody = (props: {
             onChange={handleFileChange}
           />
           <ButtonGroup>
-            <CreateFolderDialog folder_id={props.folder.id} />
+            <CreateFolderDialog apiURL={props.apiURL} folder_id={props.folder.id} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="More Options">

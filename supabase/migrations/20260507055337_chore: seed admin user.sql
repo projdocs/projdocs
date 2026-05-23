@@ -39,10 +39,10 @@ $$
                                 "is_anonymous")
         values ('00000000-0000-0000-0000-000000000000',
                 _uid,
+                'authenticated',
                 'admin',
-                'admin',
-                'admin@localhost',
-                extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf', 12)),
+                'admin@projdocs.localhost',
+                null, -- extensions.crypt(gen_random_uuid()::text, extensions.gen_salt('bf', 12)),
                 current_timestamp,
                 null,
                 '',
@@ -92,7 +92,7 @@ $$
                 _uid,
                 jsonb_build_object(
                         'sub', _uid,
-                        'email', 'admin@localhost',
+                        'email', 'admin@projdocs.localhost',
                         'email_verified', false,
                         'phone_verified', false
                 ),
