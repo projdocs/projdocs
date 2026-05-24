@@ -23,7 +23,7 @@ export default function(props: {
         filters={[
           {
             // @ts-expect-error PostgREST table join
-            column: "favorites.project_id",
+            column: "favorites.client_id",
             value: null,
             operator: "not.is",
           },
