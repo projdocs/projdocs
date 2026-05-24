@@ -86,53 +86,56 @@ export function LoginForm(props: LoginFormProps) {
       ) : (
         <div className={"flex flex-col gap-6"}>
           <Card className="overflow-hidden p-0">
-            <CardContent className="grid p-0 md:grid-cols-2">
-              <form className="p-6 md:p-8">
-                <FieldGroup>
-                  <div className="flex flex-col items-center gap-2 text-center">
-                    <h1 className="text-2xl font-bold">Welcome back</h1>
-                    <p className="text-balance text-muted-foreground">
-                      {"Select an authentication provider to continue"}
-                    </p>
-                  </div>
-                  <Field className="grid grid-cols-3 gap-4">
-                    {props.providers.map((provider) => (
-                      <Button
-                        key={provider.identifier}
-                        variant="outline"
-                        className="w-full capitalize"
-                        disabled={providerLoading === provider.identifier}
-                        onClick={async () => {
-                          setProviderLoading(provider.identifier);
+            <CardContent className="flex flex-col-reverse w-full p-0 md:flex-row items-center">
 
-                          const { error } = await createBrowserClient(
-                            props.supabase.url,
-                            props.supabase.publishableKey,
-                          ).auth.signInWithOAuth({
-                            provider: provider.identifier as never,
-                            options: {
-                              redirectTo: window.location.href,
-                            },
-                          });
+              <div className={"w-full md:w-1/2 flex flex-col gap-4 p-8"}>
+                <div className="flex flex-col items-center gap-2 text-center">
+                  <h1 className="text-2xl font-bold">Welcome back</h1>
+                  <p className="text-balance text-muted-foreground">
+                    {"Select an authentication provider to continue"}
+                  </p>
+                </div>
 
-                          if (error) {
-                            toast.error(error.message);
-                            console.error(error);
-                            setProviderLoading(null);
-                          }
-                        }}
-                      >
-                        {providerLoading === provider.identifier
-                          ? "Redirecting…"
-                          : provider.display}
-                      </Button>
-                    ))}
-                  </Field>
-                </FieldGroup>
-              </form>
-              <div className="relative hidden bg-muted md:block">
-                <Logo className={"absolute inset-0 w-full h-fit ml-10 object-cover"} />
+                <div className={"w-full flex flex-col gap-2"}>
+                  {props.providers.map((provider) => (
+                    <Button
+                      key={provider.identifier}
+                      variant="outline"
+                      className="w-full capitalize"
+                      disabled={providerLoading === provider.identifier}
+                      onClick={async () => {
+                        setProviderLoading(provider.identifier);
+
+                        const { error } = await createBrowserClient(
+                          props.supabase.url,
+                          props.supabase.publishableKey,
+                        ).auth.signInWithOAuth({
+                          provider: provider.identifier as never,
+                          options: {
+                            redirectTo: window.location.href,
+                          },
+                        });
+
+                        if (error) {
+                          toast.error(error.message);
+                          console.error(error);
+                          setProviderLoading(null);
+                        }
+                      }}
+                    >
+                      {providerLoading === provider.identifier
+                        ? "Redirecting…"
+                        : provider.display}
+                    </Button>
+                  ))}
+                </div>
               </div>
+
+              <div className={"w-full md:w-1/2"}>
+                <Logo className={"bg-muted w-full h-full p-10 py-20"}  />
+              </div>
+
+
             </CardContent>
           </Card>
           <FieldDescription className="px-6 text-center">
