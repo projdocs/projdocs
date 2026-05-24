@@ -36,7 +36,7 @@ export const ClientPageBody = (props: {
 
           <div className={"flex flex-row gap-2 justify-between items-center"}>
             <H3>{"Files"}</H3>
-            <CreateFolderDialog apiURL={props.apiURL} client_id={props.client.id} />
+            <CreateFolderDialog forOrganizationId={props.client.organization_id} apiURL={props.apiURL} client_id={props.client.id} />
           </div>
 
           <FileViewer.Client client={props.client} />

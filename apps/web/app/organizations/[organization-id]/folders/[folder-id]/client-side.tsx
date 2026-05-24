@@ -177,7 +177,7 @@ export const FolderPageBody = (props: {
             onChange={handleFileChange}
           />
           <ButtonGroup>
-            <CreateFolderDialog apiURL={props.apiURL} folder_id={props.folder.id} />
+            <CreateFolderDialog forOrganizationId={props.organizationID} apiURL={props.apiURL} folder_id={props.folder.id} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="More Options">

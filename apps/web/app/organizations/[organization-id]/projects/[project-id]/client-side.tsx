@@ -179,7 +179,7 @@ export function ProjectPage(props: {
               <div className={"flex flex-col gap-6"}>
                 <Separator />
 
-                <CreateFolderDialog apiURL={props.apiURL} project_id={props.project.id} />
+                <CreateFolderDialog forOrganizationId={props.project.organization_id} apiURL={props.apiURL} project_id={props.project.id} />
               </div>
             </CardContent>
           </Card>

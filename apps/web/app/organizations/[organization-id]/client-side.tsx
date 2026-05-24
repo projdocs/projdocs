@@ -76,6 +76,7 @@ export const DashboardPageBody = (props: {
       <div className={"flex flex-row gap-2 justify-between items-center"}>
         <H3>{"My Files"}</H3>
         <CreateFolderDialog
+          forOrganizationId={props.organizationID}
           member_id={props.member.id}
           apiURL={props.apiURL}
         />

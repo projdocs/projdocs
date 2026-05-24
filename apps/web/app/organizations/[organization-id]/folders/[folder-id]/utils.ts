@@ -7,5 +7,5 @@ export const getFolder = (supabase: SupabaseClient<Database>, props: {
   folderID: string;
 }) => supabase
   .from("folders")
-  .select("*, client:clients(*), project:projects(*), organization:organizations(*), member:members(*), folder:folder_id(*)").eq("id", props.folderID)
+  .select("*, client:clients(*), project:projects(*), organization:organizations(*), folder:folder_id(*)").eq("id", props.folderID)
   .single();
