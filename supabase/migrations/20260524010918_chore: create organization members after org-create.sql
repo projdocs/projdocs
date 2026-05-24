@@ -1,10 +1,12 @@
+set check_function_bodies = off;
 CREATE OR REPLACE FUNCTION private.organizations_after_actions()
     RETURNS trigger
     LANGUAGE plpgsql
     SECURITY DEFINER
     SET search_path TO ''
 AS
-$function$declare
+$function$
+declare
     _user auth.users%rowtype;
 begin
 
@@ -30,8 +32,10 @@ begin
                 'Deleted',
                 'User');
 
-        -- create member rows (except for ghost)
-        for _user in select * from auth.users where email not in ('admin@projdocs.localhost', 'ghost@projdocs.localhost')
+        -- create member rows (except for ghost or admin)
+        for _user in select *
+                     from auth.users
+                     where email not in ('admin@projdocs.localhost', 'ghost@projdocs.localhost')
             loop
                 insert into public.members (user_id, permissions_id)
                 values (_user.id, NEW.default_permissions_id);
@@ -42,4 +46,5 @@ begin
 END;
 $function$
 ;
+
 
