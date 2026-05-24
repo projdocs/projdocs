@@ -20,7 +20,14 @@ async function forwardToSupabaseAPI(
     { status: 500 },
   );
 
+  const SecretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!SecretKey) return NextResponse.json(
+    { message: "Server configuration error: `SUPABASE_SECRET_KEY` is not set." },
+    { status: 500 },
+  )
+
   const apiPath = params.path.join("/");
+  const ApiKey = apiPath.startsWith("/auth/v1/token") ? PublishableKey : SecretKey;
 
   const url = new URL(KongUrl);
   url.pathname = `${url.pathname.replace(/\/$/, "")}/${apiPath}`;
@@ -29,17 +36,17 @@ async function forwardToSupabaseAPI(
   baseParams.forEach((value, key) => {
     url.searchParams.set(
       key,
-      key === "apikey" ? PublishableKey : value,
+      key === "apikey" ? ApiKey : value,
     );
   });
 
   try {
     const headers = new Headers(request.headers);
-    headers.set("apikey", PublishableKey);
+    headers.set("apikey", ApiKey);
     if (!headers.has("Authorization")) {
       headers.set(
         "Authorization",
-        `Bearer ${PublishableKey}`,
+        `Bearer ${ApiKey}`,
       );
     }
 

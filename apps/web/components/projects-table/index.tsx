@@ -56,3 +56,5 @@ export const ProjectsTable = (props: {
   );
 };
 
+ProjectsTable.RefreshEvent = PROJECTS_TABLE_REFRESH_EVENT;
+
