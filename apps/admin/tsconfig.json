@@ -3,8 +3,9 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@apps/admin/*": ["./*"],
+      "@apps/web/*": ["./*"],
       "@packages/ui/*": ["../../packages/ui/src/*"],
+      "@packages/supabase/*": ["../../packages/supabase/*"],
       "@packages/shared/*": ["../../packages/shared/src/*"]
     },
     "plugins": [
