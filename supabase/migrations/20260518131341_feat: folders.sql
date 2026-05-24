@@ -38,7 +38,7 @@ alter table "public"."files"
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION private.check_folder_permissions(
+CREATE OR REPLACE FUNCTION private.check_scope_permissions(
     _permission_level public.permission_levels,
     _organization_id uuid,
     _project_id uuid,
@@ -65,7 +65,7 @@ BEGIN
                                                                                   'CLIENTS'::public.permission_scopes,
                                                                                   _client_id))
 
-               WHEN (_folder_id IS NOT NULL) THEN (select private.check_folder_permissions(_permission_level, _organization_id := f.organization_id, _project_id := f.project_id, _client_id := f.client_id, _folder_id := f.folder_id) from public.folders f where f.id = _folder_id)
+               WHEN (_folder_id IS NOT NULL) THEN (select private.check_scope_permissions(_permission_level, _organization_id := f.organization_id, _project_id := f.project_id, _client_id := f.client_id, _folder_id := f.folder_id) from public.folders f where f.id = _folder_id)
                ELSE false
         END;
 
@@ -75,17 +75,17 @@ $function$
 
 create policy "select" on public.folders
     as permissive for select to authenticated
-    using ((select private.check_folder_permissions('VIEW'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_select));
+    using ((select private.check_scope_permissions('VIEW'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_select));
 
 create policy "insert" on public.folders
     as permissive for insert to authenticated
-    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_insert));
+    with check ((select private.check_scope_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_insert));
 
 create policy "update" on public.folders
     as permissive for update to authenticated
-    using ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update))
-    with check ((select private.check_folder_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update));
+    using ((select private.check_scope_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update))
+    with check ((select private.check_scope_permissions('EDIT'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_update));
 
 create policy "delete" on public.folders
     as permissive for delete to authenticated
-    using ((select private.check_folder_permissions('DELETE'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_delete));
+    using ((select private.check_scope_permissions('DELETE'::public.permission_levels, organization_id, project_id, client_id, folder_id) as can_delete));

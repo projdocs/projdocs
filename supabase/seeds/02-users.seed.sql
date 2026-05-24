@@ -1,3 +1,8 @@
+-- Admin
+UPDATE auth.users
+SET encrypted_password = extensions.crypt('c3bcc25f-c585-4a09-8730-6d62fae27657', extensions.gen_salt('bf', 12))
+WHERE email = 'admin@projdocs.localhost';
+
 -- NRB
 INSERT INTO "auth"."users" ("instance_id", "id", "aud", "role", "email", "encrypted_password", "email_confirmed_at",
                             "invited_at", "confirmation_token", "confirmation_sent_at", "recovery_token",
