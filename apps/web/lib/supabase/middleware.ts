@@ -62,7 +62,14 @@ export async function updateSession(request: NextRequest) {
       url.searchParams.set("next", request.url);
       return NextResponse.redirect(url);
     }
+  } else {
+    if (request.nextUrl.pathname.startsWith("/setup") && user.role !== "admin") {
+      return NextResponse.json({
+        error: "unauthorized",
+      }, { status: 403 });
+    }
   }
+
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

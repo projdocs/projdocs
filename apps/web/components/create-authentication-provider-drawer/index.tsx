@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as React from "react";
+import { ReactNode, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 
@@ -16,40 +17,41 @@ import {
 } from "@packages/ui/components/drawer";
 import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@packages/ui/components/field";
 import { Input } from "@packages/ui/components/input";
-import { Button, buttonVariants } from "@packages/ui/components/button";
+import { Button } from "@packages/ui/components/button";
 import { Switch } from "@packages/ui/components/switch";
 import { Badge } from "@packages/ui/components/badge";
 import { Tabs, TabsList, TabsTrigger } from "@packages/ui/components/tabs";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@packages/ui/components/collapsible";
-import { CheckIcon, ChevronDownIcon, CopyIcon } from "lucide-react";
+import { CheckIcon, ChevronDownIcon, CopyIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
-import { supabase } from "@apps/web/lib/subase/client";
+import { supabase } from "@apps/web/lib/supabase/client";
 import {
   CustomProviderFormValues,
   customProviderSchema,
-} from "@apps/web/components/create-authentication-provider-dialog/form";
-import * as React from "react";
-import type { VariantProps } from "class-variance-authority";
+} from "@apps/web/components/create-authentication-provider-drawer/form";
+import { CustomOAuthProvider } from "@supabase/auth-js";
 
-interface CustomProviderDialogProps {
-  trigger?: React.ComponentProps<"button"> &
-    VariantProps<typeof buttonVariants> & {
-    asChild?: boolean;
-  };
+
+
+interface CreateAuthenticationProviderDrawerProps {
+  trigger?: ReactNode;
+  apiURL: string;
   kongURL: string;
+  onCreate?: (row: CustomOAuthProvider) => unknown;
 }
 
-export function CreateAuthenticationProviderDialog(props: CustomProviderDialogProps) {
+export function CreateAuthenticationProviderDrawer(props: CreateAuthenticationProviderDrawerProps) {
   const CALLBACK_URL = `${props.kongURL}/auth/v1/callback`;
 
-  const [copied, setCopied] = useState(false);
-  const [advancedOpen, setAdvancedOpen] = useState(false);
+  const [ copied, setCopied ] = useState(false);
+  const [ advancedOpen, setAdvancedOpen ] = useState(false);
+  const closeButton = useRef<HTMLButtonElement>(null);
 
   const form = useForm<CustomProviderFormValues>({
     // @ts-expect-error
     resolver: zodResolver(customProviderSchema),
     defaultValues: {
-      provider_type: "oauth2",
+      provider_type: "oidc",
       name: "",
       client_id: "",
       client_secret: "",
@@ -57,6 +59,13 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
       pkce_enabled: true,
       email_optional: false,
       acceptable_client_ids: [],
+      issuer: "",
+      discovery_url: "",
+      skip_nonce_check: false,
+      // @ts-expect-error
+      authorization_url: "",
+      token_url: "",
+      user_info_url: "",
     },
   });
 
@@ -72,7 +81,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
       form.resetField("discovery_url" as never);
       form.setValue("skip_nonce_check" as never, false as never);
     }
-  }, [providerType, form]);
+  }, [ providerType, form ]);
 
   function handleCopy() {
     navigator.clipboard.writeText(CALLBACK_URL);
@@ -82,16 +91,20 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
 
   async function handleSubmit(values: CustomProviderFormValues) {
     try {
-      await supabase().auth.admin.customProviders.createProvider({
+      const { error, data } = await supabase().auth.admin.customProviders.createProvider({
         ...values,
-        identifier: `custom-${crypto.randomUUID()}`,
+        identifier: `custom:${crypto.randomUUID()}`,
       });
 
+      if (error) throw error.message;
+
+      props.onCreate && props.onCreate(data);
       toast.success(`Provider "${values.name}" created and enabled.`);
+      closeButton.current?.click();
       form.reset();
     } catch (err) {
       toast.error(
-        err instanceof Error ? err.message : "Failed to create provider.",
+        err instanceof Error ? err.message : typeof err === "string" ? err : "Failed to create provider.",
       );
     }
   }
@@ -99,7 +112,12 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
   return (
     <Drawer direction="right">
       <DrawerTrigger asChild>
-        <Button {...props.trigger} />
+        {props.trigger ?? (
+          <Button>
+            <PlusIcon />
+            {"Add Provider"}
+          </Button>
+        )}
       </DrawerTrigger>
       <DrawerContent className="fixed inset-y-0 right-0 flex h-full w-full max-w-lg flex-col rounded-none">
 
@@ -119,7 +137,8 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
         <div className="flex-1 overflow-y-auto px-6 py-4 space-y-4">
 
           {/* ── Callback URL ── */}
-          <div className="flex items-center gap-2 rounded-md border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground">
+          <div
+            className="flex items-center gap-2 rounded-md border bg-muted px-3 py-2 text-sm font-mono text-muted-foreground">
             <span className="flex-1 truncate">{CALLBACK_URL}</span>
             <Button
               type="button"
@@ -137,7 +156,12 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
             </Button>
           </div>
 
-          <form id="provider-form" onSubmit={form.handleSubmit(handleSubmit)} noValidate>
+          <form
+            id="provider-form"
+            // @ts-expect-error
+            onSubmit={form.handleSubmit(handleSubmit)}
+            noValidate
+          >
             <FieldGroup className="gap-4">
 
               {/* ── Provider type ── */}
@@ -176,7 +200,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                       autoComplete="off"
                     />
                     {fieldState.invalid && (
-                      <FieldError errors={[fieldState.error]} />
+                      <FieldError errors={[ fieldState.error ]} />
                     )}
                   </Field>
                 )}
@@ -198,7 +222,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
+                        <FieldError errors={[ fieldState.error ]} />
                       )}
                     </Field>
                   )}
@@ -218,7 +242,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                         autoComplete="off"
                       />
                       {fieldState.invalid && (
-                        <FieldError errors={[fieldState.error]} />
+                        <FieldError errors={[ fieldState.error ]} />
                       )}
                     </Field>
                   )}
@@ -246,7 +270,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           autoComplete="off"
                         />
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -266,7 +290,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           autoComplete="off"
                         />
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -286,7 +310,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           autoComplete="off"
                         />
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -321,7 +345,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           </code>
                         </FieldDescription>
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -376,7 +400,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           )}
                         </FieldDescription>
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -481,7 +505,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                           OIDC ID tokens (multi-platform apps).
                         </FieldDescription>
                         {fieldState.invalid && (
-                          <FieldError errors={[fieldState.error]} />
+                          <FieldError errors={[ fieldState.error ]} />
                         )}
                       </Field>
                     )}
@@ -510,7 +534,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
                             discovery document location.
                           </FieldDescription>
                           {fieldState.invalid && (
-                            <FieldError errors={[fieldState.error]} />
+                            <FieldError errors={[ fieldState.error ]} />
                           )}
                         </Field>
                       )}
@@ -526,7 +550,7 @@ export function CreateAuthenticationProviderDialog(props: CustomProviderDialogPr
         <DrawerFooter className="border-t px-6 py-4">
           <div className="flex justify-end gap-2">
             <DrawerClose asChild>
-              <Button type="button" variant="outline">
+              <Button ref={closeButton} type="button" variant="outline">
                 Cancel
               </Button>
             </DrawerClose>

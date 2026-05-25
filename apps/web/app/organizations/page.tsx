@@ -12,7 +12,13 @@ import { redirect } from "next/navigation";
 export default async function () {
   const supabase = await createServerClient();
 
+  const user = await supabase.auth.getSession()
+
   const orgs = await supabase.from("organizations").select();
+
+  if(!orgs.error && orgs.data.length === 0 && user.data.session?.user.role === "admin") {
+    return redirect("/setup");
+  }
 
   if (orgs.error)
     return (

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-
+import { createServerClient } from "@apps/web/lib/supabase/server";
+import {createClient} from "@supabase/supabase-js"
 
 
 async function forwardToSupabaseAPI(
@@ -20,6 +21,19 @@ async function forwardToSupabaseAPI(
     { status: 500 },
   );
 
+  const SecretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!SecretKey) return NextResponse.json(
+    { message: "Server configuration error: `SUPABASE_SECRET_KEY` is not set." },
+    { status: 500 },
+  );
+
+  let Key = PublishableKey;
+  try {
+    if ((await (await createServerClient()).auth.getClaims()).data?.claims.role === "admin") {
+      Key = SecretKey
+    }
+  } catch (_) {}
+
   const apiPath = params.path.join("/");
 
   const url = new URL(KongUrl);
@@ -29,17 +43,17 @@ async function forwardToSupabaseAPI(
   baseParams.forEach((value, key) => {
     url.searchParams.set(
       key,
-      key === "apikey" ? PublishableKey : value,
+      key === "apikey" ? Key : value,
     );
   });
 
   try {
     const headers = new Headers(request.headers);
-    headers.set("apikey", PublishableKey);
-    if (!headers.has("Authorization")) {
+    headers.set("apikey", Key);
+    if (!headers.has("Authorization") || Key === SecretKey) {
       headers.set(
         "Authorization",
-        `Bearer ${PublishableKey}`,
+        `Bearer ${Key}`,
       );
     }
 

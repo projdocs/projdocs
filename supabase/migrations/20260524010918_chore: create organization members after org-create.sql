@@ -35,7 +35,7 @@ begin
         -- create member rows (except for ghost or admin)
         for _user in select *
                      from auth.users
-                     where email not in ('admin@projdocs.localhost', 'ghost@projdocs.localhost')
+                     where id <> '095E3B93-603F-46E0-A6CE-C200F1BE1995'::uuid
             loop
                 insert into public.members (user_id, permissions_id)
                 values (_user.id, NEW.default_permissions_id);
