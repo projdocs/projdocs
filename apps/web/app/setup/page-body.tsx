@@ -23,6 +23,7 @@ import { Badge } from "@packages/ui/components/badge";
 import { DateTime } from "luxon";
 import { CreateStorageProviderDrawer } from "@apps/web/components/create-storage-provider-drawer";
 import { supabase } from "@apps/web/lib/supabase/client";
+import { Checkbox } from "@packages/ui/components/checkbox";
 
 
 
@@ -41,6 +42,15 @@ const storageProviderColumns = [
   storageProvider.accessor("type", {
     header: "Type",
     cell: ({ getValue }) => StorageProviderTypes[getValue()],
+  }),
+  storageProvider.accessor("is_valid", {
+    header: "Valid",
+    cell: ({ getValue }) => (
+      <Checkbox
+        checked={getValue()}
+        disabled
+      />
+    ),
   }),
   storageProvider.accessor("created_at", {
     header: "Created",
