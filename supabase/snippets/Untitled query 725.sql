@@ -1,1 +1,1 @@
-GRANT SELECT (id, display, type, is_valid, created_at, __is_migration_locked) ON public.storage_providers TO admin, service_role;
+with _old_permissions_id = (select o.default_permissions_id from public.organizations o where o.id = '2e61f5e2-f6df-4e26-bd5c-aaeb016eb229') update public.organizations set default_permissions_id = (select p.id from public.permissions p where p.organization_id = '2e61f5e2-f6df-4e26-bd5c-aaeb016eb229' and p.__is_default_role = true and p.organization = 'VIEW') where id = '2e61f5e2-f6df-4e26-bd5c-aaeb016eb229';

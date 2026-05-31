@@ -7,8 +7,9 @@ import * as React from "react";
 import { ReactNode, Usable, use, useState } from "react";
 import {
   getAuthProviders,
-  GetAuthProvidersResult,
-  GetOrganizationsResult, getStorageProviders,
+  GetAuthProvidersResult, getOrganizations,
+  GetOrganizationsResult,
+  getStorageProviders,
   GetStorageProvidersResult,
 } from "@apps/web/app/setup/actions";
 import { Alert, AlertDescription, AlertTitle } from "@packages/ui/components/alert";
@@ -24,6 +25,7 @@ import { DateTime } from "luxon";
 import { CreateStorageProviderDrawer } from "@apps/web/components/create-storage-provider-drawer";
 import { supabase } from "@apps/web/lib/supabase/client";
 import { Checkbox } from "@packages/ui/components/checkbox";
+import { CreateOrganizationDrawer } from "@apps/web/components/create-organization-drawer";
 
 
 
@@ -298,6 +300,19 @@ export default function(props: {
               <SetupGroup
                 title={"Organizations"}
                 description={"Organizations are the top-level object where clients, projects, and files are stored. Each organization uses independent numbering schemes."}
+                action={(
+                  <CreateOrganizationDrawer
+                    apiURL={props.apiURL}
+                    providers={storageProviders.data}
+                    onCreateAction={async () => setOrganizations(await getOrganizations(supabase()))}
+                    trigger={(
+                      <Button size={"sm"}>
+                        <PlusIcon />
+                        {"Create"}
+                      </Button>
+                    )}
+                  />
+                )}
               >
                 {
                   organizations.error ? (
