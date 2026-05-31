@@ -51,7 +51,7 @@ export function CreateAuthenticationProviderDrawer(props: CreateAuthenticationPr
     // @ts-expect-error
     resolver: zodResolver(customProviderSchema),
     defaultValues: {
-      provider_type: "oidc",
+      provider_type: "oidc" as "oauth2" | "oidc",
       name: "",
       client_id: "",
       client_secret: "",
@@ -62,7 +62,6 @@ export function CreateAuthenticationProviderDrawer(props: CreateAuthenticationPr
       issuer: "",
       discovery_url: "",
       skip_nonce_check: false,
-      // @ts-expect-error
       authorization_url: "",
       token_url: "",
       user_info_url: "",

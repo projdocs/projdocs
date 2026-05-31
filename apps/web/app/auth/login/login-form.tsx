@@ -84,7 +84,10 @@ export function LoginForm(props: LoginFormProps) {
   const form = useForm<PasswordFormValues>({
     resolver: zodResolver(passwordSchema),
     mode: "onChange",
-    defaultValues: { email: "", password: "" },
+    defaultValues: {
+      email: process.env.NODE_ENV === "development" ? "admin@projdocs.localhost" : "",
+      password: process.env.NODE_ENV === "development" ? "c3bcc25f-c585-4a09-8730-6d62fae27657" : "",
+    },
   });
 
   async function handlePasswordLogin({ email, password }: PasswordFormValues) {

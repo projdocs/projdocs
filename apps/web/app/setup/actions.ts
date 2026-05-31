@@ -1,3 +1,7 @@
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@packages/supabase";
+
+
 
 const isApiResponse = (o: unknown) => {
   if (typeof o !== "object" || o === null) return false;
@@ -6,14 +10,24 @@ const isApiResponse = (o: unknown) => {
   return true;
 }
 
-export type GetProvidersResult = ReturnType<typeof getProviders>;
+export type GetOrganizationsResult = ReturnType<typeof getOrganizations>;
 
-export const getProviders = async (api: string): Promise<{
-  data: ReadonlyArray<{
+export const getOrganizations = (supabase: SupabaseClient<Database>) => supabase.from("organizations").select();
+
+export type GetStorageProvidersResult = ReturnType<typeof getStorageProviders>;
+
+
+export const getStorageProviders = (supabase: SupabaseClient<Database>) => supabase.from("storage_providers").select("id, display, type, is_valid, created_at");
+
+
+export type GetAuthProvidersResult = ReturnType<typeof getAuthProviders>;
+
+export const getAuthProviders = async (api: string): Promise<{
+  data: {
     id: string;
     identifier: string;
     display: string;
-  }>;
+  }[];
   error: null
 } | {
   data: null;
@@ -24,9 +38,6 @@ export const getProviders = async (api: string): Promise<{
       method: "GET",
     });
     const response = await request.json();
-
-    console.log(response);
-
     if (isApiResponse(response)) return response;
     return {
       data: null,

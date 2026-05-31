@@ -41,15 +41,6 @@ export default async function() {
 
   const { data: providers }: { data: ReadonlyArray<{ display: string; identifier: string }> } = await r.json();
 
-  if (providers.length === 0) return (
-    <Card className={"w-full max-w-sm"}>
-      <CardHeader>
-        <CardTitle>{"No Provider Connected!"}</CardTitle>
-        <CardDescription>{"No authentication provider has been configured for this ProjDocs instance."}</CardDescription>
-      </CardHeader>
-    </Card>
-  );
-
   return (
     <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
       <LoginForm

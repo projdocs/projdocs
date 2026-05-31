@@ -1,0 +1,1 @@
+GRANT SELECT (id, display, type, is_valid, created_at, __is_migration_locked) ON public.storage_providers TO admin, service_role;

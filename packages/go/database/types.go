@@ -1,27 +1,27 @@
 package database
 
 type PublicOrganizationsSelect struct {
-  DefaultPermissionsId string  `json:"default_permissions_id"`
-  Display              string  `json:"display"`
-  FolderId             *string `json:"folder_id"`
-  Id                   string  `json:"id"`
-  StorageProvidersId   string  `json:"storage_providers_id"`
+  DefaultPermissionsId string `json:"default_permissions_id"`
+  Display              string `json:"display"`
+  Id                   string `json:"id"`
+  StorageProvidersId   string `json:"storage_providers_id"`
+  StorageUploadId      string `json:"storage_upload_id"`
 }
 
 type PublicOrganizationsInsert struct {
   DefaultPermissionsId string  `json:"default_permissions_id"`
   Display              string  `json:"display"`
-  FolderId             *string `json:"folder_id"`
   Id                   *string `json:"id"`
   StorageProvidersId   string  `json:"storage_providers_id"`
+  StorageUploadId      string  `json:"storage_upload_id"`
 }
 
 type PublicOrganizationsUpdate struct {
   DefaultPermissionsId *string `json:"default_permissions_id"`
   Display              *string `json:"display"`
-  FolderId             *string `json:"folder_id"`
   Id                   *string `json:"id"`
   StorageProvidersId   *string `json:"storage_providers_id"`
+  StorageUploadId      *string `json:"storage_upload_id"`
 }
 
 type PublicMembersSelect struct {
@@ -76,6 +76,7 @@ type PublicStorageProvidersSelect struct {
   IsMigrationLocked bool        `json:"__is_migration_locked"`
   CreatedAt         string      `json:"created_at"`
   Data              interface{} `json:"data"`
+  Display           string      `json:"display"`
   Id                string      `json:"id"`
   IsValid           bool        `json:"is_valid"`
   Type              string      `json:"type"`
@@ -85,6 +86,7 @@ type PublicStorageProvidersInsert struct {
   IsMigrationLocked *bool       `json:"__is_migration_locked"`
   CreatedAt         *string     `json:"created_at"`
   Data              interface{} `json:"data"`
+  Display           *string     `json:"display"`
   Id                *string     `json:"id"`
   IsValid           *bool       `json:"is_valid"`
   Type              *string     `json:"type"`
@@ -94,63 +96,70 @@ type PublicStorageProvidersUpdate struct {
   IsMigrationLocked *bool       `json:"__is_migration_locked"`
   CreatedAt         *string     `json:"created_at"`
   Data              interface{} `json:"data"`
+  Display           *string     `json:"display"`
   Id                *string     `json:"id"`
   IsValid           *bool       `json:"is_valid"`
   Type              *string     `json:"type"`
 }
 
 type PublicClientsSelect struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      string      `json:"created_at"`
-  Id             string      `json:"id"`
-  Name           string      `json:"name"`
-  Number         int64       `json:"number"`
-  OrganizationId string      `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       string      `json:"created_at"`
+  Id              string      `json:"id"`
+  Name            string      `json:"name"`
+  Number          int64       `json:"number"`
+  OrganizationId  string      `json:"organization_id"`
+  StorageUploadId string      `json:"storage_upload_id"`
 }
 
 type PublicClientsInsert struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      *string     `json:"created_at"`
-  Id             *string     `json:"id"`
-  Name           string      `json:"name"`
-  Number         *int64      `json:"number"`
-  OrganizationId string      `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       *string     `json:"created_at"`
+  Id              *string     `json:"id"`
+  Name            string      `json:"name"`
+  Number          *int64      `json:"number"`
+  OrganizationId  string      `json:"organization_id"`
+  StorageUploadId string      `json:"storage_upload_id"`
 }
 
 type PublicClientsUpdate struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      *string     `json:"created_at"`
-  Id             *string     `json:"id"`
-  Name           *string     `json:"name"`
-  Number         *int64      `json:"number"`
-  OrganizationId *string     `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       *string     `json:"created_at"`
+  Id              *string     `json:"id"`
+  Name            *string     `json:"name"`
+  Number          *int64      `json:"number"`
+  OrganizationId  *string     `json:"organization_id"`
+  StorageUploadId *string     `json:"storage_upload_id"`
 }
 
 type PublicProjectsSelect struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      string      `json:"created_at"`
-  Display        string      `json:"display"`
-  Id             string      `json:"id"`
-  Number         int64       `json:"number"`
-  OrganizationId string      `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       string      `json:"created_at"`
+  Display         string      `json:"display"`
+  Id              string      `json:"id"`
+  Number          int64       `json:"number"`
+  OrganizationId  string      `json:"organization_id"`
+  StorageUploadId string      `json:"storage_upload_id"`
 }
 
 type PublicProjectsInsert struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      *string     `json:"created_at"`
-  Display        *string     `json:"display"`
-  Id             *string     `json:"id"`
-  Number         *int64      `json:"number"`
-  OrganizationId string      `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       *string     `json:"created_at"`
+  Display         *string     `json:"display"`
+  Id              *string     `json:"id"`
+  Number          *int64      `json:"number"`
+  OrganizationId  string      `json:"organization_id"`
+  StorageUploadId string      `json:"storage_upload_id"`
 }
 
 type PublicProjectsUpdate struct {
-  FullTextSearch interface{} `json:"__full_text_search"`
-  CreatedAt      *string     `json:"created_at"`
-  Display        *string     `json:"display"`
-  Id             *string     `json:"id"`
-  Number         *int64      `json:"number"`
-  OrganizationId *string     `json:"organization_id"`
+  FullTextSearch  interface{} `json:"__full_text_search"`
+  CreatedAt       *string     `json:"created_at"`
+  Display         *string     `json:"display"`
+  Id              *string     `json:"id"`
+  Number          *int64      `json:"number"`
+  OrganizationId  *string     `json:"organization_id"`
+  StorageUploadId *string     `json:"storage_upload_id"`
 }
 
 type PublicFavoritesSelect struct {
@@ -229,22 +238,34 @@ type PublicClientsProjectsUpdate struct {
 }
 
 type PublicStorageUploadsSelect struct {
-  CreatedAt         string `json:"created_at"`
-  Id                string `json:"id"`
-  ProviderId        string `json:"provider_id"`
-  StorageProviderId string `json:"storage_provider_id"`
+  ClientId          *string `json:"client_id"`
+  CreatedAt         string  `json:"created_at"`
+  FolderId          *string `json:"folder_id"`
+  Id                string  `json:"id"`
+  OrganizationId    *string `json:"organization_id"`
+  ProjectId         *string `json:"project_id"`
+  ProviderId        string  `json:"provider_id"`
+  StorageProviderId string  `json:"storage_provider_id"`
 }
 
 type PublicStorageUploadsInsert struct {
+  ClientId          *string `json:"client_id"`
   CreatedAt         *string `json:"created_at"`
+  FolderId          *string `json:"folder_id"`
   Id                *string `json:"id"`
+  OrganizationId    *string `json:"organization_id"`
+  ProjectId         *string `json:"project_id"`
   ProviderId        string  `json:"provider_id"`
   StorageProviderId string  `json:"storage_provider_id"`
 }
 
 type PublicStorageUploadsUpdate struct {
+  ClientId          *string `json:"client_id"`
   CreatedAt         *string `json:"created_at"`
+  FolderId          *string `json:"folder_id"`
   Id                *string `json:"id"`
+  OrganizationId    *string `json:"organization_id"`
+  ProjectId         *string `json:"project_id"`
   ProviderId        *string `json:"provider_id"`
   StorageProviderId *string `json:"storage_provider_id"`
 }
@@ -292,34 +313,34 @@ type PublicFilesVersionsUpdate struct {
 }
 
 type PublicFoldersSelect struct {
-  ClientId       *string `json:"client_id"`
-  CreatedAt      string  `json:"created_at"`
-  FolderId       *string `json:"folder_id"`
-  Id             string  `json:"id"`
-  MemberId       *string `json:"member_id"`
-  Name           string  `json:"name"`
-  OrganizationId *string `json:"organization_id"`
-  ProjectId      *string `json:"project_id"`
+  ClientId        *string `json:"client_id"`
+  CreatedAt       string  `json:"created_at"`
+  FolderId        *string `json:"folder_id"`
+  Id              string  `json:"id"`
+  Name            string  `json:"name"`
+  OrganizationId  *string `json:"organization_id"`
+  ProjectId       *string `json:"project_id"`
+  StorageUploadId string  `json:"storage_upload_id"`
 }
 
 type PublicFoldersInsert struct {
-  ClientId       *string `json:"client_id"`
-  CreatedAt      *string `json:"created_at"`
-  FolderId       *string `json:"folder_id"`
-  Id             *string `json:"id"`
-  MemberId       *string `json:"member_id"`
-  Name           string  `json:"name"`
-  OrganizationId *string `json:"organization_id"`
-  ProjectId      *string `json:"project_id"`
+  ClientId        *string `json:"client_id"`
+  CreatedAt       *string `json:"created_at"`
+  FolderId        *string `json:"folder_id"`
+  Id              *string `json:"id"`
+  Name            string  `json:"name"`
+  OrganizationId  *string `json:"organization_id"`
+  ProjectId       *string `json:"project_id"`
+  StorageUploadId string  `json:"storage_upload_id"`
 }
 
 type PublicFoldersUpdate struct {
-  ClientId       *string `json:"client_id"`
-  CreatedAt      *string `json:"created_at"`
-  FolderId       *string `json:"folder_id"`
-  Id             *string `json:"id"`
-  MemberId       *string `json:"member_id"`
-  Name           *string `json:"name"`
-  OrganizationId *string `json:"organization_id"`
-  ProjectId      *string `json:"project_id"`
+  ClientId        *string `json:"client_id"`
+  CreatedAt       *string `json:"created_at"`
+  FolderId        *string `json:"folder_id"`
+  Id              *string `json:"id"`
+  Name            *string `json:"name"`
+  OrganizationId  *string `json:"organization_id"`
+  ProjectId       *string `json:"project_id"`
+  StorageUploadId *string `json:"storage_upload_id"`
 }

@@ -1,6 +1,7 @@
 import Body from "./page-body";
 import { ErrorPage } from "@packages/ui/components/page";
-import { getProviders } from "@apps/web/app/setup/actions";
+import { getAuthProviders, getOrganizations, getStorageProviders } from "@apps/web/app/setup/actions";
+import { createServerClient } from "@apps/web/lib/supabase/server";
 
 
 export default async function() {
@@ -19,7 +20,9 @@ export default async function() {
     <Body
       kongURL={kongURL}
       apiURL={apiBase}
-      getProvidersPromise={getProviders(apiBase)}
+      getProvidersPromise={getAuthProviders(apiBase)}
+      getStorageProvidersPromise={getStorageProviders(await createServerClient())}
+      getOrganizationsPromise={getOrganizations(await createServerClient())}
     />
   )
 }

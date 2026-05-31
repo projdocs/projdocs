@@ -1126,6 +1126,7 @@ export type Database = {
           name: string
           number: number
           organization_id: string
+          storage_upload_id: string
         }
         Insert: {
           __full_text_search?: unknown
@@ -1134,6 +1135,7 @@ export type Database = {
           name: string
           number?: number
           organization_id: string
+          storage_upload_id: string
         }
         Update: {
           __full_text_search?: unknown
@@ -1142,6 +1144,7 @@ export type Database = {
           name?: string
           number?: number
           organization_id?: string
+          storage_upload_id?: string
         }
         Relationships: [
           {
@@ -1149,6 +1152,13 @@ export type Database = {
             columns: ["organization_id"]
             isOneToOne: false
             referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "clients_storage_uploads_id_fkey"
+            columns: ["storage_upload_id"]
+            isOneToOne: false
+            referencedRelation: "storage_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -1306,30 +1316,30 @@ export type Database = {
           created_at: string
           folder_id: string | null
           id: string
-          member_id: string | null
           name: string
           organization_id: string | null
           project_id: string | null
+          storage_upload_id: string
         }
         Insert: {
           client_id?: string | null
           created_at?: string
           folder_id?: string | null
           id?: string
-          member_id?: string | null
           name: string
           organization_id?: string | null
           project_id?: string | null
+          storage_upload_id: string
         }
         Update: {
           client_id?: string | null
           created_at?: string
           folder_id?: string | null
           id?: string
-          member_id?: string | null
           name?: string
           organization_id?: string | null
           project_id?: string | null
+          storage_upload_id?: string
         }
         Relationships: [
           {
@@ -1347,13 +1357,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
           {
-            foreignKeyName: "folders_member_id_fkey"
-            columns: ["member_id"]
-            isOneToOne: false
-            referencedRelation: "members"
-            referencedColumns: ["id"]
-          },
-          {
             foreignKeyName: "folders_organization_id_fkey"
             columns: ["organization_id"]
             isOneToOne: false
@@ -1365,6 +1368,13 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: false
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "folders_storage_uploads_id_fkey"
+            columns: ["storage_upload_id"]
+            isOneToOne: false
+            referencedRelation: "storage_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -1399,23 +1409,23 @@ export type Database = {
         Row: {
           default_permissions_id: string
           display: string
-          folder_id: string | null
           id: string
           storage_providers_id: string
+          storage_upload_id: string
         }
         Insert: {
           default_permissions_id: string
           display: string
-          folder_id?: string | null
           id?: string
           storage_providers_id: string
+          storage_upload_id: string
         }
         Update: {
           default_permissions_id?: string
           display?: string
-          folder_id?: string | null
           id?: string
           storage_providers_id?: string
+          storage_upload_id?: string
         }
         Relationships: [
           {
@@ -1430,6 +1440,13 @@ export type Database = {
             columns: ["storage_providers_id"]
             isOneToOne: false
             referencedRelation: "storage_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "organizations_storage_uploads_id_fkey"
+            columns: ["storage_upload_id"]
+            isOneToOne: false
+            referencedRelation: "storage_uploads"
             referencedColumns: ["id"]
           },
         ]
@@ -1518,6 +1535,7 @@ export type Database = {
           id: string
           number: number
           organization_id: string
+          storage_upload_id: string
         }
         Insert: {
           __full_text_search?: unknown
@@ -1526,6 +1544,7 @@ export type Database = {
           id?: string
           number?: number
           organization_id: string
+          storage_upload_id: string
         }
         Update: {
           __full_text_search?: unknown
@@ -1534,6 +1553,7 @@ export type Database = {
           id?: string
           number?: number
           organization_id?: string
+          storage_upload_id?: string
         }
         Relationships: [
           {
@@ -1543,6 +1563,13 @@ export type Database = {
             referencedRelation: "organizations"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "projects_storage_uploads_id_fkey"
+            columns: ["storage_upload_id"]
+            isOneToOne: false
+            referencedRelation: "storage_uploads"
+            referencedColumns: ["id"]
+          },
         ]
       }
       storage_providers: {
@@ -1550,6 +1577,7 @@ export type Database = {
           __is_migration_locked: boolean
           created_at: string
           data: Json
+          display: string
           id: string
           is_valid: boolean
           type: Database["public"]["Enums"]["settings_storage_type"]
@@ -1558,6 +1586,7 @@ export type Database = {
           __is_migration_locked?: boolean
           created_at?: string
           data?: Json
+          display?: string
           id?: string
           is_valid?: boolean
           type?: Database["public"]["Enums"]["settings_storage_type"]
@@ -1566,6 +1595,7 @@ export type Database = {
           __is_migration_locked?: boolean
           created_at?: string
           data?: Json
+          display?: string
           id?: string
           is_valid?: boolean
           type?: Database["public"]["Enums"]["settings_storage_type"]
@@ -1574,20 +1604,32 @@ export type Database = {
       }
       storage_uploads: {
         Row: {
+          client_id: string | null
           created_at: string
+          folder_id: string | null
           id: string
+          organization_id: string | null
+          project_id: string | null
           provider_id: string
           storage_provider_id: string
         }
         Insert: {
+          client_id?: string | null
           created_at?: string
+          folder_id?: string | null
           id?: string
+          organization_id?: string | null
+          project_id?: string | null
           provider_id: string
           storage_provider_id: string
         }
         Update: {
+          client_id?: string | null
           created_at?: string
+          folder_id?: string | null
           id?: string
+          organization_id?: string | null
+          project_id?: string | null
           provider_id?: string
           storage_provider_id?: string
         }
@@ -1597,6 +1639,34 @@ export type Database = {
             columns: ["storage_provider_id"]
             isOneToOne: false
             referencedRelation: "storage_providers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_uploads_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_uploads_folder_id_fkey"
+            columns: ["folder_id"]
+            isOneToOne: false
+            referencedRelation: "folders"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_uploads_organization_id_fkey"
+            columns: ["organization_id"]
+            isOneToOne: false
+            referencedRelation: "organizations"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_uploads_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
             referencedColumns: ["id"]
           },
         ]

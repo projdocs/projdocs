@@ -2,9 +2,9 @@ import { Enums } from "@packages/supabase/types.gen";
 import { z } from "zod";
 
 export const StorageProviderTypes = {
-  BUILT_IN: "Built-In (Supabase Storage)",
+  BUILT_IN: "Built-In",
+  S3: "S3-Compatible API",
   GOOGLE_DRIVE: "Google Drive API",
-  S3: "S3-Compatible Storage API",
 } satisfies {
   [key in Enums<"settings_storage_type">]: string;
 };
