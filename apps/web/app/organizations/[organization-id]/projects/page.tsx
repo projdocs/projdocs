@@ -23,6 +23,8 @@ export default async function(props: {
   const permissions = await (await createServerClient()).from("members").select("*, permissions:permissions_id(*)").single();
   if (permissions.error) console.error(permissions.error);
 
+  console.log(permissions)
+
   return (
     <Body
       apiURL={apiURL}

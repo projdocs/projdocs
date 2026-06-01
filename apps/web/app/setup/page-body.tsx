@@ -26,6 +26,7 @@ import { CreateStorageProviderDrawer } from "@apps/web/components/create-storage
 import { supabase } from "@apps/web/lib/supabase/client";
 import { Checkbox } from "@packages/ui/components/checkbox";
 import { CreateOrganizationDrawer } from "@apps/web/components/create-organization-drawer";
+import { useRouter } from "next/navigation";
 
 
 
@@ -164,6 +165,8 @@ export default function(props: {
   getOrganizationsPromise: Usable<Awaited<GetOrganizationsResult>>;
 }) {
 
+  const router = useRouter();
+
   const [ tab, setTab ] = useState<StorageKeys>(StorageKeys.AUTH);
 
   const initialStorageProviders = use(props.getStorageProvidersPromise);
@@ -175,6 +178,15 @@ export default function(props: {
   const initialOrganizations = use(props.getOrganizationsPromise);
   const [ organizations, setOrganizations ] = useState<Awaited<GetOrganizationsResult>>(initialOrganizations);
 
+  const setupTasks: {
+    [key in StorageKeys]: number;
+  } = {
+    STORAGE: 0,
+    ORGS: organizations.data?.length ? 0 : 1,
+    AUTH: authProviders.data?.length ? 0 : 1
+  }
+  const isSetup: boolean = 0 === Object.values(setupTasks).reduce((sum, value) => sum + value, 0)
+
   return (
     <div className={"bg-muted w-full min-h-full overflow-scroll flex flex-col items-center p-10"}>
 
@@ -185,17 +197,24 @@ export default function(props: {
         <CardContent className={"flex flex-col"}>
 
           <Tabs value={tab} onValueChange={(tab) => setTab(tab as StorageKeys)}>
-            <TabsList className={"mb-8"}>
-              {tabs.map((tab) => (
-                <SetupTab
-                  key={tab.key}
-                  tab={tab}
-                  AUTH={authProviders.data?.length ? 0 : 1}
-                  STORAGE={0}
-                  ORGS={organizations.data?.length ? 0 : 1}
-                />
-              ))}
-            </TabsList>
+            <div className={"flex flex-row items-center justify-between mb-8"}>
+              <TabsList>
+                {tabs.map((tab) => (
+                  <SetupTab
+                    key={tab.key}
+                    tab={tab}
+                    {...setupTasks}
+                  />
+                ))}
+              </TabsList>
+
+              <Button
+                disabled={!isSetup}
+                onClick={() => router.push("/organizations")}
+              >
+                {"Complete Setup"}
+              </Button>
+            </div>
 
             <TabsContent value={StorageKeys.AUTH}>
               <SetupGroup

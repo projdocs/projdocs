@@ -61,7 +61,7 @@ $$
                 }',
                 '{
                   "email_verified": true,
-                  "full_name": "Administrator"
+                  "full_name": "ProjDocs Administrator", "first_name": "ProjDocs", "last_name": "Administrator"
                 }',
                 null,
                 current_timestamp,

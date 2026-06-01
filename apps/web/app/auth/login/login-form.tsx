@@ -158,7 +158,7 @@ export function LoginForm(props: LoginFormProps) {
 
                     <button
                       type="button"
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors text-center w-full"
+                      className="text-xs text-muted-foreground hover:text-foreground transition-colors text-center w-full mt-3"
                       onClick={() => setShowPassword(true)}
                     >
                       {"Sign in with email & password"}

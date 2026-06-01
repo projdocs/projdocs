@@ -24,6 +24,10 @@ import { toast } from "sonner";
 import { supabase } from "@apps/web/lib/supabase/client";
 import * as tus from "tus-js-client";
 import { Progress } from "@packages/ui/components/progress";
+import { v4 } from "uuid";
+import { useEventListener } from "@packages/ui/hooks/use-event-listener";
+import { FolderFileViewer } from "@apps/web/components/file-viewer/viewer-folder";
+import { FileViewerPrimitive } from "@apps/web/components/file-viewer/primitive";
 
 
 
@@ -53,6 +57,8 @@ export const FolderPageBody = (props: {
   apiURL: string;
 }) => {
 
+  const router = useRouter();
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   const handleFileChange = async (e: ChangeEvent<HTMLInputElement>) => {
@@ -69,9 +75,9 @@ export const FolderPageBody = (props: {
       const token = session.data.session?.access_token;
       if (!token) throw new Error("No active session—please sign in again.");
 
-      const uploadID = await new Promise<string | undefined>((resolve, reject) => {
+      const fileID = await new Promise<string | undefined>((resolve, reject) => {
         const upload = new tus.Upload(file, {
-          endpoint: `${props.apiURL}/v1/folders/${props.folder.id}/upload`,
+          endpoint: `${props.apiURL}/v1/organizations/${props.organizationID}/folders/${props.folder.id}/upload`,
           retryDelays: [ 0, 1000, 3000, 5000 ],
           metadata: {
             filename: file.name,
@@ -94,20 +100,32 @@ export const FolderPageBody = (props: {
               { id: toastId },
             );
           },
-          onSuccess: () => resolve(upload.url?.split("/")?.pop()?.split("+")?.at(0)),
+          onSuccess: (result) => resolve(result.lastResponse.getHeader("Location")),
         });
 
-        upload.findPreviousUploads().then((previous) => {
-          if (previous.length > 0 && previous[0] !== undefined) {
-            upload.resumeFromPreviousUpload(previous[0]);
-          }
-          upload.start();
-        }).catch(reject);
+        // // 2026.05.31 / causing bugs in post-processing
+        // upload.findPreviousUploads().then((previous) => {
+        //   if (previous.length > 0 && previous[0] !== undefined) {
+        //     upload.resumeFromPreviousUpload(previous[0]);
+        //   }
+        //   upload.start();
+        // }).catch(reject);
+
+        upload.start();
       });
 
-      console.log(uploadID);
-
-      toast.success(`${file.name} uploaded successfully`, { id: toastId });
+      // complete the file upload
+      useEventListener.RemoteDispatch(FileViewerPrimitive.RefreshEvent, () => {});
+      toast.success(`${file.name} uploaded successfully`, {
+        action: {
+          label: "View",
+          onClick: () => {
+            router.push(`/organizations/${props.organizationID}/files/${fileID?.split(":").join("/")}`);
+            toast.dismiss(toastId);
+          },
+        },
+        id: toastId
+      });
     } catch (error) {
       const message = error instanceof Error ? error.message : "Unknown error occurred";
       toast.error(`Failed to upload ${file.name}: ${message}`, { id: toastId });
