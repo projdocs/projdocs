@@ -28,6 +28,7 @@ import { v4 } from "uuid";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { FolderFileViewer } from "@apps/web/components/file-viewer/viewer-folder";
 import { FileViewerPrimitive } from "@apps/web/components/file-viewer/primitive";
+import { DetailedError } from "tus-js-client";
 
 
 
@@ -120,15 +121,27 @@ export const FolderPageBody = (props: {
         action: {
           label: "View",
           onClick: () => {
-            router.push(`/organizations/${props.organizationID}/files/${fileID?.split(":").join("/")}`);
+            router.push(`/organizations/${props.organizationID}/files/${fileID?.split(":").at(0)}`);
             toast.dismiss(toastId);
           },
         },
         id: toastId
       });
     } catch (error) {
-      const message = error instanceof Error ? error.message : "Unknown error occurred";
-      toast.error(`Failed to upload ${file.name}: ${message}`, { id: toastId });
+      let message = error instanceof Error ? error.message : "Unknown error occurred";
+
+      // try to parse an API error
+      if (error instanceof DetailedError) {
+        try {
+          const body = error.originalResponse?.getBody();
+          if (body) {
+            const result = JSON.parse(body);
+            if (typeof result.error === "string") message = result.error;
+          }
+        } catch {}
+      }
+
+      toast.error(`Failed to upload!`, { description: message, id: toastId });
     } finally {
       setTimeout(() => toast.dismiss(toastId), 3000);
     }
@@ -218,6 +231,8 @@ export const FolderPageBody = (props: {
       <FileViewer.Folder
         folder={props.folder}
         organizationID={props.organizationID}
+        onRowClick={({path}) => router.push(path)}
+        onRowDoubleClick={({path}) => router.push(path)}
       />
     </ObjectPage>
   );

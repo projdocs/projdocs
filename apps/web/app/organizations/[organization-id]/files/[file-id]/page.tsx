@@ -7,18 +7,22 @@ export default async function (props: {
   params: Promise<{
     "organization-id": string;
     "file-id": string;
-    "version-id": string;
   }>;
 }) {
 
   const params = await props.params;
+  const supabase = await createServerClient();
+  const {data: file, error} = await supabase
+    .from("files")
+    .select()
+    .eq("id", params["file-id"])
+    .single();
 
-  const {data: version, error} = await (await createServerClient())
+  const {} = await supabase
     .from("files_versions")
     .select()
-    .eq("id", params["version-id"])
     .eq("files_id", params["file-id"])
-    .single();
+    .order("created_at")
 
   if (error) return (
     <ErrorPage

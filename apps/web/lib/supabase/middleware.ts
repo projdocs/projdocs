@@ -46,23 +46,16 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (!user) {
-
-    if (request.nextUrl.pathname.startsWith("/api/v1/projects")) {
-      return NextResponse.json({
-        error: "Unauthorized",
-      }, {
-        status: 401,
-      });
-    }
-
-    if (request.nextUrl.pathname.startsWith("/organizations")) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      url.searchParams.set("next", request.url);
-      return NextResponse.redirect(url);
-    }
-  } else {
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith("/supabase/proxy/auth/v1/token") &&
+    !request.nextUrl.pathname.startsWith("/auth")
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("next", request.url);
+    return NextResponse.redirect(url);
+  } else if (user) {
     if (request.nextUrl.pathname.startsWith("/setup") && user.role !== "admin") {
       return NextResponse.json({
         error: "unauthorized",

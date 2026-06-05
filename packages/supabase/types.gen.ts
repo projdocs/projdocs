@@ -1250,18 +1250,21 @@ export type Database = {
           created_at: string
           folder_id: string
           id: string
+          name: string
           number: number
         }
         Insert: {
           created_at?: string
           folder_id: string
           id?: string
+          name: string
           number?: number
         }
         Update: {
           created_at?: string
           folder_id?: string
           id?: string
+          name?: string
           number?: number
         }
         Relationships: [
@@ -1279,18 +1282,21 @@ export type Database = {
           created_at: string
           files_id: string
           id: string
+          number: number
           storage_uploads_id: string
         }
         Insert: {
           created_at?: string
           files_id: string
           id?: string
+          number: number
           storage_uploads_id: string
         }
         Update: {
           created_at?: string
           files_id?: string
           id?: string
+          number?: number
           storage_uploads_id?: string
         }
         Relationships: [
@@ -1604,8 +1610,10 @@ export type Database = {
       }
       storage_uploads: {
         Row: {
+          checksum: string | null
           client_id: string | null
           created_at: string
+          file_version_id: string | null
           folder_id: string | null
           id: string
           organization_id: string | null
@@ -1614,8 +1622,10 @@ export type Database = {
           storage_provider_id: string
         }
         Insert: {
+          checksum?: string | null
           client_id?: string | null
           created_at?: string
+          file_version_id?: string | null
           folder_id?: string | null
           id?: string
           organization_id?: string | null
@@ -1624,8 +1634,10 @@ export type Database = {
           storage_provider_id: string
         }
         Update: {
+          checksum?: string | null
           client_id?: string | null
           created_at?: string
+          file_version_id?: string | null
           folder_id?: string | null
           id?: string
           organization_id?: string | null
@@ -1646,6 +1658,13 @@ export type Database = {
             columns: ["client_id"]
             isOneToOne: false
             referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "storage_uploads_file_version_id_fkey"
+            columns: ["file_version_id"]
+            isOneToOne: false
+            referencedRelation: "files_versions"
             referencedColumns: ["id"]
           },
           {

@@ -75,7 +75,8 @@ export const ObjectFileViewerPrimitive = <T extends keyof Database["public"]["Ta
               id: folder.id,
               created_at: folder.created_at,
               name: folder.name,
-              organization_id: props.organizationID
+              organization_id: props.organizationID,
+              path: `/organizations/${props.organizationID}/folders/${folder.id}`
             }))}
           />
         )}

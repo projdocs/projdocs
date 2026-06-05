@@ -20,8 +20,7 @@ export default async function(props: {
     />
   );
 
-  const permissions = await (await createServerClient()).from("members").select("*, permissions:permissions_id(*)").single();
-  if (permissions.error) console.error(permissions.error);
+  const permissions = await (await createServerClient()).from("members").select("*, permissions:permissions_id!inner(*)").eq("permissions.organization_id", params["organization-id"]).single();
 
   return (
     <Body

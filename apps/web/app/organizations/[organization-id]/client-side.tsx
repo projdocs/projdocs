@@ -8,9 +8,8 @@ import { useIsMobile } from "@packages/ui/hooks/use-mobile";
 import { SidebarUserDropdown, SidebarUserProps } from "../../../components/sidebar-user-dropdown";
 import { MenuIcon } from "lucide-react";
 import { Avatar, AvatarFallback } from "@packages/ui/components/avatar";
-import { H1, H3 } from "@packages/ui/components/typography";
+import { H3 } from "@packages/ui/components/typography";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
-import { FileViewer } from "@apps/web/components/file-viewer";
 import { Tables } from "@packages/supabase";
 import { ObjectPage } from "@packages/ui/components/page";
 
@@ -82,7 +81,7 @@ export const DashboardPageBody = (props: {
         />
       </div>
 
-      <FileViewer.Member organizationID={props.organizationID} member={props.member} />
+
     </div>
   </ObjectPage>
-)
+);

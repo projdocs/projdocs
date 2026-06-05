@@ -10,6 +10,7 @@ export type FileView = {
   version: number;
   created_at: string;
   organization_id: string;
+  path: string;
 };
 
 export type FolderView = {
@@ -18,6 +19,7 @@ export type FolderView = {
   name: string;
   created_at: string;
   organization_id: string;
+  path: string;
 };
 
 export type Viewable = FileView | FolderView;
@@ -25,6 +27,8 @@ export type Viewable = FileView | FolderView;
 export type FileViewerProps = {
   items: ReadonlyArray<Viewable>;
   organizationID: string;
+  onRowClick?: (viewable: Viewable) => void;
+  onRowDoubleClick?: (viewable: Viewable) => void;
 };
 
 export type Folder = Tables<"folders"> & {

@@ -238,8 +238,10 @@ type PublicClientsProjectsUpdate struct {
 }
 
 type PublicStorageUploadsSelect struct {
+  Checksum          *string `json:"checksum"`
   ClientId          *string `json:"client_id"`
   CreatedAt         string  `json:"created_at"`
+  FileVersionId     *string `json:"file_version_id"`
   FolderId          *string `json:"folder_id"`
   Id                string  `json:"id"`
   OrganizationId    *string `json:"organization_id"`
@@ -249,8 +251,10 @@ type PublicStorageUploadsSelect struct {
 }
 
 type PublicStorageUploadsInsert struct {
+  Checksum          *string `json:"checksum"`
   ClientId          *string `json:"client_id"`
   CreatedAt         *string `json:"created_at"`
+  FileVersionId     *string `json:"file_version_id"`
   FolderId          *string `json:"folder_id"`
   Id                *string `json:"id"`
   OrganizationId    *string `json:"organization_id"`
@@ -260,8 +264,10 @@ type PublicStorageUploadsInsert struct {
 }
 
 type PublicStorageUploadsUpdate struct {
+  Checksum          *string `json:"checksum"`
   ClientId          *string `json:"client_id"`
   CreatedAt         *string `json:"created_at"`
+  FileVersionId     *string `json:"file_version_id"`
   FolderId          *string `json:"folder_id"`
   Id                *string `json:"id"`
   OrganizationId    *string `json:"organization_id"`
@@ -274,6 +280,7 @@ type PublicFilesSelect struct {
   CreatedAt string `json:"created_at"`
   FolderId  string `json:"folder_id"`
   Id        string `json:"id"`
+  Name      string `json:"name"`
   Number    int64  `json:"number"`
 }
 
@@ -281,6 +288,7 @@ type PublicFilesInsert struct {
   CreatedAt *string `json:"created_at"`
   FolderId  string  `json:"folder_id"`
   Id        *string `json:"id"`
+  Name      string  `json:"name"`
   Number    *int64  `json:"number"`
 }
 
@@ -288,6 +296,7 @@ type PublicFilesUpdate struct {
   CreatedAt *string `json:"created_at"`
   FolderId  *string `json:"folder_id"`
   Id        *string `json:"id"`
+  Name      *string `json:"name"`
   Number    *int64  `json:"number"`
 }
 
@@ -295,6 +304,7 @@ type PublicFilesVersionsSelect struct {
   CreatedAt        string `json:"created_at"`
   FilesId          string `json:"files_id"`
   Id               string `json:"id"`
+  Number           int64  `json:"number"`
   StorageUploadsId string `json:"storage_uploads_id"`
 }
 
@@ -302,6 +312,7 @@ type PublicFilesVersionsInsert struct {
   CreatedAt        *string `json:"created_at"`
   FilesId          string  `json:"files_id"`
   Id               *string `json:"id"`
+  Number           int64   `json:"number"`
   StorageUploadsId string  `json:"storage_uploads_id"`
 }
 
@@ -309,6 +320,7 @@ type PublicFilesVersionsUpdate struct {
   CreatedAt        *string `json:"created_at"`
   FilesId          *string `json:"files_id"`
   Id               *string `json:"id"`
+  Number           *int64  `json:"number"`
   StorageUploadsId *string `json:"storage_uploads_id"`
 }
 

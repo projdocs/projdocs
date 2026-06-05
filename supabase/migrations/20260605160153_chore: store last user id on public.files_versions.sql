@@ -1,9 +1,14 @@
+alter table public.files_versions
+    add column last_modified_by uuid not null default null references public.profiles (id) on update cascade;
+
+
+set check_function_bodies = off;
 
 CREATE OR REPLACE FUNCTION private.files_versions_before_actions()
     RETURNS trigger
     LANGUAGE plpgsql
     SET SEARCH_PATH = ''
-    SECURITY DEFINER 
+    SECURITY DEFINER
 AS
 $function$
 begin
@@ -24,3 +29,30 @@ begin
 end;
 $function$
 ;
+
+CREATE OR REPLACE FUNCTION private.profiles_before_actions()
+    RETURNS trigger
+    LANGUAGE plpgsql
+    SECURITY DEFINER
+    SET search_path TO ''
+AS
+$function$
+begin
+    if tg_op = 'INSERT' then
+        -- insert
+    elsif tg_op = 'UPDATE' then
+        NEW.id := OLD.id;
+        NEW.organization_id := OLD.organization_id;
+        NEW.user_id := OLD.user_id;
+    else -- DELETE
+
+        -- set last_modified to ghost
+        update public.files_versions
+        set last_modified_by = (select p.id from public.profiles p where p.user_id = '095E3B93-603F-46E0-A6CE-C200F1BE1995'::uuid and p.organization_id = old.organization_id)
+        where last_modified_by = OLD.id;
+    end if;
+    return coalesce(new, old);
+end;
+$function$
+;
+

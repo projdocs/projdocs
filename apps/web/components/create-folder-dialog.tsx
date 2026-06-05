@@ -16,7 +16,7 @@ import { FolderPlus } from "lucide-react";
 import { supabase } from "@apps/web/lib/supabase/client";
 import { toast } from "sonner";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
-import { type } from "node:os";
+import { useRouter } from "next/navigation";
 
 
 
@@ -46,6 +46,9 @@ type Props = {
 const REFRESH_EVENT = "create-folder-dialog:folder:created";
 
 export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...props }: Props) => {
+
+  const router = useRouter();
+
   const [ open, setOpen ] = useState(false);
   const [ name, setName ] = useState("");
   const [ error, setError ] = useState<string | null>(null);
@@ -69,7 +72,7 @@ export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...prop
     try {
 
       const auth = (await supabase().auth.getSession()).data?.session?.access_token;
-      if(!auth) throw "Unable to detect authorization token!";
+      if (!auth) throw "Unable to detect authorization token!";
 
       let endpoint: {
         name: string;
@@ -77,19 +80,19 @@ export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...prop
       } | undefined = undefined;
       if ("organization_id" in props) endpoint = {
         name: "organizations",
-        id: props.organization_id
+        id: props.organization_id,
       };
       if ("folder_id" in props) endpoint = {
         name: "folders",
-        id: props.folder_id
+        id: props.folder_id,
       };
       if ("client_id" in props) endpoint = {
         name: "clients",
-        id: props.client_id
+        id: props.client_id,
       };
       if ("project_id" in props) endpoint = {
         name: "projects",
-        id: props.project_id
+        id: props.project_id,
       };
       if (endpoint === undefined) throw "Unable to determine api endpoint!";
 
@@ -98,22 +101,34 @@ export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...prop
         method: "POST",
         body: JSON.stringify({ name }),
         headers: {
-          Authorization: `Bearer ${auth}`
-        }
+          Authorization: `Bearer ${auth}`,
+        },
       });
       const { error, data } = await response.json();
-      if(!response.ok) {
+      if (!response.ok) {
         throw error;
       } else {
         useEventListener.RemoteDispatch(REFRESH_EVENT, () => {});
-        console.log(data)
+        console.log(data);
       }
 
-      toast.success("Folder created!", { id: toastID });
+      toast.success(`Folder ${name} created!`, {
+        action: {
+          label: "View",
+          onClick: () => {
+            router.push(`/organizations/${forOrganizationId}/folders/${data.id}`);
+            toast.dismiss(toastID);
+          },
+        },
+        id: toastID,
+      });
       setOpen(false);
     } catch (e) {
       console.error(e);
-      toast.error("Unable to Create Folder!", { id: toastID, description: typeof e === "string" ? e : "Check the browser console for more details." })
+      toast.error("Unable to Create Folder!", {
+        id: toastID,
+        description: typeof e === "string" ? e : "Check the browser console for more details.",
+      });
     } finally {
       setLoading(false);
     }
