@@ -1282,6 +1282,7 @@ export type Database = {
           created_at: string
           files_id: string
           id: string
+          last_modified_by: string
           number: number
           storage_uploads_id: string
         }
@@ -1289,6 +1290,7 @@ export type Database = {
           created_at?: string
           files_id: string
           id?: string
+          last_modified_by: string
           number: number
           storage_uploads_id: string
         }
@@ -1296,6 +1298,7 @@ export type Database = {
           created_at?: string
           files_id?: string
           id?: string
+          last_modified_by?: string
           number?: number
           storage_uploads_id?: string
         }
@@ -1305,6 +1308,13 @@ export type Database = {
             columns: ["files_id"]
             isOneToOne: false
             referencedRelation: "files"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "files_versions_last_modified_by_fkey"
+            columns: ["last_modified_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
           {
@@ -1695,6 +1705,15 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      check_folder_permissions:
+        | { Args: never; Returns: boolean }
+        | {
+            Args: {
+              access_level: Database["public"]["Enums"]["permission_levels"]
+              folder_id: string
+            }
+            Returns: boolean
+          }
       search_table: {
         Args: {
           _limit?: number

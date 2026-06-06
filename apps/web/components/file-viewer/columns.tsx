@@ -2,6 +2,7 @@ import { createColumnHelper } from "@tanstack/react-table";
 import { Button } from "@packages/ui/components/button";
 import { Viewable } from "@apps/web/components/file-viewer/types";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, FileIcon, FolderIcon } from "lucide-react";
+import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
 
 
 
@@ -20,7 +21,7 @@ function formatDate(iso: string) {
 }
 
 const column = createColumnHelper<Viewable>();
-export const FileViewerColumns = [
+export const FileViewerColumns = (orgID: string, apiURL: string) => [
   column.accessor("name", {
     header: ({ column }) => (
       <Button
@@ -67,4 +68,23 @@ export const FileViewerColumns = [
         </span>
     ),
   }),
+  column.accessor("id", {
+    header: " ",
+    size: 1,
+    maxSize: 1,
+    cell: ({ row: { original } }) => (
+      <div className={"flex flex-row justify-end"}>
+        { original.type === "FILE" && (
+          <FileOptionsDropdown
+            viewable={original}
+            organizationID={orgID}
+            apiURL={apiURL}
+            trigger={{
+              variant: "ghost"
+            }}
+          />
+        ) }
+      </div>
+     )
+  })
 ];

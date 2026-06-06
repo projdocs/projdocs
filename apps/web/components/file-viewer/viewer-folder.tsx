@@ -90,9 +90,11 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
                 created_at: file.created_at,
                 name: file.name,
                 number: file.number,
-                version: -1,
                 organization_id: props.organizationID,
                 path: `/organizations/${props.organizationID}/files/${file.id}`,
+                parent: {
+                  id: file.folder_id
+                }
               })),
             ]}
           />

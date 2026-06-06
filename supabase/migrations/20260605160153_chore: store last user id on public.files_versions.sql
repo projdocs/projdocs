@@ -14,7 +14,13 @@ $function$
 begin
     if tg_op = 'INSERT' then
         NEW.created_at := (now() AT TIME ZONE 'utc'::text);
-        NEW.number := 1 + (select count(*) from public.files_versions fv where fv.files_id = new.files_id);
+        NEW.number := 1 + coalesce(
+                (select number
+                 from public.files_versions
+                 where files_id = new.files_id
+                 order by created_at desc
+                 limit 1),
+                0);
         NEW.last_modified_by := (select p.id from public.profiles p where p.user_id = auth.uid() and p.organization_id = private.get_folder_organization_id(_folder_id := (select f.folder_id from public.files f where f.id = NEW.files_id)));
     elsif tg_op = 'UPDATE' then
         NEW.id := OLD.id;

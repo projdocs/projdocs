@@ -1,5 +1,5 @@
 import { FileViewerProps, Viewable } from "@apps/web/components/file-viewer/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { FileViewerColumns } from "@apps/web/components/file-viewer/columns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
@@ -10,10 +10,13 @@ import { Separator } from "@packages/ui/components/separator";
 
 export const FileViewerPrimitive = (props: FileViewerProps) => {
 
+  const columns = useMemo(() => FileViewerColumns(props.organizationID, props.apiURL), [props.organizationID, props.apiURL])
   const [ sorting, setSorting ] = useState<SortingState>([]);
+
+
   const table = useReactTable({
+    columns,
     data: props.items as Viewable[],
-    columns: FileViewerColumns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),

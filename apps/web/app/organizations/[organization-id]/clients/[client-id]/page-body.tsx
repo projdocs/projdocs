@@ -44,6 +44,7 @@ export const ClientPageBody = (props: {
           </div>
 
           <FileViewer.Client
+            apiURL={props.apiURL}
             client={props.client}
             onRowClick={({path}) => router.push(path)}
             onRowDoubleClick={({path}) => router.push(path)}
