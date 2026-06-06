@@ -28,7 +28,7 @@ export const FilePreview = (props: FilePreviewProps) => {
 
   if (isTooLarge) return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="flex flex-col items-center text-center lg:w-1/2">
+      <div className="flex flex-col items-center text-center lg:w-1/2 p-4">
         <H2>{"File Too Large!"}</H2>
         <p
           className={"text-muted-foreground"}>{`It looks like this file is too large to preview in the browser (${(props.version.size / BYTES_PER_MB).toFixed(1)} mb). You can still download the file to view its contents.`}</p>
@@ -38,7 +38,7 @@ export const FilePreview = (props: FilePreviewProps) => {
 
   if (!SUPPORTED_TYPES.includes(props.version.mime_type)) return (
     <div className="w-full h-full flex items-center justify-center">
-      <div className="flex flex-col items-center text-center lg:w-1/2">
+      <div className="flex flex-col items-center text-center lg:w-1/2 p-4">
         <H2>{"Preview Unavailable"}</H2>
         <p
           className={"text-muted-foreground"}>{`ProjDocs is unable to preview this file-type in the browser (${props.version.mime_type}). You can still download the file to view its contents.`}</p>
