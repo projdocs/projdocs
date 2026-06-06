@@ -18,6 +18,8 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@packages/ui/components
 import { ButtonGroup } from "@packages/ui/components/button-group";
 import { DateTime } from "luxon";
 import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
+import { FileIcon } from "@untitledui/file-icons";
+import { useTheme } from "next-themes";
 
 
 
@@ -34,6 +36,7 @@ export default function(props: {
 }) {
 
   const router = useRouter();
+  const { resolvedTheme } = useTheme();
 
   return (
     <div className={"w-full h-full overflow-hidden"}>
@@ -50,6 +53,13 @@ export default function(props: {
             <CardHeader className={"gap-4 flex flex-row items-center justify-between"}>
 
               <Tooltip>
+
+                <FileIcon
+                  theme={resolvedTheme === "dark" ? "dark" : "light"}
+                  variant={"solid"}
+                  type={props.version.mime_type}
+                />
+
                 <TooltipTrigger disabled={!props.can.edit} className="w-full min-w-0 overflow-hidden">
                   <H4
                     className={cn(

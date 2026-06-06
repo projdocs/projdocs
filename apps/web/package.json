@@ -19,6 +19,7 @@
     "@packages/ui": "*",
     "@tus/s3-store": "^2.0.4",
     "@tus/server": "^2.4.1",
+    "@untitledui/file-icons": "^0.0.9",
     "googleapis": "171.4.0",
     "lucide-react": "^1.8.0",
     "luxon": "^3.7.2",

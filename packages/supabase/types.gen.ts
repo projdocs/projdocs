@@ -1283,6 +1283,7 @@ export type Database = {
           files_id: string
           id: string
           last_modified_by: string
+          mime_type: string
           number: number
           storage_uploads_id: string
         }
@@ -1291,6 +1292,7 @@ export type Database = {
           files_id: string
           id?: string
           last_modified_by: string
+          mime_type?: string
           number: number
           storage_uploads_id: string
         }
@@ -1299,6 +1301,7 @@ export type Database = {
           files_id?: string
           id?: string
           last_modified_by?: string
+          mime_type?: string
           number?: number
           storage_uploads_id?: string
         }
@@ -1705,15 +1708,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      check_folder_permissions:
-        | { Args: never; Returns: boolean }
-        | {
-            Args: {
-              access_level: Database["public"]["Enums"]["permission_levels"]
-              folder_id: string
-            }
-            Returns: boolean
-          }
+      check_folder_permissions: {
+        Args: {
+          access_level: Database["public"]["Enums"]["permission_levels"]
+          folder_id: string
+        }
+        Returns: boolean
+      }
       search_table: {
         Args: {
           _limit?: number

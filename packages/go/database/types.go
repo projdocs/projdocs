@@ -305,6 +305,7 @@ type PublicFilesVersionsSelect struct {
   FilesId          string `json:"files_id"`
   Id               string `json:"id"`
   LastModifiedBy   string `json:"last_modified_by"`
+  MimeType         string `json:"mime_type"`
   Number           int64  `json:"number"`
   StorageUploadsId string `json:"storage_uploads_id"`
 }
@@ -314,6 +315,7 @@ type PublicFilesVersionsInsert struct {
   FilesId          string  `json:"files_id"`
   Id               *string `json:"id"`
   LastModifiedBy   string  `json:"last_modified_by"`
+  MimeType         *string `json:"mime_type"`
   Number           int64   `json:"number"`
   StorageUploadsId string  `json:"storage_uploads_id"`
 }
@@ -323,6 +325,7 @@ type PublicFilesVersionsUpdate struct {
   FilesId          *string `json:"files_id"`
   Id               *string `json:"id"`
   LastModifiedBy   *string `json:"last_modified_by"`
+  MimeType         *string `json:"mime_type"`
   Number           *int64  `json:"number"`
   StorageUploadsId *string `json:"storage_uploads_id"`
 }
