@@ -95,11 +95,20 @@ export default function(props: {
                           key={version.id}
                           value={version.id}
                         >
-                          <div className="flex flex-col w-30">
-                            <p>{`Version ${version.number}`}</p>
-                            <p className={"text-muted-foreground"}>
-                              {DateTime.fromISO(version.created_at).toRelative()}
-                            </p>
+                          <div className="flex flex-row w-30 items-center gap-2">
+
+                            <FileIcon
+                              theme={resolvedTheme === "dark" ? "dark" : "light"}
+                              variant={"solid"}
+                              type={version.mime_type}
+                            />
+
+                            <div className={"flex flex-col"}>
+                              <p className={"line-clamp-1 truncate"}>{`Version ${version.number}`}</p>
+                              <p className={"text-muted-foreground line-clamp-1 truncate"}>
+                                {DateTime.fromISO(version.created_at).toRelative()}
+                              </p>
+                            </div>
                           </div>
                         </SelectItem>
                       ))}
