@@ -16,6 +16,6 @@ end;
 $function$
 ;
 
-REVOKE EXECUTE ON FUNCTION public.check_folder_permissions() FROM PUBLIC, anon;
-GRANT EXECUTE ON FUNCTION public.check_folder_permissions() TO authenticated, admin;
+REVOKE EXECUTE ON FUNCTION public.check_folder_permissions(public.permission_levels, uuid) FROM PUBLIC, anon;
+GRANT EXECUTE ON FUNCTION public.check_folder_permissions(public.permission_levels, uuid) TO authenticated, admin;
 
