@@ -20,6 +20,7 @@ import { DateTime } from "luxon";
 import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
 import { FileIcon } from "@untitledui/file-icons";
 import { useTheme } from "next-themes";
+import { FilePreview } from "@apps/web/components/file-preview";
 
 
 
@@ -41,13 +42,15 @@ export default function(props: {
   return (
     <div className={"w-full h-full overflow-hidden"}>
 
-      <div className="flex flex-col-reverse gap-8 lg:flex-row w-full lg:h-full">
+      <div className="flex flex-col-reverse gap-8 p-8 lg:flex-row w-full lg:h-full">
 
         <div className="flex flex-col w-full lg:w-2/3 lg:min-h-0 h-full gap-2 overflow-y-scroll [&>*]:shrink-0">
-
+          <Card className={"w-full p-0 min-h-full"}>
+            <FilePreview version={props.version} />
+          </Card>
         </div>
 
-        <div className={"flex flex-col w-full lg:w-1/3 lg:h-full lg:min-h-0 p-4"}>
+        <div className={"flex flex-col w-full lg:w-1/3 lg:h-full lg:min-h-0"}>
           <Card className={"lg:h-full w-full"}>
 
             <CardHeader className={"gap-2 flex flex-row items-center justify-between"}>

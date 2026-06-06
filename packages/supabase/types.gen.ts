@@ -1285,6 +1285,7 @@ export type Database = {
           last_modified_by: string
           mime_type: string
           number: number
+          size: number
           storage_uploads_id: string
         }
         Insert: {
@@ -1294,6 +1295,7 @@ export type Database = {
           last_modified_by: string
           mime_type?: string
           number: number
+          size?: number
           storage_uploads_id: string
         }
         Update: {
@@ -1303,6 +1305,7 @@ export type Database = {
           last_modified_by?: string
           mime_type?: string
           number?: number
+          size?: number
           storage_uploads_id?: string
         }
         Relationships: [

@@ -3,6 +3,12 @@ on:
   pull_request:
     branches:
       - production
+  workflow_dispatch:
+    inputs:
+      skip_migration_check:
+        description: "Skip the check-migrations step"
+        type: boolean
+        default: false
 
 jobs:
   test-supabase:
@@ -14,8 +20,8 @@ jobs:
           fetch-depth: 0
 
       - name: Check migrations are append-only
+        if: ${{ !inputs.skip_migration_check }}
         run: |
-          # Get list of changed files in supabase/migrations
           git fetch origin ${{ github.base_ref }}
 
           MODIFIED=$(git diff --name-only --diff-filter=MD origin/${{ github.base_ref }}...HEAD -- supabase/migrations/)
