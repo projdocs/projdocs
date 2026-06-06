@@ -50,7 +50,7 @@ export default function(props: {
         <div className={"flex flex-col w-full lg:w-1/3 lg:h-full lg:min-h-0 p-4"}>
           <Card className={"lg:h-full w-full"}>
 
-            <CardHeader className={"gap-4 flex flex-row items-center justify-between"}>
+            <CardHeader className={"gap-2 flex flex-row items-center justify-between"}>
 
               <Tooltip>
 
