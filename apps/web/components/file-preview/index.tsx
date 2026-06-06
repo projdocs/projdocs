@@ -6,7 +6,7 @@ import { useEffect, useState } from "react";
 
 
 
-const BYTES_PER_MB = 1048576;
+const BYTES_PER_MB = 1000000; // not MiB
 
 const SUPPORTED_TYPES = [
   "image/png",

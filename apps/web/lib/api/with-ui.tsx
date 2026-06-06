@@ -4,6 +4,7 @@ import { Tables } from "@packages/supabase";
 import { toast } from "sonner";
 import { Progress } from "@packages/ui/components/progress";
 import { AppRouterInstance } from "next/dist/shared/lib/app-router-context.shared-runtime";
+import { DownloadOptions } from "@apps/web/lib/api/download";
 
 
 
@@ -11,6 +12,46 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
 
   static from(host: string) {
     return new ProjDocsAPIClient(host);
+  }
+
+  async download(
+    organization: Pick<Tables<"organizations">, "id">,
+    file: Pick<Tables<"files">, "folder_id" | "id" | "name">,
+    version: Pick<Tables<"files_versions">, "id">,
+    options: DownloadOptions = {},
+  ) {
+    const toastId = toast.loading(`Downloading ${file.name}...`);
+
+    const result = await super.download(
+      organization,
+      file,
+      version,
+      {
+        ...options,
+        onProgress: (downloaded, total) => {
+          const percent = Math.floor(downloaded / total * 100);
+          toast.loading(
+            <div className="flex flex-col gap-1 w-full min-w-[200px]">
+              <span className="text-sm">{file.name}</span>
+              <Progress value={percent} className="w-full" />
+              <span className="text-xs text-muted-foreground">{percent}%</span>
+            </div>,
+            { id: toastId },
+          );
+        },
+      },
+    );
+
+    if (result.error !== null) {
+      toast.error(`Failed to download!`, { description: result.error, id: toastId });
+      return result;
+    }
+
+    // complete the file upload
+    toast.success(`${file.name} downloaded successfully`, {
+      id: toastId,
+    });
+    return result;
   }
 
 

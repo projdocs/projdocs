@@ -2,15 +2,28 @@ import { supabase } from "@apps/web/lib/supabase/client";
 import * as tus from "tus-js-client";
 import { DetailedError } from "tus-js-client";
 import { Tables } from "@packages/supabase";
+import { DownloadOptions, MultiPartDownloadClient } from "@apps/web/lib/api/download";
 
 
 
 export class ProjDocsAPI {
 
   private readonly origin: string;
+  private readonly downloader: MultiPartDownloadClient;
 
-  constructor(host: string) {
+  constructor(host: string, options?: {
+    download: DownloadOptions;
+  }) {
     this.origin = (new URL(host)).origin;
+    this.downloader = new MultiPartDownloadClient(this.origin, options?.download);
+  }
+
+  async download(organization: Pick<Tables<"organizations">, "id">,
+                 file: Pick<Tables<"files">, "folder_id" | "id">,
+                 version: Pick<Tables<"files_versions">, "id">,
+                 options: DownloadOptions = {},
+  ) {
+    return this.downloader.download(organization, file, version, options);
   }
 
   static from(host: string) {
@@ -94,7 +107,7 @@ export class ProjDocsAPI {
     error: string;
     id: null;
   }> {
-    return this.__upload(`/v1/organizations/${props.organization.id}/folders/${props.file.folder_id}/files/${props.file.id}/upload`, file, props.onProgress)
+    return this.__upload(`/v1/organizations/${props.organization.id}/folders/${props.file.folder_id}/files/${props.file.id}/upload`, file, props.onProgress);
   }
 
   async _uploadFile(file: File, { organization, folder, onProgress }: {

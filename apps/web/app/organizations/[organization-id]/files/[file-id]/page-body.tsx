@@ -21,6 +21,9 @@ import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components
 import { FileIcon } from "@untitledui/file-icons";
 import { useTheme } from "next-themes";
 import { FilePreview } from "@apps/web/components/file-preview";
+import { Button } from "@packages/ui/components/button";
+import { DownloadIcon } from "lucide-react";
+import { ProjDocsAPIClient } from "@apps/web/lib/api/with-ui";
 
 
 
@@ -120,6 +123,17 @@ export default function(props: {
                   </SelectContent>
                 </Select>
 
+                <Button
+                  variant={"outline"}
+                  onClick={async () => await ProjDocsAPIClient.from(props.apiURL).download(
+                    { id: props.organizationID },
+                    props.file,
+                    props.version,
+                  )}
+                >
+                  <DownloadIcon />
+                </Button>
+
                 <FileOptionsDropdown
                   viewable={{
                     type: "FILE",
@@ -129,7 +143,7 @@ export default function(props: {
                     created_at: props.file.created_at,
                     organization_id: props.organizationID,
                     path: `/organizations/${props.organizationID}/files/${props.file.id}`,
-                    parent: {id: props.file.folder_id}
+                    parent: { id: props.file.folder_id },
                   }}
                   apiURL={props.apiURL}
                   organizationID={props.organizationID}
