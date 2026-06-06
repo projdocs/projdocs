@@ -20,9 +20,9 @@ import { ChangeEvent, ReactNode, useRef } from "react";
 import { cn } from "@packages/ui/lib/utils";
 import { FileViewer } from "@apps/web/components/file-viewer";
 import { Folder } from "@apps/web/components/file-viewer/types";
-import { toast } from "sonner";
-import { StorageResponse } from "@packages/shared/utilities/storage/type";
+import { ProjDocsAPIClient } from "@apps/web/lib/api/with-ui";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
+import { FileViewerPrimitive } from "@apps/web/components/file-viewer/primitive";
 
 
 
@@ -49,7 +49,10 @@ const ParentBadge = ({ title, icon, path, className }: {
 export const FolderPageBody = (props: {
   folder: Folder;
   organizationID: string;
+  apiURL: string;
 }) => {
+
+  const router = useRouter();
 
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -57,34 +60,14 @@ export const FolderPageBody = (props: {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
-
-    toast.promise(new Promise(async (resolve, reject) => {
-        const response = await fetch(`/api/v1/folders/${props.folder.id}/upload?mime-type=${encodeURIComponent(file.type || "application/octet-stream")}`, {
-          method: "POST",
-          body: file,
-        });
-
-        console.log(await response.text())
-
-        if(response.ok) resolve(null);
-        else reject();
-      }),
-      {
-        loading: "Uploading file...",
-        success: (r) => {
-          console.log(r)
-          useEventListener.RemoteDispatch(FileViewer.Primitive.RefreshEvent, () => {});
-          return `File uploaded!`;
-        },
-        error: () => {
-          return ({
-            message: "Unable to upload file!",
-            description: "An unexpected server error occurred. Check the browser console for more details.",
-          });
-        },
-      });
+    if (
+      await ProjDocsAPIClient.from(props.apiURL).uploadFile(file, {
+        router,
+        organization: { id: props.organizationID },
+        folder: props.folder,
+      })
+    ) useEventListener.RemoteDispatch(FileViewerPrimitive.RefreshEvent, () => {});
   };
-
 
   return (
     <ObjectPage
@@ -97,13 +80,6 @@ export const FolderPageBody = (props: {
       description={(
         <div className={"flex flex-row gap-2 py-2 items-center max-w-full"}>
           <p className={"text-muted-foreground"}>{"located in"}</p>
-          {props.folder.member && (
-            <ParentBadge
-              title={"My Files"}
-              icon={<></>}
-              path={`/organizations/${props.organizationID}`}
-            />
-          )}
           {props.folder.folder && (
             <ParentBadge
               title={props.folder.folder.name}
@@ -146,7 +122,8 @@ export const FolderPageBody = (props: {
             onChange={handleFileChange}
           />
           <ButtonGroup>
-            <CreateFolderDialog folder_id={props.folder.id} />
+            <CreateFolderDialog forOrganizationId={props.organizationID} apiURL={props.apiURL}
+                                folder_id={props.folder.id} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="outline" size="icon" aria-label="More Options">
@@ -169,6 +146,9 @@ export const FolderPageBody = (props: {
       <FileViewer.Folder
         folder={props.folder}
         organizationID={props.organizationID}
+        apiURL={props.apiURL}
+        onRowClick={({ path }) => router.push(path)}
+        onRowDoubleClick={({ path }) => router.push(path)}
       />
     </ObjectPage>
   );

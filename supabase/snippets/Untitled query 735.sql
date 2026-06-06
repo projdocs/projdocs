@@ -1,1 +1,0 @@
-grant execute on function private.can_current_user to authenticated;

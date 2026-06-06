@@ -8,12 +8,17 @@ import { H3 } from "@packages/ui/components/typography";
 import { FileViewer } from "@apps/web/components/file-viewer";
 import { CreateFolderDialog } from "@apps/web/components/create-folder-dialog";
 import { ProjectsTable } from "@apps/web/components/projects-table";
+import { useRouter } from "next/navigation";
 
 
 
 export const ClientPageBody = (props: {
   client: Tables<"clients">;
+  apiURL: string;
 }) => {
+
+  const router = useRouter();
+
   return (
     <ObjectPage
       title={props.client.name}
@@ -35,10 +40,15 @@ export const ClientPageBody = (props: {
 
           <div className={"flex flex-row gap-2 justify-between items-center"}>
             <H3>{"Files"}</H3>
-            <CreateFolderDialog client_id={props.client.id} />
+            <CreateFolderDialog forOrganizationId={props.client.organization_id} apiURL={props.apiURL} client_id={props.client.id} />
           </div>
 
-          <FileViewer.Client client={props.client} />
+          <FileViewer.Client
+            apiURL={props.apiURL}
+            client={props.client}
+            onRowClick={({path}) => router.push(path)}
+            onRowDoubleClick={({path}) => router.push(path)}
+          />
         </div>
 
 

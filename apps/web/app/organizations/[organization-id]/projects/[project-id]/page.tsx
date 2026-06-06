@@ -13,6 +13,12 @@ export default async function(props: {
     "project-id": string;
   }>;
 }) {
+
+  const apiBase = process.env.PROJDOCS_API_URL;
+  if (!apiBase) {
+    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
+  }
+
   const params = await props.params;
   const project = await getProject(await createServerClient(), {
     projectID: params["project-id"],
@@ -24,5 +30,5 @@ export default async function(props: {
       description={`Project "${params["project-id"]}" was not found or is not accessible.`}
     />
   );
-  return <ProjectPage project={project.data} />;
+  return <ProjectPage apiURL={apiBase} project={project.data} />;
 }

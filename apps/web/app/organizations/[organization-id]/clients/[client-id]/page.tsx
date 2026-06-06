@@ -10,6 +10,12 @@ export default async function(props: {
     "client-id": string;
   }>;
 }) {
+
+  const apiBase = process.env.PROJDOCS_API_URL;
+  if (!apiBase) {
+    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
+  }
+
   const params = await props.params;
 
   const client = await (await createServerClient())
@@ -20,5 +26,5 @@ export default async function(props: {
     .single();
 
   if (client.error) return <ErrorPage />;
-  return <ClientPageBody client={client.data} />;
+  return <ClientPageBody apiURL={apiBase} client={client.data} />;
 }

@@ -82,15 +82,19 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
                 created_at: folder.created_at,
                 name: folder.name,
                 organization_id: props.organizationID,
+                path: `/organizations/${props.organizationID}/folders/${folder.id}`,
               })),
               ...items.files.map(file => ({
                 type: "FILE" as const,
                 id: file.id,
                 created_at: file.created_at,
-                name: "TODO",
+                name: file.name,
                 number: file.number,
-                version: -1,
                 organization_id: props.organizationID,
+                path: `/organizations/${props.organizationID}/files/${file.id}`,
+                parent: {
+                  id: file.folder_id
+                }
               })),
             ]}
           />

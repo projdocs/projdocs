@@ -1,37 +1,59 @@
 import { NextResponse } from "next/server";
+import { createServerClient } from "@apps/web/lib/supabase/server";
+import {createClient} from "@supabase/supabase-js"
+
 
 async function forwardToSupabaseAPI(
   request: Request,
   method: string,
-  params: { path: string[] }
+  params: { path: string[] },
 ) {
-  if (!process.env.SUPABASE_KONG_URL) {
-    return NextResponse.json(
-      { message: "Server configuration error." },
-      { status: 500 }
-    );
-  }
+
+  const KongUrl = process.env.SUPABASE_KONG_URL;
+  if (!KongUrl) return NextResponse.json(
+    { message: "Server configuration error: `SUPABASE_KONG_URL` is not set." },
+    { status: 500 },
+  );
+
+  const PublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY;
+  if (!PublishableKey) return NextResponse.json(
+    { message: "Server configuration error: `SUPABASE_PUBLISHABLE_KEY` is not set." },
+    { status: 500 },
+  );
+
+  const SecretKey = process.env.SUPABASE_SECRET_KEY;
+  if (!SecretKey) return NextResponse.json(
+    { message: "Server configuration error: `SUPABASE_SECRET_KEY` is not set." },
+    { status: 500 },
+  );
+
+  let Key = PublishableKey;
+  try {
+    if ((await (await createServerClient()).auth.getClaims()).data?.claims.role === "admin") {
+      Key = SecretKey
+    }
+  } catch (_) {}
 
   const apiPath = params.path.join("/");
 
-  const url = new URL(process.env.SUPABASE_KONG_URL);
+  const url = new URL(KongUrl);
   url.pathname = `${url.pathname.replace(/\/$/, "")}/${apiPath}`;
 
   const baseParams = new URL(request.url).searchParams;
   baseParams.forEach((value, key) => {
     url.searchParams.set(
       key,
-      key === "apikey" ? process.env.SUPABASE_PUBLISHABLE_KEY! : value
+      key === "apikey" ? Key : value,
     );
   });
 
   try {
     const headers = new Headers(request.headers);
-    headers.set("apikey", process.env.SUPABASE_PUBLISHABLE_KEY!);
-    if (!headers.has("Authorization")) {
+    headers.set("apikey", Key);
+    if (!headers.has("Authorization") || Key === SecretKey) {
       headers.set(
         "Authorization",
-        `Bearer ${process.env.SUPABASE_PUBLISHABLE_KEY!}`
+        `Bearer ${Key}`,
       );
     }
 
@@ -67,49 +89,49 @@ async function forwardToSupabaseAPI(
   } catch (error: any) {
     return NextResponse.json(
       { message: error.message || "Unexpected error" },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }
 
 export async function GET(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "GET", await params);
 }
 
 export async function HEAD(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "HEAD", await params);
 }
 
 export async function POST(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "POST", await params);
 }
 
 export async function PUT(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "PUT", await params);
 }
 
 export async function DELETE(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "DELETE", await params);
 }
 
 export async function PATCH(
   request: Request,
-  { params }: { params: Promise<{ path: string[] }> }
+  { params }: { params: Promise<{ path: string[] }> },
 ) {
   return forwardToSupabaseAPI(request, "PATCH", await params);
 }

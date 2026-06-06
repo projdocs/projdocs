@@ -30,7 +30,7 @@ export async function ProjDocsSidebar({
   organizations: readonly Tables<"organizations">[];
   user?: {
     account: JwtPayload;
-    profile: Tables<"profiles">;
+    profile: Pick<Tables<"profiles">, "full_name">;
   };
 }) {
   return (

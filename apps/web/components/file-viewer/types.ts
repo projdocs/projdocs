@@ -2,35 +2,41 @@ import { Tables } from "@packages/supabase";
 
 
 
-export type FileView = {
+export type FileViewable = {
   id: string;
   type: "FILE";
   name: string;
   number: number;
-  version: number;
   created_at: string;
   organization_id: string;
+  path: string;
+  parent: {
+    id: string;
+  }
 };
 
-export type FolderView = {
+export type FolderViewable = {
   id: string;
   type: "FOLDER";
   name: string;
   created_at: string;
   organization_id: string;
+  path: string;
 };
 
-export type Viewable = FileView | FolderView;
+export type Viewable = FileViewable | FolderViewable;
 
 export type FileViewerProps = {
   items: ReadonlyArray<Viewable>;
   organizationID: string;
+  apiURL: string;
+  onRowClick?: (viewable: Viewable) => void;
+  onRowDoubleClick?: (viewable: Viewable) => void;
 };
 
 export type Folder = Tables<"folders"> & {
   client: Tables<"clients"> | null;
   project: Tables<"projects"> | null;
   organization: Tables<"organizations"> | null;
-  member: Tables<"members"> | null;
   folder: Tables<"folders"> | null;
 }

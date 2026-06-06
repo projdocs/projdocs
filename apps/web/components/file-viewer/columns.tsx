@@ -1,8 +1,8 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button } from "@packages/ui/components/button";
-import { Viewable } from "@apps/web/components/file-viewer";
-import { useRouter } from "next/navigation";
+import { Viewable } from "@apps/web/components/file-viewer/types";
 import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, FileIcon, FolderIcon } from "lucide-react";
+import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
 
 
 
@@ -20,39 +20,8 @@ function formatDate(iso: string) {
   });
 }
 
-const FolderRow = ({ row }: {
-  row: {
-    original: Viewable;
-  }
-}) => {
-  const router = useRouter();
-  return (
-    <div
-      className={`flex items-center gap-2.5 ${row.original.type === "FOLDER" ? "cursor-pointer group" : ""}`}
-      onClick={() => {
-        switch (row.original.type) {
-          case "FOLDER":
-            router.push(`/organizations/${row.original.organization_id}/folders/${row.original.id}`);
-        }
-      }}
-    >
-      {row.original.type === "FOLDER" && (
-        <FolderIcon className="h-4 w-4 shrink-0 text-amber-500" />
-      )}
-      {row.original.type === "FILE" && (
-        <FileIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-      )}
-      <span
-        className={`text-sm truncate ${row.original.type === "FOLDER" ? "group-hover:underline underline-offset-4" : ""}`}
-      >
-        {row.original.name}
-      </span>
-    </div>
-  );
-};
-
 const column = createColumnHelper<Viewable>();
-export const FileViewerColumns = [
+export const FileViewerColumns = (orgID: string, apiURL: string) => [
   column.accessor("name", {
     header: ({ column }) => (
       <Button
@@ -65,7 +34,21 @@ export const FileViewerColumns = [
         <SortIcon sorted={column.getIsSorted()} />
       </Button>
     ),
-    cell: FolderRow,
+    cell: ({ row }) => (
+      <div className={"flex items-center gap-2.5"}>
+        {row.original.type === "FOLDER" && (
+          <FolderIcon className="h-4 w-4 shrink-0 text-amber-500" />
+        )}
+        {row.original.type === "FILE" && (
+          <FileIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+        )}
+        <span
+          className={`text-sm truncate ${row.original.type === "FOLDER" ? "group-hover:underline underline-offset-4" : ""}`}
+        >
+          {row.original.name}
+        </span>
+      </div>
+    ),
   }),
   column.accessor("created_at", {
     header: ({ column }) => (
@@ -85,4 +68,23 @@ export const FileViewerColumns = [
         </span>
     ),
   }),
+  column.accessor("id", {
+    header: " ",
+    size: 1,
+    maxSize: 1,
+    cell: ({ row: { original } }) => (
+      <div className={"flex flex-row justify-end"}>
+        { original.type === "FILE" && (
+          <FileOptionsDropdown
+            viewable={original}
+            organizationID={orgID}
+            apiURL={apiURL}
+            trigger={{
+              variant: "ghost"
+            }}
+          />
+        ) }
+      </div>
+     )
+  })
 ];

@@ -1,21 +1,32 @@
-"use client";
-
-import { use } from "react";
-import { ObjectPage } from "@packages/ui/components/page";
-import { ProjectsTable } from "@apps/web/components/projects-table";
-
+import Body from "./page-body";
+import { createServerClient } from "@apps/web/lib/supabase/server";
+import { Enums } from "@packages/supabase";
+import { ErrorPage } from "@packages/ui/components/page";
 
 
-export default function(props: {
+
+export default async function(props: {
   params: Promise<{
     "organization-id": string;
   }>;
 }) {
-  const params = use(props.params);
+  const params = await props.params;
+
+  const apiURL = process.env.PROJDOCS_API_URL;
+  if (!apiURL) return (
+    <ErrorPage
+      title={"Improper Server Configuration"}
+      description={"`PROJDOCS_API_URL` is not set but is required"}
+    />
+  )
+
+  const permissions = await (await createServerClient()).from("members").select("*, permissions:permissions_id!inner(*)").eq("permissions.organization_id", params["organization-id"]).single();
 
   return (
-    <ObjectPage title={"Projects"}>
-      <ProjectsTable organizationID={params["organization-id"]} />
-    </ObjectPage>
+    <Body
+      apiURL={apiURL}
+      canCreate={([ "EDIT", "DELETE" ] as Enums<"permission_levels">[]).includes(permissions.data?.permissions?.projects ?? "NONE")}
+      organizationID={params["organization-id"]}
+    />
   );
 }

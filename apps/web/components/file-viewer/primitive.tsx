@@ -1,5 +1,5 @@
 import { FileViewerProps, Viewable } from "@apps/web/components/file-viewer/types";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { flexRender, getCoreRowModel, getSortedRowModel, SortingState, useReactTable } from "@tanstack/react-table";
 import { FileViewerColumns } from "@apps/web/components/file-viewer/columns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
@@ -9,27 +9,18 @@ import { Separator } from "@packages/ui/components/separator";
 
 
 export const FileViewerPrimitive = (props: FileViewerProps) => {
+
+  const columns = useMemo(() => FileViewerColumns(props.organizationID, props.apiURL), [props.organizationID, props.apiURL])
   const [ sorting, setSorting ] = useState<SortingState>([]);
 
 
   const table = useReactTable({
+    columns,
     data: props.items as Viewable[],
-    columns: FileViewerColumns,
     state: { sorting },
     onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
     getSortedRowModel: getSortedRowModel(),
-    sortingFns: {
-      foldersFirst: (a, b, columnId) => {
-        const aIsFolder = a.original.type === "FOLDER";
-        const bIsFolder = b.original.type === "FOLDER";
-        if (aIsFolder !== bIsFolder) return aIsFolder ? -1 : 1; // always folders first, direction ignored
-        // within the same group, fall through to natural comparison (TanStack applies direction to this)
-        const aVal = a.getValue<string>(columnId);
-        const bVal = b.getValue<string>(columnId);
-        return aVal < bVal ? -1 : aVal > bVal ? 1 : 0;
-      },
-    },
   });
 
   return (
@@ -56,8 +47,30 @@ export const FileViewerPrimitive = (props: FileViewerProps) => {
         <ScrollArea className="flex-1 min-h-0">
           <Table>
             <TableBody>
-              {table.getRowModel().rows.map(row => (
-                <TableRow key={row.id}>
+              {/* PUT FOLDERS FIRST */}
+              {table.getRowModel().rows.filter(r => r.original.type === "FOLDER").map(row => (
+                <TableRow
+                  key={row.id}
+                  className={"cursor-pointer"}
+                  onClick={() => props.onRowClick && props.onRowClick(row.original)}
+                  onDoubleClick={() => props.onRowDoubleClick && props.onRowDoubleClick(row.original)}
+                >
+                  {row.getVisibleCells().map(cell => (
+                    <TableCell key={cell.id} className={cell.column.id === "created_at" ? "w-40" : ""}>
+                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+              }
+              {/* THEN PUT FILES */}
+              {table.getRowModel().rows.filter(r => r.original.type === "FILE").map(row => (
+                <TableRow
+                  key={row.id}
+                  className={"cursor-pointer"}
+                  onClick={() => props.onRowClick && props.onRowClick(row.original)}
+                  onDoubleClick={() => props.onRowDoubleClick && props.onRowDoubleClick(row.original)}
+                >
                   {row.getVisibleCells().map(cell => (
                     <TableCell key={cell.id} className={cell.column.id === "created_at" ? "w-40" : ""}>
                       {flexRender(cell.column.columnDef.cell, cell.getContext())}

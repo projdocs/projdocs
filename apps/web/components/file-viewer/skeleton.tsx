@@ -9,14 +9,14 @@ import { cn } from "@packages/ui/lib/utils";
 
 export const FileViewerSkeleton = () => {
 
-  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns.map(() => Math.floor(Math.random() * 40 + 40))), []);
+  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", "").map(() => Math.floor(Math.random() * 40 + 40))), []);
 
   return (
     <>
       <Table className={"w-full h-full"}>
         <TableHeader>
           <TableRow>
-            {FileViewerColumns.map((col, index, arr) => (
+            {FileViewerColumns("","").map((_, index, arr) => (
               <TableHead key={index}>
                 <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
               </TableHead>

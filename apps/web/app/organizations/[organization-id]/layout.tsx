@@ -108,6 +108,7 @@ export default async function(
     .from("profiles")
     .select()
     .eq("user_id", user.data.claims.sub)
+    .eq("organization_id", params["organization-id"])
     .single();
   if (profile.error)
     return (

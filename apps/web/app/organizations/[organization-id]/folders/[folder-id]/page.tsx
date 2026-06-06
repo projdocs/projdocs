@@ -12,6 +12,11 @@ export default async function(props: {
   }>;
 }) {
 
+  const apiBase = process.env.PROJDOCS_API_URL;
+  if (!apiBase) {
+    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
+  }
+
   const params = await props.params;
   const folder = await getFolder(await createServerClient(), {
     folderID: params["folder-id"],
@@ -25,6 +30,7 @@ export default async function(props: {
 
   return (
     <FolderPageBody
+      apiURL={apiBase}
       folder={folder.data}
       organizationID={params["organization-id"]}
     />

@@ -1,6 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@supabase/ssr";
-import { isAdmin } from "@apps/web/lib/utils-server";
 
 
 
@@ -47,40 +46,23 @@ export async function updateSession(request: NextRequest) {
   const { data } = await supabase.auth.getClaims();
   const user = data?.claims;
 
-  if (!user) {
-
-    if (request.nextUrl.pathname.startsWith("/api/v1/projects")) {
+  if (
+    !user &&
+    !request.nextUrl.pathname.startsWith("/supabase/proxy/auth/v1/token") &&
+    !request.nextUrl.pathname.startsWith("/auth")
+  ) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/auth/login";
+    url.searchParams.set("next", request.url);
+    return NextResponse.redirect(url);
+  } else if (user) {
+    if (request.nextUrl.pathname.startsWith("/setup") && user.role !== "admin") {
       return NextResponse.json({
-        error: "Unauthorized",
-      }, {
-        status: 401,
-      });
-    }
-
-    if (request.nextUrl.pathname.startsWith("/organizations")) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/login";
-      url.searchParams.set("next", request.url);
-      return NextResponse.redirect(url);
+        error: "unauthorized",
+      }, { status: 403 });
     }
   }
 
-  const wantsAdminPortal = request.nextUrl.pathname.startsWith("/admin");
-  const wantsAdminAuth = request.nextUrl.pathname.startsWith("/auth/admin");
-  if (wantsAdminPortal || wantsAdminAuth) {
-    const _isAdmin = await isAdmin();
-    if (_isAdmin && wantsAdminAuth) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/admin";
-      return NextResponse.redirect(url);
-    }
-    if (!_isAdmin && wantsAdminPortal) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/auth/admin";
-      url.searchParams.set("next", request.url);
-      return NextResponse.redirect(url);
-    }
-  }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:

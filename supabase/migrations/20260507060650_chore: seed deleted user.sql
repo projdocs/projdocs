@@ -45,7 +45,7 @@ $$
                 _uid,
                 'supabase_read_only_user',
                 'supabase_read_only_user',
-                'ghost@localhost',
+                'ghost@projdocs.localhost',
                 null,
                 current_timestamp,
                 null,
@@ -96,7 +96,7 @@ $$
                 _uid,
                 jsonb_build_object(
                         'sub', _uid,
-                        'email', 'ghost@localhost',
+                        'email', 'ghost@projdocs.localhost',
                         'email_verified', false,
                         'phone_verified', false
                 ),

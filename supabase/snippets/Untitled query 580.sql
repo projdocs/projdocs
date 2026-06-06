@@ -1,0 +1,2 @@
+alter table public.files_versions
+    add column mime_type text not null default ('application/octet-stream') check (mime_type ~ '^[a-zA-Z0-9][a-zA-Z0-9!#$&\-^_]*\/[a-zA-Z0-9][a-zA-Z0-9!#$&\-^_.+]*$');

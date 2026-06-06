@@ -1,77 +1,80 @@
-import { createServiceRoleClient } from "@apps/web/lib/supabase/server";
-import { LoginForm } from "./_components/login-form";
-import {
-  Card,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@packages/ui/components/card";
+import { LoginForm } from "@apps/web/app/auth/login/login-form";
 import { ErrorPage } from "@packages/ui/components/page";
 
-export default async function () {
 
-  // get auth provider
-  const {
-    data: { providers },
-    error,
-  } = await (
-    await createServiceRoleClient({ __unsafe_ignore_admin_check: true })
-  ).auth.admin.customProviders.listProviders();
 
-  if (error) {
+export default async function() {
 
-    if(error.name === "AuthRetryableFetchError" && error.message === "fetch failed") return (
-     <ErrorPage
-       title={"Unable to Connect to Backend"}
-       description={"The backend service is unavailable. Please try again later."}
-     />
-    )
 
-    // unable to list providers
-    return (
-      <Card className={"w-full max-w-sm"}>
-        <CardHeader>
-          <CardTitle>{"Unexpected error!"}</CardTitle>
-          <CardDescription>
-            {
-              "An unexpected error occurred while loading authentication providers!"
-            }
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
+  const apiBase = process.env.PROJDOCS_API_URL;
+  if (!apiBase) {
+    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
   }
-  else if (providers.length < 1)
-    // no providers configured
-    return (
-      <Card className={"w-full max-w-sm"}>
-        <CardHeader>
-          <CardTitle>{"No Provider Connected!"}</CardTitle>
-          <CardDescription>
-            {
-              "No authentication provider has been configured for this ProjDocs instance."
-            }
-          </CardDescription>
-        </CardHeader>
-      </Card>
-    );
-  else
-    // show providers
-    return (
-      <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
-        <LoginForm
-          supabase={{
-            url: process.env.SUPABASE_KONG_URL!,
-            publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY!,
-          }}
-          providers={providers
-            .filter((p) => p.enabled)
-            .map((p) => ({
-              id: p.id,
-              identifier: p.identifier,
-              name: p.name,
-            }))}
+
+  const kongURL = process.env.SUPABASE_KONG_URL?.trim();
+  if (!kongURL) {
+    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_KONG_URL` is not set"} />;
+  }
+
+  const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
+  if (!pubKey) {
+    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_PUBLISHABLE_KEY` is not set"} />;
+  }
+
+  let url: URL;
+  try {
+    url = new URL(apiBase);
+  } catch (e) {
+    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not a valid URL"} />;
+  }
+  url.pathname = "/public/auth/providers";
+
+  let providers;
+  try {
+    const r = await fetch(url.toString());
+    if (!r.ok) {
+      const { error }: { error: string } = await r.json();
+      return (
+        <ErrorPage title={"Unable to List Authentication Providers!"} description={error} />
+      );
+    }
+    const { data }: { data: ReadonlyArray<{ display: string; identifier: string }> } = await r.json();
+    providers = data;
+  } catch (error) {
+    if (error instanceof TypeError && (
+      error.message === "fetch failed" ||
+      error.message === "Failed to fetch" ||
+      error.message === "Load failed"
+    ))
+      return (
+        <ErrorPage
+          title={"Network Error!"}
+          description={"A connection to the backend api-service could not be established (is it running?)."}
         />
-      </div>
-    );
+      );
+    else {
+      console.error("An unexpected error occurred:", error);
+      return (
+        <ErrorPage
+          title={"Unable to List Authentication Providers!"}
+          description={"An unexpected error occurred."}
+        />
+      );
+    }
+  }
+
+
+  return (
+    <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
+      <LoginForm
+        providers={providers}
+        supabase={{
+          url: kongURL,
+          publishableKey: pubKey,
+        }}
+      />
+    </div>
+  );
+
+
 }
