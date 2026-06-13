@@ -58,10 +58,11 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
   async uploadVersion(file: File, props: {
     file: Pick<Tables<"files">, "id" | "folder_id">;
     organization: Pick<Tables<"organizations">, "id">;
+    router: AppRouterInstance;
   }): Promise<boolean> {
     const toastId = toast.loading(`Uploading ${file.name}...`);
 
-    const { error, id } = await super._uploadVersion(file, {
+    const { error, data } = await super._uploadVersion(file, {
       organization: props.organization,
       file: props.file,
       onProgress: (percent) => toast.loading(
@@ -80,8 +81,16 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
     }
 
     // complete the file upload
+    props.router.refresh();
     toast.success(`${file.name} uploaded successfully`, {
       id: toastId,
+      action: {
+        label: "View",
+        onClick: () => {
+          props.router.push(`/organizations/${props.organization.id}/files/${data.file.id}?version-id=${data.version.id}`);
+          toast.dismiss(toastId);
+        },
+      },
     });
     return true;
   }
@@ -94,7 +103,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
 
     const toastId = toast.loading(`Uploading ${file.name}...`);
 
-    const { error, id } = await super._uploadFile(file, {
+    const { error, data } = await super._uploadFile(file, {
       organization: props.organization,
       folder: props.folder,
       onProgress: (percent) => toast.loading(
@@ -117,7 +126,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
       action: {
         label: "View",
         onClick: () => {
-          props.router.push(`/organizations/${props.organization.id}/files/${id}`);
+          props.router.push(`/organizations/${props.organization.id}/files/${data.file.id}?version-id=${data.version.id}`);
           toast.dismiss(toastId);
         },
       },

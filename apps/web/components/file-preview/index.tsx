@@ -9,7 +9,7 @@ import * as Viewers from "@apps/web/components/file-preview/viewers";
 
 
 
-const BYTES_PER_MB = 1000000; // not MiB
+const BYTES_PER_MB = 1024*1024; // not MiB
 
 
 export const FilePreview = (props: FilePreviewProps) => {
@@ -69,6 +69,14 @@ export const FilePreview = (props: FilePreviewProps) => {
   // pdfs
   if (Viewers.PDF.isSupported(props.version.mime_type)) return (
     <Viewers.PDF blob={blob} />
+  );
+
+  // safe-convert api connection
+  if(Viewers.SafeConvert.isSupported(props.version.mime_type)) return (
+    <Viewers.SafeConvert
+      blob={blob}
+      {...props}
+    />
   );
 
   // catch-all

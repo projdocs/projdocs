@@ -13,8 +13,6 @@ import {
   SelectValue,
 } from "@packages/ui/components/select";
 import { useRouter } from "next/navigation";
-import { cn } from "@packages/ui/lib/utils";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@packages/ui/components/tooltip";
 import { ButtonGroup } from "@packages/ui/components/button-group";
 import { DateTime } from "luxon";
 import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
@@ -25,6 +23,7 @@ import { Button } from "@packages/ui/components/button";
 import { DownloadIcon } from "lucide-react";
 import { ProjDocsAPIClient } from "@apps/web/lib/api/with-ui";
 import { Separator } from "@packages/ui/components/separator";
+import { Badge } from "@packages/ui/components/badge";
 
 
 
@@ -49,28 +48,25 @@ export default function(props: {
       <div className="p-8 flex flex-col w-full lg:min-h-0 h-full gap-2 overflow-y-scroll [&>*]:shrink-0">
         <Card className={"w-full p-0 gap-0 h-full max-h-full overflow-y-scroll"}>
           <CardHeader className={"p-2 md:p-4 gap-2 flex flex-row items-center justify-between"}>
-            <Tooltip>
+
+            <div className={"flex flex-row gap-4 items-center max-w-full"}>
               <FileIcon
                 theme={resolvedTheme === "dark" ? "dark" : "light"}
                 variant={"solid"}
                 type={props.version.mime_type}
               />
 
-              <TooltipTrigger disabled={!props.can.edit} className="w-full min-w-0 overflow-hidden">
-                <H4
-                  className={cn(
-                    "w-full min-w-0 block truncate text-start",
-                    props.can.edit ? "cursor-pointer hover:[text-shadow:0_0_12px_rgba(99,102,241,0.9)] transition-all duration-300" : "",
-                  )}
-                  onClick={() => props.can.edit && alert("FOO")}
-                >
-                  {props.file.name}
-                </H4>
-              </TooltipTrigger>
-              <TooltipContent side={"bottom"}>
-                {"Change Name"}
-              </TooltipContent>
-            </Tooltip>
+              <H4 className={"max-w-full min-w-0 block truncate text-start"}>
+                {props.file.name}
+              </H4>
+
+              { props.versions.at(0)?.id !== props.version.id && (
+                <Badge variant={"destructive"}>
+                  {"Viewing Outdated Version"}
+                </Badge>
+              ) }
+            </div>
+
 
             <ButtonGroup>
 
@@ -134,6 +130,7 @@ export default function(props: {
                   organization_id: props.organizationID,
                   path: `/organizations/${props.organizationID}/files/${props.file.id}`,
                   parent: { id: props.file.folder_id },
+                  mime_type: props.version.mime_type,
                 }}
                 apiURL={props.apiURL}
                 organizationID={props.organizationID}

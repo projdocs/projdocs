@@ -10,6 +10,7 @@ export type FileViewable = {
   created_at: string;
   organization_id: string;
   path: string;
+  mime_type: string;
   parent: {
     id: string;
   }

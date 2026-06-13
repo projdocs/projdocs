@@ -1,8 +1,9 @@
 import { createColumnHelper } from "@tanstack/react-table";
 import { Button } from "@packages/ui/components/button";
 import { Viewable } from "@apps/web/components/file-viewer/types";
-import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, FileIcon, FolderIcon } from "lucide-react";
+import { ArrowDownIcon, ArrowUpDownIcon, ArrowUpIcon, FolderIcon } from "lucide-react";
 import { FileOptionsDropdown } from "@apps/web/components/file-viewer/components/file-options-dropdown";
+import { FileIcon } from "@untitledui/file-icons";
 
 
 
@@ -21,7 +22,7 @@ function formatDate(iso: string) {
 }
 
 const column = createColumnHelper<Viewable>();
-export const FileViewerColumns = (orgID: string, apiURL: string) => [
+export const FileViewerColumns = (orgID: string, apiURL: string, theme: string) => [
   column.accessor("name", {
     header: ({ column }) => (
       <Button
@@ -37,10 +38,15 @@ export const FileViewerColumns = (orgID: string, apiURL: string) => [
     cell: ({ row }) => (
       <div className={"flex items-center gap-2.5"}>
         {row.original.type === "FOLDER" && (
-          <FolderIcon className="h-4 w-4 shrink-0 text-amber-500" />
+          <FolderIcon className="h-9 w-9 shrink-0 text-amber-500" />
         )}
         {row.original.type === "FILE" && (
-          <FileIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
+          <FileIcon
+            className={"h-9 w-9 shrink-0"}
+            theme={theme === "dark" ? "dark" : "light"}
+            variant={"solid"}
+            type={row.original.mime_type}
+          />
         )}
         <span
           className={`text-sm truncate ${row.original.type === "FOLDER" ? "group-hover:underline underline-offset-4" : ""}`}
@@ -74,17 +80,17 @@ export const FileViewerColumns = (orgID: string, apiURL: string) => [
     maxSize: 1,
     cell: ({ row: { original } }) => (
       <div className={"flex flex-row justify-end"}>
-        { original.type === "FILE" && (
+        {original.type === "FILE" && (
           <FileOptionsDropdown
             viewable={original}
             organizationID={orgID}
             apiURL={apiURL}
             trigger={{
-              variant: "ghost"
+              variant: "ghost",
             }}
           />
-        ) }
+        )}
       </div>
-     )
-  })
+    ),
+  }),
 ];

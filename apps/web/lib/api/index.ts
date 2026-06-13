@@ -4,7 +4,20 @@ import { DetailedError } from "tus-js-client";
 import { Tables } from "@packages/supabase";
 import { DownloadOptions, MultiPartDownloadClient } from "@apps/web/lib/api/download";
 
-
+type UploadResult = {
+  data: {
+    file: {
+      id: string;
+    };
+    version: {
+      id: string;
+    }
+  }
+  error: null
+} | {
+  error: string;
+  data: null;
+}
 
 export class ProjDocsAPI {
 
@@ -30,7 +43,7 @@ export class ProjDocsAPI {
     return new ProjDocsAPI(host);
   }
 
-  private async __upload(path: string, file: File, onProgress?: (progressPercentInteger: number) => unknown) {
+  private async __upload(path: string, file: File, onProgress?: (progressPercentInteger: number) => unknown): Promise<UploadResult> {
 
     try {
       const session = await supabase().auth.getSession();
@@ -41,6 +54,7 @@ export class ProjDocsAPI {
 
       const result = await new Promise<string | undefined>((resolve, reject) => {
         const upload = new tus.Upload(file, {
+          chunkSize: 10 * 1024 * 1024,
           endpoint: `${this.origin}/${path.startsWith("/") ? path.substring(1) : path}`,
           retryDelays: [ 0, 1000, 3000, 5000 ],
           metadata: {
@@ -71,9 +85,17 @@ export class ProjDocsAPI {
         upload.start();
       });
       if (result === undefined) throw new Error("Upload completed, but the the file's ID was not found.");
+
+      // file-id:version-id
+      const parts = result.split(":");
+      if (parts.length !== 2) throw new Error("Upload failed: result unexpected!");
+
       return ({
         error: null,
-        id: result.split(":").at(0)!, // file-id:version-id
+        data: {
+          file: { id: parts[0]! },
+          version: { id: parts[1]! },
+        }
       });
     } catch (error) {
       let message = error instanceof Error ? error.message : "Unknown error occurred";
@@ -90,7 +112,7 @@ export class ProjDocsAPI {
       }
 
       return ({
-        id: null,
+        data: null,
         error: message,
       });
     }
@@ -100,13 +122,7 @@ export class ProjDocsAPI {
     file: Pick<Tables<"files">, "id" | "folder_id">
     organization: Pick<Tables<"organizations">, "id">;
     onProgress?: (progressPercentInteger: number) => unknown;
-  }): Promise<{
-    id: string;
-    error: null
-  } | {
-    error: string;
-    id: null;
-  }> {
+  }): Promise<UploadResult> {
     return this.__upload(`/v1/organizations/${props.organization.id}/folders/${props.file.folder_id}/files/${props.file.id}/upload`, file, props.onProgress);
   }
 
@@ -114,13 +130,7 @@ export class ProjDocsAPI {
     organization: Pick<Tables<"organizations">, "id">;
     folder: Pick<Tables<"folders">, "id">;
     onProgress?: (progressPercentInteger: number) => unknown;
-  }): Promise<{
-    id: string;
-    error: null
-  } | {
-    error: string;
-    id: null;
-  }> {
+  }): Promise<UploadResult> {
     return this.__upload(`/v1/organizations/${organization.id}/folders/${folder.id}/upload`, file, onProgress);
   }
 }

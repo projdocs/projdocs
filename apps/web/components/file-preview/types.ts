@@ -10,8 +10,8 @@ export type FilePreviewProps = {
   apiURL: string;
 }
 
-export type Viewer = ((props: {
+export type Viewer<T = {}> = ((props: {
   blob: Blob,
-}) => ReactNode) & {
+} & T) => ReactNode) & {
   isSupported: (mimeType: string) => boolean;
 }
