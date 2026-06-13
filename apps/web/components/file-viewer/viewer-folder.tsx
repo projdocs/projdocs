@@ -20,7 +20,12 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
 
   const [ loading, setLoading ] = useState<boolean>(true);
   const [ items, _setItems ] = useState<{
-    files: readonly Tables<"files">[];
+    files: readonly (Tables<"files"> & {
+      versions: readonly {
+        mime_type: string;
+        number: number;
+      }[];
+    })[];
     folders: readonly Tables<"folders">[];
   } | null | undefined>();
   const setItems = useDebouncedCallback((_items: typeof items) => {
@@ -35,7 +40,7 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
       .eq("folder_id", folder.id);
     const files = await supabase()
       .from("files")
-      .select()
+      .select("*, versions:files_versions!inner(number, mime_type)")
       .eq("folder_id", folder.id);
     if (folders.error || files.error) {
       if (folders.error) toast.error("Unable to Load Folders!", {
@@ -94,7 +99,8 @@ export const FolderFileViewer = ({ folder, ...props }: Omit<FileViewerProps, "it
                 path: `/organizations/${props.organizationID}/files/${file.id}`,
                 parent: {
                   id: file.folder_id
-                }
+                },
+                mime_type: file.versions.reduce((p, c) => p && c.number > p.number ? c : p, ({ number: -1, mime_type: "unknown" }) as ({ number: number; mime_type: string })).mime_type
               })),
             ]}
           />

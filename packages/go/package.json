@@ -1,6 +1,8 @@
 {
   "name": "@packages/go",
   "scripts": {
-    "gen": "supabase gen types --local --lang=go > database/types.go"
+    "gen:types": "supabase gen types --local --lang=go > database/types.go",
+    "gen:migrations": "rm -rf ./migrations/migrations && cp -r ../../supabase/migrations ./migrations/migrations",
+    "gen": "npm run gen:types && npm run gen:migrations"
   }
 }

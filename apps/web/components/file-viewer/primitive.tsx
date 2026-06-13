@@ -5,12 +5,14 @@ import { FileViewerColumns } from "@apps/web/components/file-viewer/columns";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
 import { ScrollArea, ScrollBar } from "@packages/ui/components/scroll-area";
 import { Separator } from "@packages/ui/components/separator";
+import { useTheme } from "next-themes";
 
 
 
 export const FileViewerPrimitive = (props: FileViewerProps) => {
 
-  const columns = useMemo(() => FileViewerColumns(props.organizationID, props.apiURL), [props.organizationID, props.apiURL])
+  const theme = useTheme();
+  const columns = useMemo(() => FileViewerColumns(props.organizationID, props.apiURL, theme.resolvedTheme ?? "dark"), [ props.organizationID, props.apiURL, theme.resolvedTheme ]);
   const [ sorting, setSorting ] = useState<SortingState>([]);
 
 

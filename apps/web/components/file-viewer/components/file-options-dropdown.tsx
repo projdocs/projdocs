@@ -35,6 +35,8 @@ export const FileOptionsDropdown = (props: {
   trigger?: ComponentProps<"button"> & VariantProps<typeof buttonVariants>
 }) => {
 
+  const router = useRouter();
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   return (
@@ -48,6 +50,7 @@ export const FileOptionsDropdown = (props: {
           if (!file) return;
           e.target.value = "";
           await ProjDocsAPIClient.from(props.apiURL).uploadVersion(file, {
+            router,
             file: {
               id: props.viewable.id,
               folder_id: props.viewable.parent.id
