@@ -34,16 +34,27 @@ jobs:
 
           echo "✅ Only new migration files detected."
 
+      - name: Check for migration changes
+        id: migrations
+        run: |
+          git diff --quiet HEAD^ HEAD -- supabase/migrations \
+            && echo "changed=false" >> $GITHUB_OUTPUT \
+            || echo "changed=true" >> $GITHUB_OUTPUT
+
       - name: Setup Supabase CLI
+        if: steps.migrations.outputs.changed == 'true'
         uses: supabase/setup-cli@v2
         with:
           version: 2.98.1
 
       - run: supabase db start
+        if: steps.migrations.outputs.changed == 'true'
         env:
           GOOGLE_OAUTH_CLIENT_ID: not-set
           GOOGLE_OAUTH_CLIENT_SECRET: not-set
 
       - run: supabase test db
+        if: steps.migrations.outputs.changed == 'true'
 
       - run: supabase stop --no-backup
+        if: steps.migrations.outputs.changed == 'true'
