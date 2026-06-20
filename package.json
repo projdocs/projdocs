@@ -3,25 +3,14 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "build": "turbo build",
-    "dev": "turbo dev",
-    "lint": "turbo lint",
-    "format": "turbo format",
-    "typecheck": "turbo typecheck",
+    "build": "npm run build --ws",
     "gen": "npm run gen --ws",
     "test": "vitest run"
   },
   "overrides": {
     "@monaco-editor/react": {
       "monaco-editor": {
-        "dompurify": "^3.4.2"
-      }
-    },
-    "@packages/ui": {
-      "@monaco-editor/react": {
-        "monaco-editor": {
-          "dompurify": "^3.4.2"
-        }
+        "dompurify": "^3.4.11"
       }
     }
   },
@@ -30,11 +19,10 @@
     "@packages/typescript-config": "*",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
-    "turbo": "^2.8.17",
     "typescript": "5.9.3",
     "vitest": "4.1.4"
   },
-  "packageManager": "npm@11.4.2",
+  "packageManager": "npm@11.12.1",
   "engines": {
     "node": ">=20"
   },

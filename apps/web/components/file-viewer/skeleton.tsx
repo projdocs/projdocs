@@ -4,19 +4,21 @@ import { FileViewerColumns } from "@apps/web/components/file-viewer/columns";
 import { Skeleton } from "@packages/ui/components/skeleton";
 import { Separator } from "@packages/ui/components/separator";
 import { cn } from "@packages/ui/lib/utils";
+import { useTheme } from "next-themes";
 
 
 
 export const FileViewerSkeleton = () => {
 
-  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", "").map(() => Math.floor(Math.random() * 40 + 40))), []);
+  const theme = useTheme();
+  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", "", theme.resolvedTheme ?? "dark").map(() => Math.floor(Math.random() * 40 + 40))), []);
 
   return (
     <>
       <Table className={"w-full h-full"}>
         <TableHeader>
           <TableRow>
-            {FileViewerColumns("","").map((_, index, arr) => (
+            {FileViewerColumns("","", theme.resolvedTheme ?? "dark").map((_, index, arr) => (
               <TableHead key={index}>
                 <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
               </TableHead>
