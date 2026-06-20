@@ -47,7 +47,7 @@ async function pdfToImages(pdfjsLib: PDFJS, blob: Blob, scale = 1.5): Promise<st
 export const PDF: Viewer = ({ blob }) => {
 
   const [ pages, _setPages ] = useState<string[] | null>(null);
-  const setPages = useDebouncedCallback(_setPages, 500);
+  const setPages = useDebouncedCallback(_setPages, 100);
 
   usePDFJS(async (pdfjs) => await pdfToImages(pdfjs, blob)
     .then(setPages)

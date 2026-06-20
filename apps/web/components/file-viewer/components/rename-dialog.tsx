@@ -88,7 +88,7 @@ export function RenameDialog(props: RenameDialogProps) {
             <Button
               type="button"
               variant="outline"
-              onClick={() => onOpenChange(false)}
+              onClick={() => alert("TODO")}
             >
               Cancel
             </Button>
