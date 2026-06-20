@@ -2,6 +2,7 @@ import Body from "./page-body";
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { Enums } from "@packages/supabase";
 import { ErrorPage } from "@packages/ui/components/page";
+import { connection } from "next/server";
 
 
 
@@ -10,6 +11,8 @@ export default async function(props: {
     "organization-id": string;
   }>;
 }) {
+
+  await connection();
   const params = await props.params;
 
   const apiURL = process.env.PROJDOCS_API_URL;

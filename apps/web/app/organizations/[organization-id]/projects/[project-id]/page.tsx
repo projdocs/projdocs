@@ -4,6 +4,7 @@ import {
   ProjectPage,
 } from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/client-side";
 import { getProject } from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/utils";
+import { connection } from "next/server";
 
 
 
@@ -14,10 +15,8 @@ export default async function(props: {
   }>;
 }) {
 
+  await connection();
   const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
 
   const params = await props.params;
   const project = await getProject(await createServerClient(), {

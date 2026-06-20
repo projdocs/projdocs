@@ -2,6 +2,7 @@ import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
 import { FolderPageBody } from "@apps/web/app/organizations/[organization-id]/folders/[folder-id]/client-side";
 import { getFolder } from "@apps/web/app/organizations/[organization-id]/folders/[folder-id]/utils";
+import { connection } from "next/server";
 
 
 
@@ -12,11 +13,8 @@ export default async function(props: {
   }>;
 }) {
 
+  await connection();
   const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
-
   const params = await props.params;
   const folder = await getFolder(await createServerClient(), {
     folderID: params["folder-id"],

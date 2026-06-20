@@ -10,22 +10,8 @@ async function forwardToSupabaseAPI(
 ) {
 
   const KongUrl = process.env.SUPABASE_KONG_URL;
-  if (!KongUrl) return NextResponse.json(
-    { message: "Server configuration error: `SUPABASE_KONG_URL` is not set." },
-    { status: 500 },
-  );
-
   const PublishableKey = process.env.SUPABASE_PUBLISHABLE_KEY;
-  if (!PublishableKey) return NextResponse.json(
-    { message: "Server configuration error: `SUPABASE_PUBLISHABLE_KEY` is not set." },
-    { status: 500 },
-  );
-
   const SecretKey = process.env.SUPABASE_SECRET_KEY;
-  if (!SecretKey) return NextResponse.json(
-    { message: "Server configuration error: `SUPABASE_SECRET_KEY` is not set." },
-    { status: 500 },
-  );
 
   let Key = PublishableKey;
   try {

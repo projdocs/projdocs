@@ -1,25 +1,17 @@
 import { LoginForm } from "@apps/web/app/auth/login/login-form";
 import { ErrorPage } from "@packages/ui/components/page";
+import { connection } from "next/server";
 
 
 
 export default async function() {
 
+  await connection();
 
   const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
+  const kongURL = process.env.SUPABASE_KONG_URL;
+  const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY;
 
-  const kongURL = process.env.SUPABASE_KONG_URL?.trim();
-  if (!kongURL) {
-    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_KONG_URL` is not set"} />;
-  }
-
-  const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
-  if (!pubKey) {
-    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_PUBLISHABLE_KEY` is not set"} />;
-  }
 
   let url: URL;
   try {

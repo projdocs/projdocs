@@ -2,9 +2,12 @@ import Body from "./page-body";
 import { ErrorPage } from "@packages/ui/components/page";
 import { getAuthProviders, getOrganizations, getStorageProviders } from "@apps/web/app/setup/actions";
 import { createServerClient } from "@apps/web/lib/supabase/server";
+import { connection } from "next/server";
 
 
 export default async function() {
+
+  await connection();
 
   const apiBase = process.env.PROJDOCS_API_URL;
   if (!apiBase) {

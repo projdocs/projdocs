@@ -1,10 +1,14 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { Card, CardDescription, CardHeader, CardTitle } from "@packages/ui/components/card";
 import { redirect } from "next/navigation";
+import { connection } from "next/server";
 
 
 
 export default async function() {
+
+  await connection();
+
   const supabase = await createServerClient();
 
   const user = await supabase.auth.getSession();

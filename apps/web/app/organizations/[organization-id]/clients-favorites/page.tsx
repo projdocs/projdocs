@@ -1,7 +1,6 @@
 "use client";
 
 import { use } from "react";
-import { useRouter } from "next/navigation";
 import { ObjectPage } from "@packages/ui/components/page";
 import { ClientsTable } from "@apps/web/components/clients-table";
 
@@ -13,7 +12,6 @@ export default function(props: {
   }>;
 }) {
   const params = use(props.params);
-  const router = useRouter();
 
   return (
     <ObjectPage title={"My Clients"}>
