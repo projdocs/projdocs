@@ -1,7 +1,9 @@
 package main
 
 import (
+	Events "changeme/internal/events"
 	"embed"
+	"runtime"
 
 	"log"
 	"time"
@@ -11,34 +13,38 @@ import (
 	"github.com/wailsapp/wails/v3/pkg/services/dock"
 )
 
-// Wails uses Go's `embed` package to embed the frontend files into the binary.
-// Any files in the frontend/dist folder will be embedded into the binary and
-// made available to the frontend.
-// See https://pkg.go.dev/embed for more information.
-
 //go:embed all:frontend/dist
 var assets embed.FS
+
+//go:embed build/iconTemplate.png
+var trayIcon []byte
+
 var isAutoStartEnabled bool
 
 func init() {
-	// Register a custom event whose associated data type is string.
-	// This is not required, but the binding generator will pick up registered events
-	// and provide a strongly typed JS/TS API for them.
-	application.RegisterEvent[string]("time")
+	application.RegisterEvent[bool](Events.ProjDocs.Window.SetVisible)
 }
 
 // main function serves as the application's entry point. It initializes the application, creates a window,
 // and starts a goroutine that emits a time-based event every second. It subsequently runs the application and
 // logs any error that might occur.
 func main() {
+	app := getApp()
+	window := getWindow(app)
+	setupSystemTray(app, window)
 
+	if err := app.Run(); err != nil {
+		log.Fatal(err)
+	}
+}
+
+func getApp() *application.App {
 	dockService := dock.New()
 
 	app := application.New(application.Options{
 		Name:        "ProjDocs",
 		Description: "ProjDocs Desktop Client",
 		Services: []application.Service{
-			application.NewService(&GreetService{}),
 			application.NewService(dockService),
 		},
 		Assets: application.AssetOptions{Handler: application.AssetFileServerFS(assets)},
@@ -58,6 +64,10 @@ func main() {
 		dockService.HideAppIcon()
 	})
 
+	return app
+}
+
+func getWindow(app *application.App) *application.WebviewWindow {
 	window := app.Window.
 		NewWithOptions(application.WebviewWindowOptions{
 			Title: "ProjDocs Desktop",
@@ -80,11 +90,31 @@ func main() {
 		window.Hide()
 	})
 
+	app.Event.On(Events.ProjDocs.Window.SetVisible, func(event *application.CustomEvent) {
+		visible := event.Data.(bool)
+		if visible {
+			window.Show()
+		} else {
+			window.Hide()
+		}
+	})
+
+	return window
+}
+
+func setupSystemTray(
+	app *application.App,
+	window *application.WebviewWindow,
+) {
 	// Create system tray
 	systray := app.SystemTray.New()
 
-	//systray.SetIcon(icon)
-	systray.SetLabel("PD")
+	if runtime.GOOS == "darwin" {
+		systray.SetTemplateIcon(trayIcon)
+	} else {
+		systray.SetIcon(trayIcon)
+	}
+
 	systray.
 		AttachWindow(window).
 		WindowOffset(10).
@@ -98,7 +128,30 @@ func main() {
 		})
 
 	// Set menu
+	systray.SetMenu(getSystemTrayMenu(app, window))
+}
+
+func getSystemTrayMenu(
+	app *application.App,
+	window *application.WebviewWindow,
+) *application.Menu {
 	menu := app.NewMenu()
+	showProjDocsCheckbox := menu.AddCheckbox("Show ProjDocs", window.IsVisible()).OnClick(func(ctx *application.Context) {
+		showWindow := ctx.ClickedMenuItem().Checked()
+		if showWindow {
+			window.Show()
+		} else {
+			window.Hide()
+		}
+	})
+	window.OnWindowEvent(events.Common.WindowHide, func(event *application.WindowEvent) {
+		showProjDocsCheckbox.SetChecked(false)
+	})
+	window.OnWindowEvent(events.Common.WindowShow, func(event *application.WindowEvent) {
+		showProjDocsCheckbox.SetChecked(true)
+	})
+
+	menu.AddSeparator()
 	menu.AddCheckbox("Start at Login", isAutoStartEnabled).OnClick(func(ctx *application.Context) {
 		isAutoStartEnabled = ctx.ClickedMenuItem().Checked()
 		if isAutoStartEnabled {
@@ -115,23 +168,5 @@ func main() {
 	menu.Add("Quit").OnClick(func(ctx *application.Context) {
 		app.Quit()
 	})
-	systray.SetMenu(menu)
-
-	// Create a goroutine that emits an event containing the current time every second.
-	// The frontend can listen to this event and update the UI accordingly.
-	go func() {
-		for {
-			now := time.Now().Format(time.RFC1123)
-			app.Event.Emit("time", now)
-			time.Sleep(time.Second)
-		}
-	}()
-
-	// Run the application. This blocks until the application has been exited.
-	err := app.Run()
-
-	// If an error occurred while running the application, log it and exit.
-	if err != nil {
-		log.Fatal(err)
-	}
+	return menu
 }
