@@ -31,7 +31,6 @@ function validateFolderName(name: string): string | null {
 
 type Props = {
   trigger?: ReactNode;
-  apiURL: string;
   forOrganizationId: string;
 } & ({
   project_id: string;
@@ -45,7 +44,7 @@ type Props = {
 
 const REFRESH_EVENT = "create-folder-dialog:folder:created";
 
-export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...props }: Props) => {
+export const CreateFolderDialog = ({ trigger, forOrganizationId, ...props }: Props) => {
 
   const router = useRouter();
 
@@ -97,7 +96,7 @@ export const CreateFolderDialog = ({ trigger, apiURL, forOrganizationId, ...prop
       if (endpoint === undefined) throw "Unable to determine api endpoint!";
 
 
-      const response = await fetch(`${apiURL}/v1/organizations/${forOrganizationId}/${endpoint.name}/${endpoint.id}/folders`, {
+      const response = await fetch(`${window.projdocs.PROJDOCS_API_URL}/v1/organizations/${forOrganizationId}/${endpoint.name}/${endpoint.id}/folders`, {
         method: "POST",
         body: JSON.stringify({ name }),
         headers: {

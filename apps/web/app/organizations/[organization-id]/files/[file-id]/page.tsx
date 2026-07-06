@@ -14,7 +14,6 @@ export default async function(props: {
 }) {
 
   await connection();
-  const apiBase = process.env.PROJDOCS_API_URL;
   const searchParams = await props.searchParams;
   const versionID = searchParams["version-id"];
   if (versionID !== undefined && typeof versionID !== "string") return (
@@ -57,7 +56,6 @@ export default async function(props: {
       file={file}
       version={viewingVersion}
       versions={versions}
-      apiURL={apiBase}
       organizationID={params["organization-id"]}
       can={{
         edit: (

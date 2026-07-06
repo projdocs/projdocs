@@ -36,7 +36,6 @@ export default function(props: {
     delete: boolean;
   }
   organizationID: string;
-  apiURL: string;
 }) {
 
   const router = useRouter();
@@ -111,7 +110,7 @@ export default function(props: {
 
               <Button
                 variant={"outline"}
-                onClick={async () => await ProjDocsAPIClient.from(props.apiURL).download(
+                onClick={async () => await ProjDocsAPIClient.from(window.projdocs.PROJDOCS_API_URL).download(
                   { id: props.organizationID },
                   props.file,
                   props.version,
@@ -132,7 +131,6 @@ export default function(props: {
                   parent: { id: props.file.folder_id },
                   mime_type: props.version.mime_type,
                 }}
-                apiURL={props.apiURL}
                 organizationID={props.organizationID}
               />
             </ButtonGroup>
@@ -141,7 +139,6 @@ export default function(props: {
           <Separator />
 
           <FilePreview
-            apiURL={props.apiURL}
             version={props.version}
             file={props.file}
             organization={{

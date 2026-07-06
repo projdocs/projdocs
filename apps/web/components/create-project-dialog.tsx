@@ -37,7 +37,6 @@ type FormValues = z.infer<typeof formSchema>;
 interface CreateProjectDialogProps {
   trigger?: ReactNode;
   organizationID: string;
-  apiURL: string;
 }
 
 export function CreateProjectDialog(props: CreateProjectDialogProps) {
@@ -56,7 +55,7 @@ export function CreateProjectDialog(props: CreateProjectDialogProps) {
   async function handleSubmit(values: FormValues) {
     const id = toast.loading("Creating project...");
     try {
-      const response = await fetch(`${props.apiURL}/v1/organizations/${props.organizationID}/projects`, {
+      const response = await fetch(`${window.projdocs.PROJDOCS_API_URL}/v1/organizations/${props.organizationID}/projects`, {
         method: "POST",
         body: JSON.stringify(values),
         headers: {

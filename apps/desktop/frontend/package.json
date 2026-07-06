@@ -18,10 +18,13 @@
     "@tailwindcss/vite": "^4.3.2",
     "@types/react-dom": "^19.2.3",
     "@wailsio/runtime": "latest",
+    "jose": "^6.2.3",
     "react": "^19.2.4",
     "react-dom": "^19.2.4",
     "react-router-dom": "^7.18.1",
-    "tailwindcss": "^4.3.1"
+    "tailwindcss": "^4.3.1",
+    "use-debounce": "^10.1.1",
+    "zustand": "^5.0.14"
   },
   "devDependencies": {
     "@packages/eslint-config": "*",

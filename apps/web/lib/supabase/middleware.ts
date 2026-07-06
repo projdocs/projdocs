@@ -8,9 +8,12 @@ export async function updateSession(request: NextRequest) {
     request,
   });
 
+  const url = new URL(process.env.PROJDOCS_API_URL);
+  url.pathname = "/public/supabase/proxy";
+
   const supabase = createServerClient(
-    process.env.SUPABASE_KONG_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    url.toString(),
+    "set-in-middleware",
     {
       auth: {
         detectSessionInUrl: false,
@@ -48,7 +51,6 @@ export async function updateSession(request: NextRequest) {
 
   if (
     !user &&
-    !request.nextUrl.pathname.startsWith("/supabase/proxy/auth/v1/token") &&
     !request.nextUrl.pathname.startsWith("/auth")
   ) {
     const url = request.nextUrl.clone();

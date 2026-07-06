@@ -16,7 +16,6 @@ export default async function(props: {
 }) {
 
   await connection();
-  const apiBase = process.env.PROJDOCS_API_URL;
 
   const params = await props.params;
   const project = await getProject(await createServerClient(), {
@@ -29,5 +28,5 @@ export default async function(props: {
       description={`Project "${params["project-id"]}" was not found or is not accessible.`}
     />
   );
-  return <ProjectPage apiURL={apiBase} project={project.data} />;
+  return <ProjectPage project={project.data} />;
 }

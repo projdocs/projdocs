@@ -30,7 +30,6 @@ const onClick: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (e) => {
 
 export const FileOptionsDropdown = (props: {
   viewable: FileViewable;
-  apiURL: string;
   organizationID: string;
   trigger?: ComponentProps<"button"> & VariantProps<typeof buttonVariants>
 }) => {
@@ -49,7 +48,7 @@ export const FileOptionsDropdown = (props: {
           const file = e.target.files?.[0];
           if (!file) return;
           e.target.value = "";
-          await ProjDocsAPIClient.from(props.apiURL).uploadVersion(file, {
+          await ProjDocsAPIClient.from(window.projdocs.PROJDOCS_API_URL).uploadVersion(file, {
             router,
             file: {
               id: props.viewable.id,

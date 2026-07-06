@@ -37,7 +37,6 @@ type FormValues = z.infer<typeof formSchema>;
 interface CreateClientDialogProps {
   trigger?: ReactNode;
   organizationID: string;
-  apiURL: string;
 }
 
 export function CreateClientDialog(props: CreateClientDialogProps) {
@@ -56,7 +55,7 @@ export function CreateClientDialog(props: CreateClientDialogProps) {
   async function handleSubmit(values: FormValues) {
     const id = toast.loading("Creating client...");
     try {
-      const response = await fetch(`${props.apiURL}/v1/organizations/${props.organizationID}/clients`, {
+      const response = await fetch(`${window.projdocs.PROJDOCS_API_URL}/v1/organizations/${props.organizationID}/clients`, {
         method: "POST",
         body: JSON.stringify(values),
         headers: {

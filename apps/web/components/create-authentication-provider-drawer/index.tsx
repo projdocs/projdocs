@@ -35,13 +35,11 @@ import { CustomOAuthProvider } from "@supabase/auth-js";
 
 interface CreateAuthenticationProviderDrawerProps {
   trigger?: ReactNode;
-  apiURL: string;
-  kongURL: string;
   onCreate?: (row: CustomOAuthProvider) => unknown;
 }
 
 export function CreateAuthenticationProviderDrawer(props: CreateAuthenticationProviderDrawerProps) {
-  const CALLBACK_URL = `${props.kongURL}/auth/v1/callback`;
+  const CALLBACK_URL = `${window.projdocs.PROJDOCS_API_URL}/public/supabase/proxy/auth/v1/callback`;
 
   const [ copied, setCopied ] = useState(false);
   const [ advancedOpen, setAdvancedOpen ] = useState(false);

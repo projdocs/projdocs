@@ -23,7 +23,7 @@ export const FilePreview = (props: FilePreviewProps) => {
     let mounted = true;
     setBlob(null);
 
-    if (!isTooLarge) ProjDocsAPI.from(props.apiURL).download(
+    if (!isTooLarge) ProjDocsAPI.from(window.projdocs.PROJDOCS_API_URL).download(
       props.organization,
       props.file,
       props.version,

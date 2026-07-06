@@ -143,7 +143,6 @@ function ClientCombobox(props: {
 
 export function ProjectPage(props: {
   project: Project;
-  apiURL: string;
 }) {
 
   const router = useRouter();
@@ -161,7 +160,6 @@ export function ProjectPage(props: {
       <div className="flex flex-col-reverse gap-8 lg:flex-row w-full lg:h-full max-h-full">
         <div className="flex flex-col w-full lg:w-2/3 lg:h-full gap-2">
           <FileViewer.Project
-            apiURL={props.apiURL}
             project={props.project}
             onRowClick={({path}) => router.push(path)}
             onRowDoubleClick={({path}) => router.push(path)}
@@ -184,7 +182,7 @@ export function ProjectPage(props: {
               <div className={"flex flex-col gap-6"}>
                 <Separator />
 
-                <CreateFolderDialog forOrganizationId={props.project.organization_id} apiURL={props.apiURL} project_id={props.project.id} />
+                <CreateFolderDialog forOrganizationId={props.project.organization_id} project_id={props.project.id} />
               </div>
             </CardContent>
           </Card>

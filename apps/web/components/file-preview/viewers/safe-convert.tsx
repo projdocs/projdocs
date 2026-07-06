@@ -49,7 +49,7 @@ export const SafeConvert: Viewer<FilePreviewProps> = (props) => {
         throw "Unable to load authentication session!";
       }
     })
-      .then(session => fetch(`${props.apiURL}/v1/organizations/${props.organization.id}/folders/${props.file.folder_id}/files/${props.file.id}/versions/${props.version.id}/preview`, {
+      .then(session => fetch(`${window.projdocs.PROJDOCS_API_URL}/v1/organizations/${props.organization.id}/folders/${props.file.folder_id}/files/${props.file.id}/versions/${props.version.id}/preview`, {
         headers: {
           "Authorization": `Bearer ${session}`,
         },
@@ -72,7 +72,7 @@ export const SafeConvert: Viewer<FilePreviewProps> = (props) => {
           description: typeof e === "string" ? e : "Check the browser console for more details.",
         });
       });
-  }, [ props.version.id, props.file.id, props.organization.id, props.apiURL ]);
+  }, [ props.version.id, props.file.id, props.organization.id ]);
 
   if (blob === undefined) return (
     <Skeleton blob={null as any} />

@@ -30,7 +30,6 @@ export type Viewable = FileViewable | FolderViewable;
 export type FileViewerProps = {
   items: ReadonlyArray<Viewable>;
   organizationID: string;
-  apiURL: string;
   onRowClick?: (viewable: Viewable) => void;
   onRowDoubleClick?: (viewable: Viewable) => void;
 };

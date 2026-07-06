@@ -14,7 +14,6 @@ import { useRouter } from "next/navigation";
 
 export const ClientPageBody = (props: {
   client: Tables<"clients">;
-  apiURL: string;
 }) => {
 
   const router = useRouter();
@@ -40,11 +39,10 @@ export const ClientPageBody = (props: {
 
           <div className={"flex flex-row gap-2 justify-between items-center"}>
             <H3>{"Files"}</H3>
-            <CreateFolderDialog forOrganizationId={props.client.organization_id} apiURL={props.apiURL} client_id={props.client.id} />
+            <CreateFolderDialog forOrganizationId={props.client.organization_id} client_id={props.client.id} />
           </div>
 
           <FileViewer.Client
-            apiURL={props.apiURL}
             client={props.client}
             onRowClick={({path}) => router.push(path)}
             onRowDoubleClick={({path}) => router.push(path)}

@@ -24,5 +24,5 @@ export default async function(props: {
     .single();
 
   if (client.error) return <ErrorPage />;
-  return <ClientPageBody apiURL={apiBase} client={client.data} />;
+  return <ClientPageBody client={client.data} />;
 }

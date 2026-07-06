@@ -8,18 +8,14 @@ export default async function() {
 
   await connection();
 
-  const apiBase = process.env.PROJDOCS_API_URL;
-  const kongURL = process.env.SUPABASE_KONG_URL;
-  const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY;
-
-
   let url: URL;
   try {
-    url = new URL(apiBase);
+    url = new URL(process.env.PROJDOCS_API_URL);
+    url.pathname = "/public/auth/providers";
   } catch (e) {
     return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not a valid URL"} />;
   }
-  url.pathname = "/public/auth/providers";
+
 
   let providers;
   try {
@@ -57,16 +53,9 @@ export default async function() {
 
 
   return (
-    <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
-      <LoginForm
-        providers={providers}
-        supabase={{
-          url: kongURL,
-          publishableKey: pubKey,
-        }}
-      />
+    <div className={"h-full w-full flex flex-col items-center justify-center"}>
+      <LoginForm providers={providers} />
     </div>
   );
-
 
 }

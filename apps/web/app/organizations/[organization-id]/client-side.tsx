@@ -67,7 +67,6 @@ export const DashboardPageBody = (props: {
   user: Tables<"profiles">;
   member: Tables<"members">;
   organizationID: string;
-  apiURL: string;
 }) => (
   <ObjectPage title={`Welcome back, ${props.user.first_name}!`}>
     <div className={"flex flex-col gap-4"}>

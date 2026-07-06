@@ -15,11 +15,6 @@ export default async function Page(props: {
 
   const params = await props.params;
 
-  const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
-
   const supabase = await createServerClient();
   const { data: { session }, error } = await supabase.auth.getSession();
 
@@ -42,7 +37,6 @@ export default async function Page(props: {
       user={user.data}
       member={member.data}
       organizationID={params["organization-id"]}
-      apiURL={apiBase}
     />
   );
 }

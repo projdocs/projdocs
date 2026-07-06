@@ -14,7 +14,6 @@ export default async function(props: {
 }) {
 
   await connection();
-  const apiBase = process.env.PROJDOCS_API_URL;
   const params = await props.params;
   const folder = await getFolder(await createServerClient(), {
     folderID: params["folder-id"],
@@ -28,7 +27,6 @@ export default async function(props: {
 
   return (
     <FolderPageBody
-      apiURL={apiBase}
       folder={folder.data}
       organizationID={params["organization-id"]}
     />

@@ -15,19 +15,10 @@ export default async function(props: {
   await connection();
   const params = await props.params;
 
-  const apiURL = process.env.PROJDOCS_API_URL;
-  if (!apiURL) return (
-    <ErrorPage
-      title={"Improper Server Configuration"}
-      description={"`PROJDOCS_API_URL` is not set but is required"}
-    />
-  )
-
   const permissions = await (await createServerClient()).from("members").select("*, permissions:permissions_id!inner(*)").eq("permissions.organization_id", params["organization-id"]).single();
 
   return (
     <Body
-      apiURL={apiURL}
       canCreate={([ "EDIT", "DELETE" ] as Enums<"permission_levels">[]).includes(permissions.data?.permissions?.projects ?? "NONE")}
       organizationID={params["organization-id"]}
     />

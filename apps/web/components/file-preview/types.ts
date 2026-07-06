@@ -7,7 +7,6 @@ export type FilePreviewProps = {
   file: Tables<"files">;
   version: Tables<"files_versions">;
   organization: Pick<Tables<"organizations">, "id">
-  apiURL: string;
 }
 
 export type Viewer<T = {}> = ((props: {

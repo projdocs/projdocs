@@ -49,7 +49,6 @@ const ParentBadge = ({ title, icon, path, className }: {
 export const FolderPageBody = (props: {
   folder: Folder;
   organizationID: string;
-  apiURL: string;
 }) => {
 
   const router = useRouter();
@@ -61,7 +60,7 @@ export const FolderPageBody = (props: {
     if (!file) return;
     e.target.value = "";
     if (
-      await ProjDocsAPIClient.from(props.apiURL).uploadFile(file, {
+      await ProjDocsAPIClient.from(window.projdocs.PROJDOCS_API_URL).uploadFile(file, {
         router,
         organization: { id: props.organizationID },
         folder: props.folder,
@@ -122,7 +121,7 @@ export const FolderPageBody = (props: {
             onChange={handleFileChange}
           />
           <ButtonGroup>
-            <CreateFolderDialog forOrganizationId={props.organizationID} apiURL={props.apiURL}
+            <CreateFolderDialog forOrganizationId={props.organizationID}
                                 folder_id={props.folder.id} />
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -146,7 +145,6 @@ export const FolderPageBody = (props: {
       <FileViewer.Folder
         folder={props.folder}
         organizationID={props.organizationID}
-        apiURL={props.apiURL}
         onRowClick={({ path }) => router.push(path)}
         onRowDoubleClick={({ path }) => router.push(path)}
       />

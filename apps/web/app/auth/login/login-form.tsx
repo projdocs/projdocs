@@ -16,6 +16,7 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from "@pa
 import Logo from "@packages/ui/branding/logo/logo";
 
 
+
 const passwordSchema = z.object({
   email: z.email(),
   password: z.string().min(1, "Password is required"),
@@ -24,14 +25,10 @@ type PasswordFormValues = z.infer<typeof passwordSchema>;
 
 interface LoginFormProps {
   providers: ReadonlyArray<{ display: string; identifier: string }>;
-  supabase: {
-    url: string;
-    publishableKey: string;
-  };
 }
 
 const ExchangePKCECode = (
-  props: LoginFormProps["supabase"] & {
+  props: {
     params: ReadonlyURLSearchParams;
   },
 ) => {
@@ -106,7 +103,7 @@ export function LoginForm(props: LoginFormProps) {
   return (
     <div className="w-full max-w-sm md:max-w-4xl">
       {params.has("code") ? (
-        <ExchangePKCECode params={params} {...props.supabase} />
+        <ExchangePKCECode params={params} />
       ) : (
         <div className={"flex flex-col gap-6"}>
           <Card className="overflow-hidden p-0">
@@ -132,9 +129,12 @@ export function LoginForm(props: LoginFormProps) {
                           onClick={async () => {
                             setProviderLoading(provider.identifier);
 
+                            const url = new URL(window.projdocs.PROJDOCS_API_URL);
+                            url.pathname = "/public/supabase/proxy";
+
                             const { error } = await createBrowserClient(
-                              props.supabase.url,
-                              props.supabase.publishableKey,
+                              url.toString(),
+                              "set-in-proxy",
                             ).auth.signInWithOAuth({
                               provider: provider.identifier as never,
                               options: {
@@ -179,7 +179,7 @@ export function LoginForm(props: LoginFormProps) {
                             {...form.register("email")}
                           />
                           {form.formState.errors.email && (
-                            <FieldError errors={[form.formState.errors.email]} />
+                            <FieldError errors={[ form.formState.errors.email ]} />
                           )}
                         </Field>
                         <Field>
@@ -192,7 +192,7 @@ export function LoginForm(props: LoginFormProps) {
                             {...form.register("password")}
                           />
                           {form.formState.errors.password && (
-                            <FieldError errors={[form.formState.errors.password]} />
+                            <FieldError errors={[ form.formState.errors.password ]} />
                           )}
                         </Field>
                         <Button
@@ -219,7 +219,7 @@ export function LoginForm(props: LoginFormProps) {
               </div>
 
               <div className={"w-full md:w-1/2 bg-muted"}>
-                <Logo className={"w-full h-full p-10 py-20"}  />
+                <Logo className={"w-full h-full p-10 py-20"} />
               </div>
 
 

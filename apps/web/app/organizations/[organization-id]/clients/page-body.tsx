@@ -6,14 +6,13 @@ import { CreateClientDialog } from "@apps/web/components/create-client-dialog";
 
 export default function(props: {
   organizationID: string;
-  apiURL: string;
   canCreate: boolean
 }) {
   return (
     <ObjectPage
       title={"Clients"}
       action={props.canCreate ? (
-        <CreateClientDialog apiURL={props.apiURL} organizationID={props.organizationID} />) : undefined
+        <CreateClientDialog organizationID={props.organizationID} />) : undefined
       }
     >
       <ClientsTable organizationID={props.organizationID} />

@@ -158,8 +158,6 @@ const SetupTab = ({ tab, ...todos }: {
 );
 
 export default function(props: {
-  apiURL: string;
-  kongURL: string;
   getProvidersPromise: Usable<Awaited<GetAuthProvidersResult>>;
   getStorageProvidersPromise: Usable<Awaited<GetStorageProvidersResult>>;
   getOrganizationsPromise: Usable<Awaited<GetOrganizationsResult>>;
@@ -226,8 +224,6 @@ export default function(props: {
                   description={"Configure any OAuth/OIDC-compatible authentication provider. This is how your regular users will authenticate into ProjDocs."}
                   action={(
                     <CreateAuthenticationProviderDrawer
-                      apiURL={props.apiURL}
-                      kongURL={props.kongURL}
                       // @ts-expect-error
                       onCreate={(newP) => setAuthProviders(p => ({
                         ...p,
@@ -321,7 +317,6 @@ export default function(props: {
                 description={"Organizations are the top-level object where clients, projects, and files are stored. Each organization uses independent numbering schemes."}
                 action={(
                   <CreateOrganizationDrawer
-                    apiURL={props.apiURL}
                     providers={storageProviders.data}
                     onCreateAction={async () => setOrganizations(await getOrganizations(supabase()))}
                     trigger={(
