@@ -12,6 +12,8 @@ func (a *App) setupEventHandlers() {
 	a.server.Event.OnApplicationEvent(events.Common.ApplicationLaunchedWithUrl, func(e *application.ApplicationEvent) {
 		e.Cancel()
 		a.handleCustomURL(e.Context().URL())
+		a._dockService.HideAppIcon()
+		a.window.Show()
 	})
 
 	a.server.Event.On(SetWindowVisibleEvent, func(event *application.CustomEvent) {
@@ -23,15 +25,13 @@ func (a *App) setupEventHandlers() {
 		}
 	})
 
+	a.window.RegisterHook(events.Common.WindowShow, func(event *application.WindowEvent) {
+		a._dockService.HideAppIcon()
+	})
+
 	a.window.RegisterHook(events.Common.WindowClosing, func(event *application.WindowEvent) {
 		event.Cancel()
 		a.window.Hide()
-	})
-	a.window.OnWindowEvent(events.Common.WindowShow, func(event *application.WindowEvent) {
-		a.dockService.ShowAppIcon()
-	})
-	a.window.OnWindowEvent(events.Common.WindowHide, func(event *application.WindowEvent) {
-		a.dockService.HideAppIcon()
 	})
 }
 
