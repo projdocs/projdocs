@@ -9,20 +9,20 @@ import { StarfieldBackground } from "@packages/ui/backgrounds/stars";
 
 
 
-const validIpAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])$/;
+const validIpAddress = /^(([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])\.){3}([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])(:([0-9]|[1-9][0-9]{1,3}|[1-5][0-9]{4}|6[0-4][0-9]{3}|65[0-4][0-9]{2}|655[0-2][0-9]|6553[0-5]))?$/;
 
 const validHostname = /^(([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]*[a-zA-Z0-9])\.)*([A-Za-z0-9]|[A-Za-z0-9][A-Za-z0-9-]*[A-Za-z0-9])$/;
 
 function normalizeUrl(input: string): string | null {
   if (validIpAddress.test(input) || validHostname.test(input)) {
-    return `https://${input}`;
+    return `${import.meta.env.DEV ? "http" : "https"}://${input}`;
   }
   return null; // neither a valid IP nor hostname
 }
 
 export default function LoginPage() {
 
-  const [ input, setInput ] = useState("");
+  const [ input, setInput ] = useState(import.meta.env.DEV ? "127.0.0.1:3000" : "");
 
   return (
     <StarfieldBackground>
@@ -33,8 +33,12 @@ export default function LoginPage() {
         <div className="flex flex-1 flex-col items-center pt-8 gap-1">
           <ButtonGroup>
             <InputGroup>
-              <InputGroupInput value={input} onChange={(e) => setInput(e.target.value)}
-                               placeholder="dms.projdocs.com" />
+              <InputGroupInput
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                placeholder="dms.projdocs.com"
+                disabled={import.meta.env.DEV}
+              />
               <InputGroupAddon>
                 {"https://"}
               </InputGroupAddon>
@@ -49,8 +53,8 @@ export default function LoginPage() {
                 }
 
                 const url = new URL(fqdn);
-                url.pathname = "/";
-                url.searchParams.set("next", "projdocs:///auth/callback");
+                url.pathname = "/auth/authorize";
+                url.searchParams.set("aud", "desktop");
 
                 try {
                   await Browser.OpenURL(url);

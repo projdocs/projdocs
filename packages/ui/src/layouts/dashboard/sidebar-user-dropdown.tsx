@@ -2,11 +2,7 @@
 
 import { ChevronsUpDown, LogOut } from "lucide-react";
 
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@packages/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@packages/ui/components/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,14 +11,10 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@packages/ui/components/dropdown-menu";
-import {
-  SidebarMenu,
-  SidebarMenuButton, SidebarMenuButtonProps,
-  SidebarMenuItem,
-  useSidebar,
-} from "@packages/ui/components/sidebar";
-import { useRouter } from "next/navigation";
+import { SidebarMenuButton, SidebarMenuButtonProps, useSidebar } from "@packages/ui/components/sidebar";
 import { cn } from "@packages/ui/lib/utils";
+
+
 
 export type SidebarUserProps = {
   name: string;
@@ -30,21 +22,25 @@ export type SidebarUserProps = {
   avatar: string;
 }
 
-export function SidebarUserDropdown(props: { user: SidebarUserProps; button?: SidebarMenuButtonProps }) {
-  const { isMobile } = useSidebar();
-  const router = useRouter();
+export type SidebarUserDropdownProps = {
+  user: SidebarUserProps;
+  button?: SidebarMenuButtonProps;
+  onLogoutClick: () => unknown;
+};
 
+export function SidebarUserDropdown(props: SidebarUserDropdownProps) {
+  const { isMobile } = useSidebar();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <SidebarMenuButton
           size="lg"
-          { ...props.button }
+          {...props.button}
           className={cn("data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground", props.button?.className)}
         >
           <Avatar className="h-8 w-8 rounded-lg">
             <AvatarImage src={props.user.avatar} alt={props.user.name} />
-            <AvatarFallback className="rounded-lg">{props.user.name.at(0)}</AvatarFallback>
+            <AvatarFallback className="rounded-lg">{props.user.name[0] ?? "?"}</AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">{props.user.name}</span>
@@ -64,7 +60,7 @@ export function SidebarUserDropdown(props: { user: SidebarUserProps; button?: Si
             <Avatar className="h-8 w-8 rounded-lg">
               <AvatarImage src={props.user.avatar} alt={props.user.name} />
               <AvatarFallback className="rounded-lg">
-                {props.user.name.at(0)}
+                {props.user.name[0] ?? "?"}
               </AvatarFallback>
             </Avatar>
             <div className="grid flex-1 text-left text-sm leading-tight">
@@ -74,7 +70,7 @@ export function SidebarUserDropdown(props: { user: SidebarUserProps; button?: Si
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
-        <DropdownMenuItem onClick={() => router.push("/auth/logout")}>
+        <DropdownMenuItem onClick={props.onLogoutClick}>
           <LogOut />
           Log out
         </DropdownMenuItem>

@@ -6,6 +6,8 @@ import { useSearchParams } from "react-router-dom";
 import { Alert, AlertDescription, AlertTitle } from "@packages/ui/components/alert";
 import { StorageKeys } from "@apps/desktop/lib/storage";
 import { useNavigate } from "react-router";
+import { supabase } from "@apps/desktop/lib/supabase";
+import { toast } from "sonner";
 
 
 
@@ -35,16 +37,28 @@ export default function AuthCallback() {
       return;
     }
 
-    console.log("logged-in", {
-      token,
-      web,
-      api,
+    supabase(api).auth.verifyOtp({
+      token_hash: token,
+      type: "email",
+    }).then(({ data, error }) => {
+      if (error) throw error.message;
+      if (!data.user) {
+        toast.error("Authentication failed!", {
+          description: "No user was present.",
+        });
+        return;
+      }
+      window.localStorage.setItem(StorageKeys.ProjDocs.Host.API, api);
+      window.localStorage.setItem(StorageKeys.ProjDocs.Host.Web, web);
+      navigate("/");
+    }).catch(e => {
+      toast.error("Unable to authenticate!", {
+        description: "An error occurred while logging in. Please sign-in again.",
+      });
+      console.error(e);
+      navigate("/auth/login");
     });
 
-    window.localStorage.setItem(StorageKeys.ProjDocs.Auth.Session, token);
-    window.localStorage.setItem(StorageKeys.ProjDocs.Host.API, api);
-    window.localStorage.setItem(StorageKeys.ProjDocs.Host.Web, web);
-    navigate("/");
   }, []);
 
   return (

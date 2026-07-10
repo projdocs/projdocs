@@ -1,10 +1,6 @@
 "use client";
 
-import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@packages/ui/components/collapsible";
+import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@packages/ui/components/collapsible";
 import {
   SidebarGroup,
   SidebarGroupLabel,
@@ -16,8 +12,9 @@ import {
 } from "@packages/ui/components/sidebar";
 import { ChevronRightIcon } from "lucide-react";
 import { ReactNode } from "react";
-import { usePathname, useRouter } from "next/navigation";
 import { Button } from "@packages/ui/components/button";
+
+
 
 export type AdminSidebarMenuSubitem = Pick<
   AdminSidebarMenuItem,
@@ -34,12 +31,11 @@ export type AdminSidebarMenuItem = {
 export type SidebarGroups = {
   title?: string;
   items: readonly AdminSidebarMenuItem[];
+  onClick: (path: string) => unknown;
+  path: string;
 };
 
 export function CustomSidebarGroup(props: SidebarGroups) {
-  const router = useRouter();
-  const pathname = usePathname();
-
   return (
     <SidebarGroup>
       {typeof props.title === "string" && (
@@ -51,9 +47,9 @@ export function CustomSidebarGroup(props: SidebarGroups) {
             key={`${index}-${item.url}`}
             asChild
             defaultOpen={
-              item.url === pathname ||
+              item.url === props.path ||
               (item.items !== undefined &&
-                !!item.items.find((item) => item.url === pathname))
+                !!item.items.find((item) => item.url === props.path))
             }
             className="group/collapsible"
           >
@@ -61,8 +57,8 @@ export function CustomSidebarGroup(props: SidebarGroups) {
               {item.items === undefined ? (
                 <SidebarMenuButton
                   tooltip={item.title}
-                  onClick={() => router.push(item.url)}
-                  disabled={item.url === pathname}
+                  onClick={() => props.onClick(item.url)}
+                  disabled={item.url === props.path}
                   className={"disabled:bg-secondary"}
                 >
                   {item.icon}
@@ -74,7 +70,8 @@ export function CustomSidebarGroup(props: SidebarGroups) {
                     <SidebarMenuButton tooltip={item.title}>
                       {item.icon}
                       <span>{item.title}</span>
-                      <ChevronRightIcon className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
+                      <ChevronRightIcon
+                        className="ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90" />
                     </SidebarMenuButton>
                   </CollapsibleTrigger>
                   <CollapsibleContent>
@@ -84,8 +81,8 @@ export function CustomSidebarGroup(props: SidebarGroups) {
                           <Button
                             size={"sm"}
                             variant={"ghost"}
-                            onClick={() => router.push(item.url)}
-                            disabled={item.url === pathname}
+                            onClick={() => props.onClick(item.url)}
+                            disabled={item.url === props.path}
                             className={
                               "w-full justify-start disabled:bg-secondary"
                             }

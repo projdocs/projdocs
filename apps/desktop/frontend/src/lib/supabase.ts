@@ -4,17 +4,28 @@ import { Database } from "@packages/supabase";
 
 
 
-export const supabase = (host?: string): SupabaseClient<Database> => {
-  const $host = window.localStorage.getItem(StorageKeys.ProjDocs.Host.API);
-  if (!$host) throw new Error(`localStorage('${StorageKeys.ProjDocs.Host.API}') is unset`);
+const store: {
+  [key: string]: SupabaseClient<Database>
+} = {};
 
-  const url = new URL(host ?? $host);
+export const supabase = (_host?: string): SupabaseClient<Database> => {
+
+  let host: string | null = _host ?? null;
+  if (!host) {
+    host = window.localStorage.getItem(StorageKeys.ProjDocs.Host.API);
+    if (!host) throw new Error(`localStorage('${StorageKeys.ProjDocs.Host.API}') is unset`);
+  }
+
+  const url = new URL(host);
   url.pathname = "/public/supabase/proxy";
 
-  return createClient<Database>(url.toString(), "handled-in-proxy", {
-    accessToken: async () => window.localStorage.getItem(StorageKeys.ProjDocs.Auth.Session),
+  const storageKey = url.host;
+  if (storageKey in store) return store[storageKey]!;
+
+  store[storageKey] = createClient<Database>(url.toString(), "handled-in-proxy", {
     auth: {
-      autoRefreshToken: false,
+      storageKey,
+      autoRefreshToken: true,
       detectSessionInUrl: false,
       storage: {
         getItem(key) {
@@ -29,4 +40,6 @@ export const supabase = (host?: string): SupabaseClient<Database> => {
       },
     },
   });
+
+  return store[storageKey]!;
 };

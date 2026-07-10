@@ -1,56 +1,11 @@
 import { LayoutProps } from "@apps/web/lib/types/layout";
-import { SidebarInset, SidebarProvider } from "@packages/ui/components/sidebar";
-import { CustomSidebarGroups, ProjDocsSidebar } from "../../../components/proj-docs-sidebar";
 import { createServerClient } from "@apps/web/lib/supabase/server";
-import { FolderHeartIcon, FolderIcon, LayoutDashboardIcon, UserIcon, UserStarIcon } from "lucide-react";
-import { Tables } from "@packages/supabase/types.gen";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@packages/ui/components/card";
-import { MobileSidebarTrigger, SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/client-side";
+import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/client-side";
+import DashboardLayout from "@packages/ui/layouts/dashboard";
+import RouterBridge from "@apps/web/components/router-bridge";
 
 
-
-const getItems = (props: { organization: Tables<"organizations"> }) =>
-  [
-    {
-      items: [
-        {
-          title: "Dashboard",
-          url: `/organizations/${props.organization.id}`,
-          icon: <LayoutDashboardIcon />,
-        },
-      ],
-    },
-    {
-      title: "Clients",
-      items: [
-        {
-          title: "My Clients",
-          url: `/organizations/${props.organization.id}/clients-favorites`,
-          icon: <UserStarIcon />,
-        },
-        {
-          title: "All Clients",
-          url: `/organizations/${props.organization.id}/clients`,
-          icon: <UserIcon />,
-        },
-      ],
-    },
-    {
-      title: "Projects",
-      items: [
-        {
-          title: "My Projects",
-          url: `/organizations/${props.organization.id}/projects-favorites`,
-          icon: <FolderHeartIcon />,
-        },
-        {
-          title: "All Projects",
-          url: `/organizations/${props.organization.id}/projects`,
-          icon: <FolderIcon />,
-        },
-      ],
-    },
-  ] satisfies CustomSidebarGroups;
 
 export default async function(
   props: LayoutProps<
@@ -128,33 +83,17 @@ export default async function(
     );
 
   return (
-    <SidebarProvider>
-      <ProjDocsSidebar
-        organizations={organizations}
+    <RouterBridge>
+      <DashboardLayout
         organization={organization}
-        groups={getItems({
-          organization,
-        })}
+        organizations={organizations}
         user={{
+          data: user.data.claims,
           profile: profile.data,
-          account: user.data.claims,
         }}
-      />
-      <SidebarInset>
-        <div className="flex h-dvh w-full flex-col">
-          <div className="flex-1 overflow-y-auto">
-            {props.children}
-          </div>
-          <MobileSidebarTrigger
-            user={{
-              name: profile.data.full_name,
-              email: user.data.claims.email ?? user.data.claims.phone ?? user.data.claims.sub,
-              avatar: user.data.claims.user_metadata?.picture ??
-                user.data.claims.user_metadata?.avatar_url,
-            }}
-          />
-        </div>
-      </SidebarInset>
-    </SidebarProvider>
+      >
+        {props.children}
+      </DashboardLayout>
+    </RouterBridge>
   );
 }
