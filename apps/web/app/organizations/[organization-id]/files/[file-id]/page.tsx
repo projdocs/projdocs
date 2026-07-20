@@ -1,7 +1,7 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
-import Body from "./page-body";
 import { connection } from "next/server";
+import { FilePage } from "@packages/ui/routing/pages/file";
 
 
 
@@ -52,7 +52,8 @@ export default async function(props: {
   );
 
   return (
-    <Body
+    <FilePage
+      apiURL={process.env.PROJDOCS_API_URL}
       file={file}
       version={viewingVersion}
       versions={versions}

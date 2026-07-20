@@ -1,7 +1,7 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
-import { DashboardPageBody } from "@apps/web/app/organizations/[organization-id]/client-side";
 import { connection } from "next/server";
+import { DashboardPage } from "@packages/ui/routing/pages/dashboard";
 
 
 
@@ -33,7 +33,7 @@ export default async function Page(props: {
     <ErrorPage title={"Unable to Load User"} description={"Member error: " + member.error.message} />
   );
   return (
-    <DashboardPageBody
+    <DashboardPage
       user={user.data}
       member={member.data}
       organizationID={params["organization-id"]}

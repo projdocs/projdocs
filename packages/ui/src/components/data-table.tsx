@@ -10,14 +10,7 @@ import {
   TableOptions,
   useReactTable,
 } from "@tanstack/react-table";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@packages/ui/components/table";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
 import { cn } from "@packages/ui/lib/utils";
 import {
   ChevronDownIcon,
@@ -30,20 +23,10 @@ import {
   Loader2,
 } from "lucide-react";
 import { Label } from "@packages/ui/components/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@packages/ui/components/select";
-import {
-  Pagination,
-  PaginationContent,
-  PaginationItem,
-} from "@packages/ui/components/pagination";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@packages/ui/components/select";
+import { Pagination, PaginationContent, PaginationItem } from "@packages/ui/components/pagination";
 import { Button } from "@packages/ui/components/button";
-import { ComponentProps, HTMLAttributes, useEffect, useId, useMemo, useState } from "react";
+import { ComponentProps, useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 

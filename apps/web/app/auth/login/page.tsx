@@ -1,12 +1,18 @@
 import { LoginForm } from "@apps/web/app/auth/login/login-form";
 import { ErrorPage } from "@packages/ui/components/page";
 import { connection } from "next/server";
+import { createServerClient } from "@apps/web/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 
 
 export default async function() {
 
   await connection();
+
+  const supabase = await createServerClient();
+  const isLoggedIn = await supabase.auth.getSession().then(({ data }) => !!data.session?.user.id).catch(() =>false)
+  if(isLoggedIn) return redirect("/organizations")
 
   let url: URL;
   try {

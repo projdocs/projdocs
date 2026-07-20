@@ -5,9 +5,16 @@ import { Outlet } from "react-router-dom";
 import { JSX, useEffect } from "react";
 import { Events } from "@wailsio/runtime";
 import { useNavigate } from "react-router";
+import { SupabaseProvider } from "@packages/ui/lib/supabase-adapter";
+import { LibraryRouterProvider } from "@packages/ui/routing";
+import { useReactRouterAdapter } from "@packages/ui/routing/adapters/react-router";
+import { supabase } from "@apps/desktop/lib/supabase";
+
 
 
 export default function RootLayout(): JSX.Element {
+
+  const router = useReactRouterAdapter();
 
   const navigate = useNavigate();
   useEffect(() => Events.On("projdocs:window:redirect", (event) => {
@@ -21,12 +28,16 @@ export default function RootLayout(): JSX.Element {
 
   return (
     <div className={"bg-background h-dvh w-dvw flex flex-col overflow-hidden overscroll-none"}>
-      <ThemeProvider>
-        <Toaster />
-        <TooltipProvider>
-          <Outlet />
-        </TooltipProvider>
-      </ThemeProvider>
+      <LibraryRouterProvider adapter={router}>
+        <SupabaseProvider adapter={{ client: supabase }}>
+          <ThemeProvider>
+            <Toaster />
+            <TooltipProvider>
+              <Outlet />
+            </TooltipProvider>
+          </ThemeProvider>
+        </SupabaseProvider>
+      </LibraryRouterProvider>
     </div>
   );
 }

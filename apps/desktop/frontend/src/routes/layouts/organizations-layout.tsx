@@ -65,7 +65,7 @@ export const OrganizationsLayout = () => {
         description: "An error occurred while loading the current user.",
       });
     });
-  }, []);
+  }, [ organizationID ]);
 
   if (state === undefined) return (
     <Skeleton className={"w-full h-full"} />

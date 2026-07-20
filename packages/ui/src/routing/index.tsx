@@ -1,9 +1,12 @@
 "use client";
 import { ComponentType, createContext, ReactNode, useContext } from "react";
 
+
+
 export interface RouterAdapter {
   Link: ComponentType<{ href: string; children: ReactNode; className?: string }>;
   navigate: (href: string, opts?: { replace?: boolean }) => void;
+  refresh: () => void;
   usePathname: () => string;
   useSearchParams: () => URLSearchParams;
 }

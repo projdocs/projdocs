@@ -22,6 +22,7 @@ export function useReactRouterAdapter(): RouterAdapter {
       navigate: (href, opts) => navigate(href, { replace: opts?.replace }),
       usePathname: () => location.pathname,
       useSearchParams: () => searchParams,
+      refresh: () => navigate(0),
     }),
     [ navigate, location.pathname, searchParams ],
   );

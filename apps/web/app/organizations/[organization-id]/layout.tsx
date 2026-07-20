@@ -1,9 +1,10 @@
 import { LayoutProps } from "@apps/web/lib/types/layout";
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { Card, CardDescription, CardFooter, CardHeader, CardTitle } from "@packages/ui/components/card";
-import { SelectOrgButton } from "@apps/web/app/organizations/[organization-id]/client-side";
 import DashboardLayout from "@packages/ui/layouts/dashboard";
 import RouterBridge from "@apps/web/components/router-bridge";
+import SupabaseProvider from "@apps/web/lib/supabase/provider";
+import { SelectOrgButton } from "@apps/web/components/select-org-button";
 
 
 
@@ -84,16 +85,18 @@ export default async function(
 
   return (
     <RouterBridge>
-      <DashboardLayout
-        organization={organization}
-        organizations={organizations}
-        user={{
-          data: user.data.claims,
-          profile: profile.data,
-        }}
-      >
-        {props.children}
-      </DashboardLayout>
+      <SupabaseProvider>
+        <DashboardLayout
+          organization={organization}
+          organizations={organizations}
+          user={{
+            data: user.data.claims,
+            profile: profile.data,
+          }}
+        >
+          {props.children}
+        </DashboardLayout>
+      </SupabaseProvider>
     </RouterBridge>
   );
 }

@@ -1,8 +1,7 @@
 "use client";
 
 import { use } from "react";
-import { ObjectPage } from "@packages/ui/components/page";
-import { ClientsTable } from "@apps/web/components/clients-table";
+import { FavoriteClientsPage } from "@packages/ui/routing/pages/clients-favorites";
 
 
 
@@ -14,19 +13,8 @@ export default function(props: {
   const params = use(props.params);
 
   return (
-    <ObjectPage title={"My Clients"}>
-      <ClientsTable
-        organizationID={params["organization-id"]}
-        select={"*, favorites!inner(*), links:clients_projects(*, project:projects(*))"}
-        filters={[
-          {
-            // @ts-expect-error PostgREST table join
-            column: "favorites.client_id",
-            value: null,
-            operator: "not.is",
-          },
-        ]}
-      />
-    </ObjectPage>
+    <FavoriteClientsPage
+      organizationID={params["organization-id"]}
+    />
   );
 }

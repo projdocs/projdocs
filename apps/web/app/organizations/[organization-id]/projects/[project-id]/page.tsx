@@ -1,10 +1,8 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
-import {
-  ProjectPage,
-} from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/client-side";
-import { getProject } from "@apps/web/app/organizations/[organization-id]/projects/[project-id]/utils";
 import { connection } from "next/server";
+import { ProjectPage } from "@packages/ui/routing/pages/project";
+import { getProject } from "@packages/ui/routing/pages/project-utils";
 
 
 
@@ -28,5 +26,10 @@ export default async function(props: {
       description={`Project "${params["project-id"]}" was not found or is not accessible.`}
     />
   );
-  return <ProjectPage project={project.data} />;
+  return (
+    <ProjectPage
+      project={project.data}
+      apiURL={process.env.PROJDOCS_API_URL}
+    />
+  );
 }

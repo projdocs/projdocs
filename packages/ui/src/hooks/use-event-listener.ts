@@ -6,7 +6,7 @@ import { useCallback, useEffect, useRef } from "react";
 
 export function useEventListener<TDetail = void>(
   eventName: string,
-  handler: (detail: TDetail) => void
+  handler: (detail: TDetail) => void,
 ) {
   const handlerRef = useRef(handler);
   handlerRef.current = handler;
@@ -26,4 +26,4 @@ export function useEventListener<TDetail = void>(
 
 useEventListener.RemoteDispatch = <TDetail>(eventName: string, detail: TDetail) => {
   window.dispatchEvent(new CustomEvent<TDetail>(eventName, { detail }));
-}
+};

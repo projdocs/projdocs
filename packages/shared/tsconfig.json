@@ -3,7 +3,8 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@packages/shared/*": ["./src/*"]
+      "@packages/shared/*": ["./src/*"],
+      "@packages/ui/*": ["../ui/src/*"]
     },
     "module": "ESNext",
     "moduleResolution": "bundler"

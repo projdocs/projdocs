@@ -33,7 +33,8 @@ export default function({ children }: LayoutProps) {
     <body className={"w-dvw h-dvh"}>
     <Script id="window-config" strategy="beforeInteractive">
       {`window.projdocs = ${JSON.stringify({
-        ...process.env
+        NODE_ENV: process.env.NODE_ENV,
+        PROJDOCS_API_URL: process.env.PROJDOCS_API_URL,
       } satisfies Environment)};`}
     </Script>
     <ThemeProvider>

@@ -11,7 +11,9 @@
   },
   "peerDependencies": {
     "zod": "^4.3.6",
-    "googleapis": "^171.4.0"
+    "googleapis": "^171.4.0",
+    "@supabase/supabase-js": "^2.110.2",
+    "@packages/ui": "*"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.1.18",

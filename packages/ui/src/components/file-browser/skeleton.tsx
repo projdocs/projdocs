@@ -1,0 +1,43 @@
+import { useMemo } from "react";
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@packages/ui/components/table";
+import { FileViewerColumns } from "./columns";
+import { Skeleton } from "@packages/ui/components/skeleton";
+import { Separator } from "@packages/ui/components/separator";
+import { cn } from "@packages/ui/lib/utils";
+import { useTheme } from "next-themes";
+
+
+
+export const FileBrowserSkeleton = () => {
+
+  const theme = useTheme();
+  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", theme.resolvedTheme ?? "dark").map(() => Math.floor(Math.random() * 40 + 40))), []);
+
+  return (
+    <>
+      <Table className={"w-full h-full"}>
+        <TableHeader>
+          <TableRow>
+            {FileViewerColumns("",theme.resolvedTheme ?? "dark").map((_, index, arr) => (
+              <TableHead key={index}>
+                <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
+              </TableHead>
+            ))}
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {skeletonWidths.map((row, i) => (
+            <TableRow key={i}>
+              {row.map((width, j) => (
+                <TableCell key={j}>
+                  <Skeleton suppressHydrationWarning className="h-4" style={{ width: `${width}%` }} />
+                </TableCell>
+              ))}
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+      <Separator />
+    </>
+  );
+};
