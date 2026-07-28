@@ -169,6 +169,7 @@ export function ProjectPage(props: ProjectPageProps) {
       <div className="flex flex-col-reverse gap-8 lg:flex-row w-full lg:h-full max-h-full">
         <div className="flex flex-col w-full lg:w-2/3 lg:h-full gap-2">
           <FileBrowser.Project
+            apiURL={props.apiURL}
             project={props.project}
             onRowClick={({ path }) => router.navigate(path)}
             onRowDoubleClick={({ path }) => router.navigate(path)}

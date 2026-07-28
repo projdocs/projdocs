@@ -22,7 +22,7 @@ function formatDate(iso: string) {
 }
 
 const column = createColumnHelper<Viewable>();
-export const FileViewerColumns = (orgID: string, theme: string) => [
+export const FileViewerColumns = (orgID: string, theme: string, apiURL: string) => [
   column.accessor("name", {
     header: ({ column }) => (
       <Button
@@ -82,6 +82,7 @@ export const FileViewerColumns = (orgID: string, theme: string) => [
       <div className={"flex flex-row justify-end"}>
         {original.type === "FILE" && (
           <FileOptionsDropdown
+            apiURL={apiURL}
             viewable={original}
             organizationID={orgID}
             trigger={{

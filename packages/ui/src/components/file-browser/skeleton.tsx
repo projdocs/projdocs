@@ -11,14 +11,14 @@ import { useTheme } from "next-themes";
 export const FileBrowserSkeleton = () => {
 
   const theme = useTheme();
-  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", theme.resolvedTheme ?? "dark").map(() => Math.floor(Math.random() * 40 + 40))), []);
+  const skeletonWidths = useMemo(() => Array.from({ length: 10 }, () => FileViewerColumns("", theme.resolvedTheme ?? "dark", "").map(() => Math.floor(Math.random() * 40 + 40))), []);
 
   return (
     <>
       <Table className={"w-full h-full"}>
         <TableHeader>
           <TableRow>
-            {FileViewerColumns("",theme.resolvedTheme ?? "dark").map((_, index, arr) => (
+            {FileViewerColumns("",theme.resolvedTheme ?? "dark", "").map((_, index, arr) => (
               <TableHead key={index}>
                 <Skeleton className={cn("h-4")} style={{ width: `${((index + 1) / (arr.length + 1)) * 100}%` }} />
               </TableHead>

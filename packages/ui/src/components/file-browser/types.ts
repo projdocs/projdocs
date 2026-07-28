@@ -32,6 +32,7 @@ export type FileViewerProps = {
   organizationID: string;
   onRowClick?: (viewable: Viewable) => void;
   onRowDoubleClick?: (viewable: Viewable) => void;
+  apiURL: string;
 };
 
 export type Folder = Tables<"folders"> & {

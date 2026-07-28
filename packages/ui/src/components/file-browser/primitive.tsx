@@ -12,7 +12,7 @@ import { useTheme } from "next-themes";
 export const FileBrowserPrimitive = (props: FileViewerProps) => {
 
   const theme = useTheme();
-  const columns = useMemo(() => FileViewerColumns(props.organizationID, theme.resolvedTheme ?? "dark"), [ props.organizationID, theme.resolvedTheme ]);
+  const columns = useMemo(() => FileViewerColumns(props.organizationID, theme.resolvedTheme ?? "dark", props.apiURL), [ props.organizationID, theme.resolvedTheme, props.apiURL ]);
   const [ sorting, setSorting ] = useState<SortingState>([]);
 
 

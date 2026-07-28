@@ -149,6 +149,7 @@ export const FolderPage = (props: {
       )}
     >
       <FileBrowser.Folder
+        apiURL={props.apiURL}
         folder={props.folder}
         organizationID={props.organizationID}
         onRowClick={({ path }) => router.navigate(path)}

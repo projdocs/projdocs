@@ -20,6 +20,7 @@ import { ComponentProps, MouseEventHandler, useRef } from "react";
 import type { VariantProps } from "class-variance-authority";
 import { useLibraryRouter } from "@packages/ui/routing";
 import {ProjDocsAPIClient} from "@packages/shared/utilities/api/with-ui"
+import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
 
 
 const onClick: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (e) => {
@@ -30,9 +31,11 @@ const onClick: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (e) => {
 export const FileOptionsDropdown = (props: {
   viewable: FileViewable;
   organizationID: string;
+  apiURL: string;
   trigger?: ComponentProps<"button"> & VariantProps<typeof buttonVariants>
 }) => {
 
+  const supabase = useLibrarySupabase();
   const router = useLibraryRouter();
 
   const inputRef = useRef<HTMLInputElement>(null);
@@ -47,7 +50,7 @@ export const FileOptionsDropdown = (props: {
           const file = e.target.files?.[0];
           if (!file) return;
           e.target.value = "";
-          await ProjDocsAPIClient.from(window.projdocs.PROJDOCS_API_URL).uploadVersion(file, {
+          await ProjDocsAPIClient.from(supabase, props.apiURL).uploadVersion(file, {
             router,
             file: {
               id: props.viewable.id,

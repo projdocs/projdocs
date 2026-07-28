@@ -50,6 +50,7 @@ export function ClientPage(props: ClientPageProps) {
           </div>
 
           <FileBrowser.Client
+            apiURL={props.apiURL}
             client={props.client}
             onRowClick={({ path }) => router.navigate(path)}
             onRowDoubleClick={({ path }) => router.navigate(path)}
