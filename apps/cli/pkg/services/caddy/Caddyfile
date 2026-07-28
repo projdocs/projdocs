@@ -1,0 +1,28 @@
+{$WEB_DOMAIN} {
+
+    @supabase_api path /supabase/auth/v1/* /supabase/rest/v1/* /supabase/graphql/v1 /supabase/realtime/v1/* /supabase/storage/v1/* /supabase/functions/v1/* /supabase/mcp /supabase/sso/*
+    @api path /api /api/*
+
+    handle @supabase_api {
+        uri strip_prefix /supabase
+        reverse_proxy kong:8000
+    }
+
+    handle @api {
+        uri strip_prefix /api
+        reverse_proxy api:8080
+    }
+
+    handle {
+        reverse_proxy web:3000
+    }
+    header -server
+}
+
+:80 {
+	respond "{\"error\":\"resource not found\"}" 404
+}
+
+:443 {
+	respond "{\"error\":\"resource not found\"}" 404
+}

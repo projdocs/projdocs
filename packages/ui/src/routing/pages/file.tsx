@@ -124,6 +124,7 @@ export function FilePage(props: FilePageProps) {
               </Button>
 
               <FileOptionsDropdown
+                apiURL={props.apiURL}
                 viewable={{
                   type: "FILE",
                   id: props.file.id,

@@ -1,0 +1,8 @@
+{
+  "name": "@apps/cli",
+  "scripts": {
+    "gen": "npm run gen:migrations && npm run gen:migrations:post",
+    "gen:migrations": "rm -rf ./internal/migrations/gen && cp -r ../../supabase/migrations ./internal/migrations/gen",
+    "gen:migrations:post": "node -e \"const fs = require('fs');const path = require('path');const dir = './internal/migrations/gen' || '.';fs.readdirSync(dir).forEach(file => {const newName = file.split('_')[0] + path.extname(file);if (newName !== file)fs.renameSync(path.join(dir, file), path.join(dir, newName));});\""
+  }
+}
