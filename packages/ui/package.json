@@ -61,7 +61,7 @@
     }
   },
   "devDependencies": {
-    "next": "^16.2.10",
+    "next": "^16.2.12",
     "@packages/shared": "*",
     "@packages/eslint-config": "*",
     "@packages/typescript-config": "*",
