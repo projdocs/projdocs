@@ -9,7 +9,7 @@ export type UseOncelerOptions<T> = {
 export function useOnceler<T>(
   action: (signal: AbortSignal) => Promise<T>,
   onResult: (result: T) => void,
-  options?: UseOncelerOptions<T>
+  options?: UseOncelerOptions<T>,
 ) {
   const controllerRef = useRef<AbortController | null>(null);
   const runIdRef = useRef(0);
@@ -46,7 +46,7 @@ export function useOnceler<T>(
         }
       }
     })();
-  }, [action, options]);
+  }, [ action, options ]);
 
   const abort = useCallback(() => {
     controllerRef.current?.abort();

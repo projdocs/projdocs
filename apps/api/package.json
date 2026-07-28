@@ -1,0 +1,7 @@
+{
+  "name": "@packages/api",
+  "scripts": {
+    "gen:types": "supabase gen types --local --lang=go > internal/database/types.go",
+    "gen": "npm run gen:types"
+  }
+}

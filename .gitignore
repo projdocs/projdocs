@@ -26,6 +26,7 @@ coverage
 .next/
 out/
 build
+!apps/desktop/build
 dist
 
 

@@ -1,6 +1,7 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
-import Body from "./page-body";
+import { connection } from "next/server";
+import { FilePage } from "@packages/ui/routing/pages/file";
 
 
 
@@ -12,11 +13,7 @@ export default async function(props: {
   }>;
 }) {
 
-  const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
-
+  await connection();
   const searchParams = await props.searchParams;
   const versionID = searchParams["version-id"];
   if (versionID !== undefined && typeof versionID !== "string") return (
@@ -55,11 +52,11 @@ export default async function(props: {
   );
 
   return (
-    <Body
+    <FilePage
+      apiURL={process.env.PROJDOCS_API_URL}
       file={file}
       version={viewingVersion}
       versions={versions}
-      apiURL={apiBase}
       organizationID={params["organization-id"]}
       can={{
         edit: (

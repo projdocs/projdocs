@@ -46,7 +46,6 @@ type OrganizationSchema = z.infer<typeof organizationSchema>;
 
 export const CreateOrganizationDrawer = (props: {
   trigger?: ReactNode;
-  apiURL: string;
   onCreateAction?: () => unknown;
   providers: Awaited<GetStorageProvidersResult>["data"];
 }) => {
@@ -66,7 +65,7 @@ export const CreateOrganizationDrawer = (props: {
     const id = toast.loading("Creating organization...");
     try {
       const token = (await supabase().auth.getSession()).data.session?.access_token;
-      const response = await fetch(`${props.apiURL}/v1/organizations`, {
+      const response = await fetch(`${window.projdocs.PROJDOCS_API_URL}/v1/organizations`, {
         method: "POST",
         body: JSON.stringify({
           name: values.display,

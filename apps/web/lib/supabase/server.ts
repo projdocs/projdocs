@@ -8,9 +8,12 @@ import { Database } from "@packages/supabase/types.gen";
 export async function createServerClient() {
   const cookieStore = await cookies();
 
+  const url = new URL(process.env.PROJDOCS_API_URL);
+  url.pathname = "/public/supabase/proxy"
+
   return createClient<Database>(
-    process.env.SUPABASE_KONG_URL!,
-    process.env.SUPABASE_PUBLISHABLE_KEY!,
+    url.toString(),
+    "set-in-proxy",
     {
       cookies: {
         getAll() {

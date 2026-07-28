@@ -6,6 +6,8 @@ import { cn } from "@packages/ui/lib/utils";
 import { TooltipProvider } from "@packages/ui/components/tooltip";
 import { LayoutProps } from "@apps/web/lib/types/layout";
 import { Toaster } from "@packages/ui/components/sonner";
+import Script from "next/script";
+import { Environment } from "@apps/web/lib/types/runtime-env";
 
 
 
@@ -29,6 +31,12 @@ export default function({ children }: LayoutProps) {
       )}
     >
     <body className={"w-dvw h-dvh"}>
+    <Script id="window-config" strategy="beforeInteractive">
+      {`window.projdocs = ${JSON.stringify({
+        NODE_ENV: process.env.NODE_ENV,
+        PROJDOCS_API_URL: process.env.PROJDOCS_API_URL,
+      } satisfies Environment)};`}
+    </Script>
     <ThemeProvider>
       <Toaster />
       <TooltipProvider>{children}</TooltipProvider>

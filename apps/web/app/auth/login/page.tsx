@@ -1,33 +1,27 @@
 import { LoginForm } from "@apps/web/app/auth/login/login-form";
 import { ErrorPage } from "@packages/ui/components/page";
+import { connection } from "next/server";
+import { createServerClient } from "@apps/web/lib/supabase/server";
+import { redirect } from "next/navigation";
 
 
 
 export default async function() {
 
+  await connection();
 
-  const apiBase = process.env.PROJDOCS_API_URL;
-  if (!apiBase) {
-    return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not set"} />;
-  }
-
-  const kongURL = process.env.SUPABASE_KONG_URL?.trim();
-  if (!kongURL) {
-    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_KONG_URL` is not set"} />;
-  }
-
-  const pubKey = process.env.SUPABASE_PUBLISHABLE_KEY?.trim();
-  if (!pubKey) {
-    return <ErrorPage title={"Configuration Error"} description={"`SUPABASE_PUBLISHABLE_KEY` is not set"} />;
-  }
+  const supabase = await createServerClient();
+  const isLoggedIn = await supabase.auth.getSession().then(({ data }) => !!data.session?.user.id).catch(() =>false)
+  if(isLoggedIn) return redirect("/organizations")
 
   let url: URL;
   try {
-    url = new URL(apiBase);
+    url = new URL(process.env.PROJDOCS_API_URL);
+    url.pathname = "/public/auth/providers";
   } catch (e) {
     return <ErrorPage title={"Configuration Error"} description={"`PROJDOCS_API_URL` is not a valid URL"} />;
   }
-  url.pathname = "/public/auth/providers";
+
 
   let providers;
   try {
@@ -65,16 +59,9 @@ export default async function() {
 
 
   return (
-    <div className={"flex min-h-svh flex-col items-center justify-center bg-muted p-6 md:p-10"}>
-      <LoginForm
-        providers={providers}
-        supabase={{
-          url: kongURL,
-          publishableKey: pubKey,
-        }}
-      />
+    <div className={"h-full w-full flex flex-col items-center justify-center"}>
+      <LoginForm providers={providers} />
     </div>
   );
-
 
 }

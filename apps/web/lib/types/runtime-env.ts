@@ -2,14 +2,7 @@ import { z } from "zod";
 
 const EnvironmentSchema = z.object({
   NODE_ENV: z.enum(["development", "production", "test"]).default("development"),
-
-  // ProjDocs
   PROJDOCS_API_URL: z.url(),
-
-  // Supabase
-  SUPABASE_KONG_URL: z.url(),
-  SUPABASE_PUBLISHABLE_KEY: z.string().startsWith("sb_publishable_"),
-  SUPABASE_SECRET_KEY: z.string().startsWith("sb_secret_"),
 });
 
 export type Environment = z.infer<typeof EnvironmentSchema>;

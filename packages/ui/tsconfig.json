@@ -3,11 +3,21 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@packages/ui/*": ["./src/*"]
+      "@packages/ui/*": [
+        "./src/*"
+      ],
+      "@packages/shared/*": [
+        "../shared/src/*"
+      ]
     },
     "module": "ESNext",
     "moduleResolution": "bundler"
   },
-  "include": ["."],
-  "exclude": ["node_modules", "dist"]
+  "include": [
+    "."
+  ],
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

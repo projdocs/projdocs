@@ -4,7 +4,10 @@ import { Environment } from "./lib/types/runtime-env";
 
 declare global {
   namespace NodeJS {
-    interface ProcessEnv extends Environment{}
+    interface ProcessEnv extends Environment {}
+  }
+  interface Window {
+    projdocs: Environment
   }
 }
 
