@@ -1,10 +1,10 @@
 package main
 
 import (
-	"changeme/internal/projdocs"
 	"embed"
 	"log"
 
+	"github.com/projdocs/projdocs/apps/desktop/internal/projdocs"
 	"github.com/wailsapp/wails/v3/pkg/application"
 )
 
