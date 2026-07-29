@@ -131,6 +131,11 @@ func createOrganization(ctx *gin.Context) {
 		"table": "organizations",
 		"id":    orgID.String(),
 	})
+	if err != nil {
+		log.Printf("unable to create folder: %v", err)
+		response.Error(ctx, http.StatusInternalServerError, "failed to create folder")
+		return
+	}
 
 	// update the upload record with the real folder path
 	if _, err = txn.ExecContext(ctx,

@@ -32,7 +32,7 @@ export class ProjDocsAPI {
   }) {
     this.supabase = supabase;
     this.origin = (new URL(host)).origin;
-    this.downloader = new MultiPartDownloadClient(this.origin, options?.download);
+    this.downloader = new MultiPartDownloadClient(supabase, this.origin, options?.download);
   }
 
   async download(organization: Pick<Tables<"organizations">, "id">,

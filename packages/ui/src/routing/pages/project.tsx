@@ -56,6 +56,7 @@ function ClientCombobox(props: {
     } else supabase.rpc("search_table", {
       _table: "CLIENTS",
       _query: query.trim(),
+      _organization_id: props.project.organization_id
     }).then(({ data, error }) => {
       if (error) {
         console.error(error);

@@ -15,12 +15,12 @@ import { Button, buttonVariants } from "@packages/ui/components/button";
 import { EllipsisVerticalIcon } from "lucide-react";
 import { RenameDialog } from "@packages/ui/components/file-browser/components/rename-dialog";
 import { FileViewable } from "@packages/ui/components/file-browser/types";
-import * as React from "react";
 import { ComponentProps, MouseEventHandler, useRef } from "react";
 import type { VariantProps } from "class-variance-authority";
 import { useLibraryRouter } from "@packages/ui/routing";
-import {ProjDocsAPIClient} from "@packages/shared/utilities/api/with-ui"
+import { ProjDocsAPIClient } from "@packages/shared/utilities/api/with-ui";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
+
 
 
 const onClick: MouseEventHandler<HTMLButtonElement | HTMLDivElement> = (e) => {
@@ -54,7 +54,7 @@ export const FileOptionsDropdown = (props: {
             router,
             file: {
               id: props.viewable.id,
-              folder_id: props.viewable.parent.id
+              folder_id: props.viewable.parent.id,
             },
             organization: { id: props.organizationID },
           });

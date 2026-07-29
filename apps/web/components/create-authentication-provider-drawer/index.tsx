@@ -1,6 +1,6 @@
 "use client";
 
-import * as React from "react";
+import "client-only";
 import { ReactNode, useEffect, useRef, useState } from "react";
 import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -36,10 +36,12 @@ import { CustomOAuthProvider } from "@supabase/auth-js";
 interface CreateAuthenticationProviderDrawerProps {
   trigger?: ReactNode;
   onCreate?: (row: CustomOAuthProvider) => unknown;
+  apiURL: string;
 }
 
 export function CreateAuthenticationProviderDrawer(props: CreateAuthenticationProviderDrawerProps) {
-  const CALLBACK_URL = `${window.projdocs.PROJDOCS_API_URL}/public/supabase/proxy/auth/v1/callback`;
+
+  const CALLBACK_URL = `${props.apiURL}/public/supabase/proxy/auth/v1/callback`;
 
   const [ copied, setCopied ] = useState(false);
   const [ advancedOpen, setAdvancedOpen ] = useState(false);

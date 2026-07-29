@@ -1,6 +1,5 @@
-import { Geist_Mono, Inter } from "next/font/google";
-
 import "@packages/ui/globals.css";
+import { Geist_Mono, Inter } from "next/font/google";
 import { ThemeProvider } from "@apps/web/components/theme-provider";
 import { cn } from "@packages/ui/lib/utils";
 import { TooltipProvider } from "@packages/ui/components/tooltip";
@@ -31,7 +30,7 @@ export default function({ children }: LayoutProps) {
       )}
     >
     <body className={"w-dvw h-dvh"}>
-    <Script id="window-config" strategy="beforeInteractive">
+    <Script id={"window-config"} strategy={"beforeInteractive"}>
       {`window.projdocs = ${JSON.stringify({
         NODE_ENV: process.env.NODE_ENV,
         PROJDOCS_API_URL: process.env.PROJDOCS_API_URL,
