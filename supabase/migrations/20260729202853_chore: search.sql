@@ -1,12 +1,25 @@
-drop function if exists "public"."search_table"(_table public.searchable_tables, _query text, _organization_id text, _limit integer);
+drop function if exists "public"."search_table"(_table public.searchable_tables, _query text, _organization_id text,
+                                                _limit integer);
 
 set check_function_bodies = off;
 
-CREATE OR REPLACE FUNCTION public.search_table(_table public.searchable_tables, _query text, _organization_id uuid, _limit integer DEFAULT 25)
-    RETURNS TABLE(number bigint, id uuid, display text, rank real)
+CREATE OR REPLACE FUNCTION public.search_table(
+    _table public.searchable_tables,
+    _query text,
+    _organization_id uuid,
+    _limit integer DEFAULT 25
+)
+    RETURNS TABLE
+            (
+                number  bigint,
+                id      uuid,
+                display text,
+                rank    real
+            )
     LANGUAGE plpgsql
     SET search_path TO ''
-AS $function$
+AS
+$function$
 declare
     _tsquery       tsquery := to_tsquery('english', regexp_replace(
                                                             regexp_replace(trim(_query), '[^\w\s]', '', 'g'), -- strip special chars
@@ -28,7 +41,8 @@ begin
                    p.display,
                    ts_rank(p.__full_text_search, _tsquery) as rank
             from public.projects p
-            where p.__full_text_search @@ _tsquery and p.organization_id = _organization_id
+            where p.__full_text_search @@ _tsquery
+              and p.organization_id = _organization_id
             order by rank desc
             limit _limit_clamped;
 
@@ -38,7 +52,8 @@ begin
                    c.name::text,
                    ts_rank(c.__full_text_search, _tsquery) as rank
             from public.clients c
-            where c.__full_text_search @@ _tsquery and c.organization_id = _organization_id
+            where c.__full_text_search @@ _tsquery
+              and c.organization_id = _organization_id
             order by rank desc
             limit _limit_clamped;
         end case;
