@@ -18,7 +18,6 @@ import { Field, FieldError, FieldLabel } from "@packages/ui/components/field";
 import { Input } from "@packages/ui/components/input";
 import { Button } from "@packages/ui/components/button";
 import { toast } from "sonner";
-import * as React from "react";
 import { ReactNode, useState } from "react";
 import { PlusIcon } from "lucide-react";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";

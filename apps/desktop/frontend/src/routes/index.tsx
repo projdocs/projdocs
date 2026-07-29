@@ -39,10 +39,21 @@ export default [
               {
                 path: ":organizationID",
                 children: [
-
                   { index: true, ...Routes.Dashboard },
-                  { path: "clients", ...Routes.Clients },
+                  {
+                    path: "clients", children: [
+                      { index: true, ...Routes.Clients },
+                      { path: ":clientID", ...Routes.Client },
+                    ],
+                  },
                   { path: "clients-favorites", ...Routes.FavoriteClients },
+                  {
+                    path: "projects", children: [
+                      { index: true, ...Routes.Projects },
+                      { path: ":projectID", ...Routes.Project },
+                    ],
+                  },
+                  { path: "projects-favorites", ...Routes.FavoriteProjects },
                 ],
               },
             ],

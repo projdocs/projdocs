@@ -158,6 +158,7 @@ const SetupTab = ({ tab, ...todos }: {
 );
 
 export default function(props: {
+  apiURL: string;
   getProvidersPromise: Usable<Awaited<GetAuthProvidersResult>>;
   getStorageProvidersPromise: Usable<Awaited<GetStorageProvidersResult>>;
   getOrganizationsPromise: Usable<Awaited<GetOrganizationsResult>>;
@@ -224,6 +225,7 @@ export default function(props: {
                   description={"Configure any OAuth/OIDC-compatible authentication provider. This is how your regular users will authenticate into ProjDocs."}
                   action={(
                     <CreateAuthenticationProviderDrawer
+                      apiURL={props.apiURL}
                       // @ts-expect-error
                       onCreate={(newP) => setAuthProviders(p => ({
                         ...p,

@@ -11,6 +11,7 @@ export default async function() {
 
   return (
     <Body
+      apiURL={process.env.PROJDOCS_API_URL}
       getProvidersPromise={getAuthProviders(process.env.PROJDOCS_API_URL)}
       getStorageProvidersPromise={getStorageProviders(await createServerClient())}
       getOrganizationsPromise={getOrganizations(await createServerClient())}

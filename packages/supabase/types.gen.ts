@@ -1724,6 +1724,7 @@ export type Database = {
       search_table: {
         Args: {
           _limit?: number
+          _organization_id: string
           _query: string
           _table: Database["public"]["Enums"]["searchable_tables"]
         }
