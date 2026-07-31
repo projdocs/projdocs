@@ -57,7 +57,7 @@ export const FolderFileBrowser = ({ folder, ...props }: Omit<FileViewerProps, "i
     });
   };
 
-  useEffect(() => {(async () => await getItems())();}, []);
+  useEffect(() => {(async () => await getItems())();}, [folder.id]);
   useEventListener(CreateFolderDialog.RefreshEvent, getItems);
   useEventListener(FileBrowserPrimitive.RefreshEvent, getItems);
 

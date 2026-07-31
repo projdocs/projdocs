@@ -1,18 +1,9 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
 import { connection } from "next/server";
-import { FolderPage } from "@packages/ui/routing/pages/folder";
+import { FolderPage, getFolder } from "@packages/ui/routing/pages/folder";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { Database } from "@packages/supabase";
-
-
-
-const getFolder = (supabase: SupabaseClient<Database>, props: {
-  folderID: string;
-}) => supabase
-  .from("folders")
-  .select("*, client:clients(*), project:projects(*), organization:organizations(*), folder:folder_id(*)").eq("id", props.folderID)
-  .single();
 
 export default async function(props: {
   params: Promise<{

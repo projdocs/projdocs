@@ -21,11 +21,20 @@ import { FileBrowser } from "@packages/ui/components/file-browser";
 import { Folder } from "@packages/ui/components/file-browser/types";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { FileBrowserPrimitive } from "@packages/ui/components/file-browser/primitive";
-import { useLibraryRouter } from "@packages/ui/routing/index";
+import { useLibraryRouter } from "@packages/ui/routing";
 import { ProjDocsAPIClient } from "@packages/shared/utilities/api/with-ui";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
+import { SupabaseClient } from "@supabase/supabase-js";
+import { Database } from "@packages/supabase";
 
 
+
+export const getFolder = (supabase: SupabaseClient<Database>, props: {
+  folderID: string;
+}) => supabase
+  .from("folders")
+  .select("*, client:clients(*), project:projects(*), organization:organizations(*), folder:folder_id(*)").eq("id", props.folderID)
+  .single();
 
 const ParentBadge = ({ title, icon, path, className }: {
   title: string;
@@ -47,11 +56,13 @@ const ParentBadge = ({ title, icon, path, className }: {
   );
 };
 
-export const FolderPage = (props: {
+export type FolderPageProps = {
   folder: Folder;
   organizationID: string;
   apiURL: string;
-}) => {
+}
+
+export const FolderPage = (props: FolderPageProps) => {
 
   const router = useLibraryRouter();
   const supabase = useLibrarySupabase();

@@ -47,7 +47,7 @@ export const ObjectFileBrowserPrimitive = <T extends keyof Database["public"]["T
   };
 
 
-  useEffect(() => {(async () => await getFolders())();}, []);
+  useEffect(() => {(async () => await getFolders())();}, [object.id]);
   useEventListener(CreateFolderDialog.RefreshEvent, getFolders);
   useEventListener(FileBrowserPrimitive.RefreshEvent, getFolders);
 

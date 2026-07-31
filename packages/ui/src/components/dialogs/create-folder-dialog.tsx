@@ -110,7 +110,6 @@ export const CreateFolderDialog = ({ trigger, forOrganizationId, apiURL, ...prop
         throw error;
       } else {
         useEventListener.RemoteDispatch(REFRESH_EVENT, () => {});
-        console.log(data);
       }
 
       toast.success(`Folder ${name} created!`, {

@@ -16,6 +16,7 @@ export default [
   {
     Component: RootLayout,
     ErrorBoundary: RootErrorBoundary,
+    shouldRevalidate: () => true,
     children: [
       {
         index: true,
@@ -54,6 +55,17 @@ export default [
                     ],
                   },
                   { path: "projects-favorites", ...Routes.FavoriteProjects },
+                  {
+                    path: "folders/:folderID",
+                    ...Routes.Folders,
+                    shouldRevalidate: () => true,
+                  },
+                  {
+                    path: "files/:fileID",
+                    ...Routes.Files,
+                    shouldRevalidate: (props) => props.currentParams.organizationID !== props.nextParams.organizationID || props.currentParams.fileID !== props.nextParams.fileID
+                  },
+
                 ],
               },
             ],
