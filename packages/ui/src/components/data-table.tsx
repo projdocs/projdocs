@@ -20,7 +20,6 @@ import {
   ChevronRightIcon,
   ChevronsUpDownIcon,
   ChevronUpIcon,
-  Loader2,
 } from "lucide-react";
 import { Label } from "@packages/ui/components/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@packages/ui/components/select";
@@ -29,6 +28,7 @@ import { Button } from "@packages/ui/components/button";
 import { ComponentProps, useEffect, useId, useMemo, useState } from "react";
 import { useOnceler } from "@packages/ui/hooks/use-onceler";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
+import { useLoadingDebouncer } from "@packages/ui/hooks/use-loading-debouncer";
 
 
 
@@ -86,7 +86,7 @@ export function usePaginatedDataTable<TData>(
     return initialSortState;
   });
 
-  const [ isLoading, setIsLoading ] = useState<boolean>(false);
+  const [ isLoading, setIsLoading ] = useLoadingDebouncer(true, 250);
 
   const pageCount = useMemo(() => {
     if (pagination.pageSize <= 0) return 0;
@@ -440,12 +440,7 @@ export function PaginatedDataTable<TData>(
         {/* Overlay goes OUTSIDE the disabled wrapper so it still shows/captures clicks */}
         {isLoading ? (
           <div
-            className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background/60 backdrop-blur-[1px]">
-            <div className="flex items-center gap-2 rounded-md border bg-background px-3 py-2 shadow-sm">
-              <Loader2 className="h-4 w-4 animate-spin" />
-              <span className="text-sm">Loading…</span>
-            </div>
-          </div>
+            className="absolute inset-0 z-20 flex items-center justify-center rounded-md bg-background/60 backdrop-blur-[1px]" />
         ) : null}
       </div>
     </div>

@@ -204,7 +204,7 @@ export default {
         .order("number", { ascending: false });
       if (versionsError) throw new Error("Unable to load file-version!");
 
-      const viewingVersion = versionID === undefined ? versions[0] : versions.find(v => v.id === versionID);
+      const viewingVersion = typeof versionID !== "string" ? versions[0] : versions.find(v => v.id === versionID);
       if (viewingVersion === undefined) throw new Error("Unable to load file version!");
 
       return {

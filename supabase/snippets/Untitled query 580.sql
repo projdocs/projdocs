@@ -1,1 +1,1 @@
-alter function search_table rename to foo;
+SELECT pg_get_functiondef(('private.files_versions_before_actions()')::regprocedure);

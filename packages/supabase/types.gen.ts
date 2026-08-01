@@ -1287,6 +1287,7 @@ export type Database = {
           id: string
           last_modified_by: string
           mime_type: string
+          modified_at: string
           number: number
           size: number
           storage_uploads_id: string
@@ -1297,6 +1298,7 @@ export type Database = {
           id?: string
           last_modified_by: string
           mime_type?: string
+          modified_at?: string
           number: number
           size?: number
           storage_uploads_id: string
@@ -1307,6 +1309,7 @@ export type Database = {
           id?: string
           last_modified_by?: string
           mime_type?: string
+          modified_at?: string
           number?: number
           size?: number
           storage_uploads_id?: string
