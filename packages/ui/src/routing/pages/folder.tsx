@@ -24,17 +24,8 @@ import { FileBrowserPrimitive } from "@packages/ui/components/file-browser/primi
 import { useLibraryRouter } from "@packages/ui/routing";
 import { ProjDocsAPIClient } from "@packages/shared/utilities/api/with-ui";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "@packages/supabase";
 
 
-
-export const getFolder = (supabase: SupabaseClient<Database>, props: {
-  folderID: string;
-}) => supabase
-  .from("folders")
-  .select("*, client:clients(*), project:projects(*), organization:organizations(*), folder:folder_id(*)").eq("id", props.folderID)
-  .single();
 
 const ParentBadge = ({ title, icon, path, className }: {
   title: string;

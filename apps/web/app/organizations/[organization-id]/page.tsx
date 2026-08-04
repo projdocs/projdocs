@@ -2,6 +2,7 @@ import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
 import { connection } from "next/server";
 import { DashboardPage } from "@packages/ui/routing/pages/dashboard";
+import { getDashboardFiles } from "@packages/ui/routing/pages/dashboard-actions";
 
 
 
@@ -32,11 +33,22 @@ export default async function Page(props: {
   if (member.error) return (
     <ErrorPage title={"Unable to Load User"} description={"Member error: " + member.error.message} />
   );
+
+  const files = await getDashboardFiles(supabase, user.data.id);
+  if (files.error) return (
+    <ErrorPage
+      title={"Unable to load recent files!"}
+      description={files.error.message}
+    />
+  );
+
   return (
     <DashboardPage
+      apiURL={process.env.PROJDOCS_API_URL}
       user={user.data}
       member={member.data}
       organizationID={params["organization-id"]}
+      files={files.data}
     />
   );
 }

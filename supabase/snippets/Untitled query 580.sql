@@ -1,1 +1,1 @@
-SELECT pg_get_functiondef(('private.files_versions_before_actions()')::regprocedure);
+SELECT pg_get_functiondef(('private.files_before_actions()')::regprocedure);

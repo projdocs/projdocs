@@ -1,9 +1,10 @@
 import { createServerClient } from "@apps/web/lib/supabase/server";
 import { ErrorPage } from "@packages/ui/components/page";
 import { connection } from "next/server";
-import { FolderPage, getFolder } from "@packages/ui/routing/pages/folder";
-import { SupabaseClient } from "@supabase/supabase-js";
-import { Database } from "@packages/supabase";
+import { FolderPage } from "@packages/ui/routing/pages/folder";
+import { getFolder } from "@packages/ui/routing/pages/folder-actions";
+
+
 
 export default async function(props: {
   params: Promise<{

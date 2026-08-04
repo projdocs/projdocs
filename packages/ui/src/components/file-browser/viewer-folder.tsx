@@ -12,23 +12,25 @@ import { FileBrowserPrimitive } from "./primitive";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
 import { CreateFolderDialog } from "@packages/ui/components/dialogs/create-folder-dialog";
 
+type FolderFileBrowserItems = {
+  files: readonly (Tables<"files"> & {
+    versions: readonly {
+      mime_type: string;
+      number: number;
+    }[];
+  })[];
+  folders: readonly Tables<"folders">[];
+} | null | undefined;
 
-
-export const FolderFileBrowser = ({ folder, ...props }: Omit<FileViewerProps, "items"> & {
+type FolderFileBrowserProps = Omit<FileViewerProps, "items"> & {
   folder: Folder
-}) => {
+}
+
+export const FolderFileBrowser = ({ folder, ...props }: FolderFileBrowserProps) => {
 
   const supabase = useLibrarySupabase();
   const [ loading, setLoading ] = useState<boolean>(true);
-  const [ items, _setItems ] = useState<{
-    files: readonly (Tables<"files"> & {
-      versions: readonly {
-        mime_type: string;
-        number: number;
-      }[];
-    })[];
-    folders: readonly Tables<"folders">[];
-  } | null | undefined>();
+  const [ items, _setItems ] = useState<FolderFileBrowserItems>();
   const setItems = useDebouncedCallback((_items: typeof items) => {
     _setItems(_items);
     setLoading(false);
@@ -62,51 +64,66 @@ export const FolderFileBrowser = ({ folder, ...props }: Omit<FileViewerProps, "i
   useEventListener(FileBrowserPrimitive.RefreshEvent, getItems);
 
   return (
-    <div className="flex flex-col flex-1 h-full">
-      <Card className="relative h-full p-0 flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
-        {items !== undefined && loading && (
-          <div className="z-50 absolute inset-0 backdrop-blur-[2px] bg-background/20" />
-        )}
-        {items === undefined ? (
-          <FileBrowserSkeleton />
-        ) : items === null ? (
-          <div className={"flex flex-col items-center justify-center w-full h-full m-4 gap-2 bg-red-950"}>
-            <AlertCircleIcon className={"text-destructive"} />
-            <p className={"font-semibold text-destructive"}>{"Unable to Load Folder's Contents!"}</p>
-            <p>{"An unexpected error occurred while trying to load this folder's contents."}</p>
-            <Button className={"px-8 mt-8"} onClick={getItems}>
-              {"Retry"}
-            </Button>
-          </div>
-        ) : (
-          <FileBrowserPrimitive
-            {...props}
-            items={[
-              ...items.folders.map(folder => ({
-                type: "FOLDER" as const,
-                id: folder.id,
-                created_at: folder.created_at,
-                name: folder.name,
-                organization_id: props.organizationID,
-                path: `/organizations/${props.organizationID}/folders/${folder.id}`,
-              })),
-              ...items.files.map(file => ({
-                type: "FILE" as const,
-                id: file.id,
-                created_at: file.created_at,
-                name: file.name,
-                number: file.number,
-                organization_id: props.organizationID,
-                path: `/organizations/${props.organizationID}/files/${file.id}`,
-                parent: {
-                  id: file.folder_id
-                },
-                mime_type: file.versions.reduce((p, c) => p && c.number > p.number ? c : p, ({ number: -1, mime_type: "unknown" }) as ({ number: number; mime_type: string })).mime_type
-              })),
-            ]}
-          />
-        )}
-      </Card>
-    </div>
+    <Primitive
+      loading={loading}
+      items={items}
+      retry={getItems}
+      {...props}
+    />
   );
 };
+
+const Primitive = (props: Omit<FolderFileBrowserProps, "folder"> & {
+  loading: boolean;
+  items: FolderFileBrowserItems;
+  retry: () => unknown;
+}) => (
+  <div className="flex flex-col flex-1 h-full">
+    <Card className="relative h-full p-0 flex flex-col flex-1 min-h-0 overflow-hidden gap-0">
+      {props.items !== undefined && props.loading && (
+        <div className="z-50 absolute inset-0 backdrop-blur-[2px] bg-background/20" />
+      )}
+      {props.items === undefined ? (
+        <FileBrowserSkeleton />
+      ) : props.items === null ? (
+        <div className={"flex flex-col items-center justify-center w-full h-full m-4 gap-2 bg-red-950"}>
+          <AlertCircleIcon className={"text-destructive"} />
+          <p className={"font-semibold text-destructive"}>{"Unable to Load Folder's Contents!"}</p>
+          <p>{"An unexpected error occurred while trying to load this folder's contents."}</p>
+          <Button className={"px-8 mt-8"} onClick={props.retry}>
+            {"Retry"}
+          </Button>
+        </div>
+      ) : (
+        <FileBrowserPrimitive
+          {...props}
+          items={[
+            ...props.items.folders.map(folder => ({
+              type: "FOLDER" as const,
+              id: folder.id,
+              created_at: folder.created_at,
+              name: folder.name,
+              organization_id: props.organizationID,
+              path: `/organizations/${props.organizationID}/folders/${folder.id}`,
+            })),
+            ...props.items.files.map(file => ({
+              type: "FILE" as const,
+              id: file.id,
+              created_at: file.created_at,
+              name: file.name,
+              number: file.number,
+              organization_id: props.organizationID,
+              path: `/organizations/${props.organizationID}/files/${file.id}`,
+              parent: {
+                id: file.folder_id
+              },
+              mime_type: file.versions.reduce((p, c) => p && c.number > p.number ? c : p, ({ number: -1, mime_type: "unknown" }) as ({ number: number; mime_type: string })).mime_type
+            })),
+          ]}
+        />
+      )}
+    </Card>
+  </div>
+)
+
+FolderFileBrowser.Primitive = Primitive;

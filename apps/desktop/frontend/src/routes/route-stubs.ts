@@ -13,7 +13,9 @@ import { ClientPage, ClientPageProps } from "@packages/ui/routing/pages/client";
 import { ProjectPage, ProjectPageProps } from "@packages/ui/routing/pages/project";
 import { getProject } from "@packages/ui/routing/pages/project-utils";
 import { FilePage, FilePageProps } from "@packages/ui/routing/pages/file";
-import { FolderPage, FolderPageProps, getFolder } from "@packages/ui/routing/pages/folder";
+import { FolderPage, FolderPageProps } from "@packages/ui/routing/pages/folder";
+import { getDashboardFiles } from "@packages/ui/routing/pages/dashboard-actions";
+import { getFolder } from "@packages/ui/routing/pages/folder-actions";
 
 
 
@@ -43,6 +45,9 @@ export default {
     Component: Shim(DashboardPage),
     loader: async function(props): Promise<DashboardPageProps> {
 
+      const apiURL = window.localStorage.getItem(StorageKeys.ProjDocs.Host.API);
+      if (!apiURL) throw new Error("No API set!");
+
       const organizationID = props.params.organizationID;
       if (!organizationID) throw new Error("No organization ID param");
 
@@ -55,10 +60,15 @@ export default {
       const member = await supabase().from("members").select("*, permission:permissions!inner(*)").eq("user_id", user.data.user_id).eq("permissions.organization_id", organizationID).single();
       if (member.error) throw new Error("Unable to Load User!");
 
+      const files = await getDashboardFiles(supabase(), user.data.id);
+      if (files.error) console.error(`Unable to load recent files: ${files.error.message}`);
+
       return {
+        apiURL,
+        organizationID,
         user: user.data,
         member: member.data,
-        organizationID: organizationID,
+        files: files.data,
       };
     },
   },
