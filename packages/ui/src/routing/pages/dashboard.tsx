@@ -5,6 +5,7 @@ import { useEffect } from "react";
 import { toast } from "sonner";
 import { H3 } from "@packages/ui/components/typography";
 import { FileBrowser } from "@packages/ui/components/file-browser";
+import { useLibraryRouter } from "@packages/ui/routing";
 
 
 
@@ -21,6 +22,8 @@ export type DashboardPageProps = {
 }
 
 export function DashboardPage(props: DashboardPageProps) {
+
+  const router = useLibraryRouter();
 
   useEffect(() => {
     if (typeof props.files === "undefined") toast.error("Unable to load recent files!");
@@ -40,6 +43,8 @@ export function DashboardPage(props: DashboardPageProps) {
             folders: [],
             files: props.files ?? [],
           }}
+          onRowDoubleClick={(row) => router.navigate(`/organizations/${props.organizationID}/${row.type === "FILE" ? "files" : "folders"}/${row.id}`)}
+          onRowClick={(row) => router.navigate(`/organizations/${props.organizationID}/${row.type === "FILE" ? "files" : "folders"}/${row.id}`)}
         />
       </div>
     </ObjectPage>
