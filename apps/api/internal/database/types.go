@@ -134,6 +134,7 @@ type PublicClientsUpdate struct {
 
 type PublicProjectsSelect struct {
   FullTextSearch  interface{} `json:"__full_text_search"`
+  ClientId        string      `json:"client_id"`
   CreatedAt       string      `json:"created_at"`
   Display         string      `json:"display"`
   Id              string      `json:"id"`
@@ -144,6 +145,7 @@ type PublicProjectsSelect struct {
 
 type PublicProjectsInsert struct {
   FullTextSearch  interface{} `json:"__full_text_search"`
+  ClientId        string      `json:"client_id"`
   CreatedAt       *string     `json:"created_at"`
   Display         *string     `json:"display"`
   Id              *string     `json:"id"`
@@ -154,6 +156,7 @@ type PublicProjectsInsert struct {
 
 type PublicProjectsUpdate struct {
   FullTextSearch  interface{} `json:"__full_text_search"`
+  ClientId        *string     `json:"client_id"`
   CreatedAt       *string     `json:"created_at"`
   Display         *string     `json:"display"`
   Id              *string     `json:"id"`
@@ -213,30 +216,6 @@ type PublicPermissionsUpdate struct {
   Projects       *string `json:"projects"`
 }
 
-type PublicClientsProjectsSelect struct {
-  ClientId       string `json:"client_id"`
-  CreatedAt      string `json:"created_at"`
-  Id             string `json:"id"`
-  OrganizationId string `json:"organization_id"`
-  ProjectId      string `json:"project_id"`
-}
-
-type PublicClientsProjectsInsert struct {
-  ClientId       string  `json:"client_id"`
-  CreatedAt      *string `json:"created_at"`
-  Id             *string `json:"id"`
-  OrganizationId string  `json:"organization_id"`
-  ProjectId      string  `json:"project_id"`
-}
-
-type PublicClientsProjectsUpdate struct {
-  ClientId       *string `json:"client_id"`
-  CreatedAt      *string `json:"created_at"`
-  Id             *string `json:"id"`
-  OrganizationId *string `json:"organization_id"`
-  ProjectId      *string `json:"project_id"`
-}
-
 type PublicStorageUploadsSelect struct {
   Checksum          *string `json:"checksum"`
   ClientId          *string `json:"client_id"`
@@ -277,27 +256,30 @@ type PublicStorageUploadsUpdate struct {
 }
 
 type PublicFilesSelect struct {
-  CreatedAt string `json:"created_at"`
-  FolderId  string `json:"folder_id"`
-  Id        string `json:"id"`
-  Name      string `json:"name"`
-  Number    int64  `json:"number"`
+  CreatedAt  string `json:"created_at"`
+  FolderId   string `json:"folder_id"`
+  Id         string `json:"id"`
+  ModifiedAt string `json:"modified_at"`
+  Name       string `json:"name"`
+  Number     int64  `json:"number"`
 }
 
 type PublicFilesInsert struct {
-  CreatedAt *string `json:"created_at"`
-  FolderId  string  `json:"folder_id"`
-  Id        *string `json:"id"`
-  Name      string  `json:"name"`
-  Number    *int64  `json:"number"`
+  CreatedAt  *string `json:"created_at"`
+  FolderId   string  `json:"folder_id"`
+  Id         *string `json:"id"`
+  ModifiedAt *string `json:"modified_at"`
+  Name       string  `json:"name"`
+  Number     *int64  `json:"number"`
 }
 
 type PublicFilesUpdate struct {
-  CreatedAt *string `json:"created_at"`
-  FolderId  *string `json:"folder_id"`
-  Id        *string `json:"id"`
-  Name      *string `json:"name"`
-  Number    *int64  `json:"number"`
+  CreatedAt  *string `json:"created_at"`
+  FolderId   *string `json:"folder_id"`
+  Id         *string `json:"id"`
+  ModifiedAt *string `json:"modified_at"`
+  Name       *string `json:"name"`
+  Number     *int64  `json:"number"`
 }
 
 type PublicFilesVersionsSelect struct {

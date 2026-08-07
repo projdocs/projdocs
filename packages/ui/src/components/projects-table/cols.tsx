@@ -42,7 +42,7 @@ const FavoriteButton = ({ row }: { row: Column }) => {
         e.stopPropagation();
         setClicked(true);
         if (row.favorite_id) {
-          const { error } = await supabase.from("favorites").delete().eq("client_id", row.id);
+          const { error } = await supabase.from("favorites").delete().eq("id", row.favorite_id);
           if (error) toast.error("Unable to Remove Favorite!", {
             description: error.message,
           });
