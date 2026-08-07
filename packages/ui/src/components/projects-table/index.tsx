@@ -30,7 +30,7 @@ export const ProjectsTable = (props: {
         const res = await getSupabaseRows({
           supabase: () => supabase,
           table: "projects",
-          select: props.select ?? "*, favorites(*), links:clients_projects(*, client:clients(*))",
+          select: props.select ?? "*, favorites(*), client:clients(*)",
           filters: [
             {
               column: "organization_id",
@@ -42,17 +42,7 @@ export const ProjectsTable = (props: {
         })(r);
         return ({
           count: res.count,
-          rows: res.rows.map(r => {
-            const row = (r as Tables<"projects"> & {
-              favorites: Tables<"favorites">[]; links: readonly (Tables<"clients_projects"> & {
-                client: Tables<"clients">
-              })[];
-            });
-            return {
-              ...row,
-              favorite_id: row.favorites?.at(0)?.id ?? null,
-            };
-          }),
+          rows: res.rows,
         });
       }}
     />

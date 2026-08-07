@@ -18,17 +18,25 @@ import { Field, FieldError, FieldLabel } from "@packages/ui/components/field";
 import { Input } from "@packages/ui/components/input";
 import { Button } from "@packages/ui/components/button";
 import { toast } from "sonner";
-import { ReactNode, useState } from "react";
+import { ReactNode, useEffect, useState } from "react";
 import { PlusIcon } from "lucide-react";
 import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { ProjectsTable } from "@packages/ui/components/projects-table";
 import { useLibraryRouter } from "@packages/ui/routing";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
+import { Tables } from "@packages/supabase";
+import { ObjectCombobox } from "@packages/ui/components/comboboxes/primitive";
 
 
 
 const formSchema = z.object({
   display: z.string().min(1, "Name is required"),
+  client: z.object({
+    display: z.string(),
+    id: z.string(),
+    number: z.number(),
+    rank: z.number(),
+  }).nullable(),
 });
 
 type FormValues = z.infer<typeof formSchema>;
@@ -37,6 +45,7 @@ interface CreateProjectDialogProps {
   trigger?: ReactNode;
   organizationID: string;
   apiURL: string;
+  client?: Tables<"clients">;
 }
 
 export function CreateProjectDialog(props: CreateProjectDialogProps) {
@@ -50,6 +59,7 @@ export function CreateProjectDialog(props: CreateProjectDialogProps) {
     resolver: zodResolver(formSchema),
     defaultValues: {
       display: "",
+      client: null,
     },
   });
 
@@ -93,10 +103,13 @@ export function CreateProjectDialog(props: CreateProjectDialogProps) {
   }
 
   return (
-    <Dialog open={open} onOpenChange={(next) => {
-      if (!next) form.reset();
-      setOpen(next);
-    }}>
+    <Dialog
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) form.reset();
+        setOpen(next);
+      }}
+    >
       <DialogTrigger asChild>
         {props.trigger ?? (
           <Button><PlusIcon />{"Create Project"}</Button>
@@ -110,7 +123,8 @@ export function CreateProjectDialog(props: CreateProjectDialogProps) {
           </DialogDescription>
         </DialogHeader>
 
-        <form id="create-project-form" onSubmit={form.handleSubmit(handleSubmit)} noValidate>
+        <form className={"flex flex-col gap-4"} id="create-project-form" onSubmit={form.handleSubmit(handleSubmit)}
+              noValidate>
           <Controller
             name="display"
             control={form.control}
@@ -124,6 +138,26 @@ export function CreateProjectDialog(props: CreateProjectDialogProps) {
                   aria-invalid={fieldState.invalid}
                   autoComplete="off"
                   autoFocus
+                />
+                {fieldState.invalid && (
+                  <FieldError errors={[ fieldState.error ]} />
+                )}
+              </Field>
+            )}
+          />
+
+          <Controller
+            name="client"
+            control={form.control}
+            render={({ field, fieldState }) => (
+              <Field data-invalid={fieldState.invalid}>
+                <FieldLabel htmlFor="client-display">Client</FieldLabel>
+                <ObjectCombobox
+                  nullable
+                  table={"clients"}
+                  value={field.value}
+                  setValue={value => form.setValue("client", value)}
+                  organizationID={props.organizationID}
                 />
                 {fieldState.invalid && (
                   <FieldError errors={[ fieldState.error ]} />

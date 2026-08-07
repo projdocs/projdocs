@@ -30,6 +30,9 @@ func createProject(ctx *gin.Context) {
 	// parse request
 	var body struct {
 		Display string `json:"display" binding:"required"`
+		Client  struct {
+			ID string `json:"id" binding:"required"`
+		} `json:"client" binding:"required"`
 	}
 	if err := ctx.ShouldBindJSON(&body); err != nil {
 		response.Error(ctx, http.StatusBadRequest, fmt.Sprintf("invalid request body: %v", err))
@@ -74,11 +77,12 @@ func createProject(ctx *gin.Context) {
 	// create the project
 	// handles RLS/permissions as current user
 	if err = txn.QueryRowContext(ctx,
-		`INSERT INTO public.projects (id, display, organization_id, storage_upload_id) VALUES ($1, $2, $3, $4) returning number`,
+		`INSERT INTO public.projects (id, display, organization_id, storage_upload_id, client_id) VALUES ($1, $2, $3, $4, $5) returning number`,
 		projectID.String(),
 		body.Display,
 		orgID,
 		storageUploadId.String(),
+		body.Client.ID,
 	).Scan(&number); err != nil {
 		log.Printf("unable to create project: %v", err)
 		if strings.Index(err.Error(), "duplicate key value violates unique constraint") != -1 {

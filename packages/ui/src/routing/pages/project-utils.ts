@@ -8,7 +8,7 @@ export const getProject = (supabase: SupabaseClient<Database>, props: {
   organizationID: string;
 }) => supabase
   .from("projects")
-  .select("*, links:clients_projects(*, client:clients(*))")
+  .select("*, client:clients(*)")
   .eq("id", props.projectID)
   .eq("organization_id", props.organizationID)
   .single();

@@ -63,11 +63,11 @@ export function ClientPage(props: ClientPageProps) {
 
           <ProjectsTable
             organizationID={props.client.organization_id}
-            select={"*, links:clients_projects!inner(*, client:clients(*))"}
+            select={"*, client:clients(*)"}
             filters={[
               {
                 // @ts-expect-error PostgREST table join
-                column: "links.client_id",
+                column: "client_id",
                 value: props.client.id,
                 operator: "eq",
               },

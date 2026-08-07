@@ -10,7 +10,7 @@ export function FavoriteClientsPage(props: FavoriteClientsPageProps) {
     <ObjectPage title={"My Clients"}>
       <ClientsTable
         organizationID={props.organizationID}
-        select={"*, favorites!inner(*), links:clients_projects(*, project:projects(*))"}
+        select={"*, favorites!inner(*), projects:projects!inner(*)"}
         filters={[
           {
             // @ts-expect-error PostgREST table join

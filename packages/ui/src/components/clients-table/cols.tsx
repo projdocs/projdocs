@@ -19,9 +19,7 @@ import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
 export const CLIENTS_TABLE_REFRESH_EVENT = "clients:refresh";
 type Column = Tables<"clients"> & {
   favorite_id: string | null;
-  links: readonly (Tables<"clients_projects"> & {
-    project: Tables<"projects">
-  })[];
+  projects: Tables<"projects">[];
 };
 
 const FavoriteButton = ({ row }: { row: Column }) => {
@@ -66,7 +64,7 @@ const FavoriteButton = ({ row }: { row: Column }) => {
   );
 };
 
-export const ProjectsRow = ({ row: { original: { links } } }: {
+export const ProjectsRow = ({ row: { original: { projects } } }: {
   row: {
     original: Column
   }
@@ -74,7 +72,7 @@ export const ProjectsRow = ({ row: { original: { links } } }: {
   const router = useLibraryRouter();
   return (
     <AvatarGroup>
-      {links.slice(0, 2).map(({ project }) => (
+      {projects.slice(0, 2).map((project) => (
         <Tooltip key={project.id}>
           <TooltipTrigger key={project.id} className={"cursor-pointer"}>
             <Avatar className={"hover:outline-accent-foreground hover:outline-1"} onClick={(e) => {
@@ -90,8 +88,8 @@ export const ProjectsRow = ({ row: { original: { links } } }: {
           </TooltipContent>
         </Tooltip>
       ))}
-      {links.length > 2 && (
-        <AvatarGroupCount>+{links.length - 2}</AvatarGroupCount>
+      {projects.length > 2 && (
+        <AvatarGroupCount>+{projects.length - 2}</AvatarGroupCount>
       )}
     </AvatarGroup>
   );
@@ -106,7 +104,7 @@ export const ClientColumns = [
     enableSorting: true,
   }),
   column.accessor("name", { header: "Name" }),
-  column.accessor("links", {
+  column.accessor("projects", {
     header: "Projects",
     cell: ProjectsRow,
   }),

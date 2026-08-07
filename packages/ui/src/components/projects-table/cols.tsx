@@ -10,7 +10,7 @@ import { useEventListener } from "@packages/ui/hooks/use-event-listener";
 import { useState } from "react";
 import { DateTime } from "luxon";
 import { ClickToCopyID } from "@packages/ui/components/id-value";
-import { Avatar, AvatarFallback, AvatarGroup, AvatarGroupCount } from "@packages/ui/components/avatar";
+import { Avatar, AvatarFallback, AvatarGroup } from "@packages/ui/components/avatar";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@packages/ui/components/tooltip";
 import { P } from "@packages/ui/components/typography";
 import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
@@ -21,9 +21,7 @@ import { useLibraryRouter } from "@packages/ui/routing";
 export const PROJECTS_TABLE_REFRESH_EVENT = "projects:refresh";
 type Column = Tables<"projects"> & {
   favorite_id: string | null;
-  links: readonly (Tables<"clients_projects"> & {
-    client: Tables<"clients">
-  })[];
+  client: Tables<"clients">;
 };
 
 const FavoriteButton = ({ row }: { row: Column }) => {
@@ -71,7 +69,7 @@ const FavoriteButton = ({ row }: { row: Column }) => {
 };
 
 
-export const ClientsRow = ({ row: { original: { links } } }: {
+export const ClientsRow = ({ row: { original: { client } } }: {
   row: {
     original: Column
   }
@@ -79,25 +77,20 @@ export const ClientsRow = ({ row: { original: { links } } }: {
   const router = useLibraryRouter();
   return (
     <AvatarGroup>
-      {links.slice(0, 2).map(({ client }) => (
-        <Tooltip key={client.id}>
-          <TooltipTrigger key={client.id} className={"cursor-pointer"}>
-            <Avatar className={"hover:outline-accent-foreground hover:outline-1"} onClick={(e) => {
-              e.stopPropagation();
-              e.preventDefault();
-              router.navigate(`/organizations/${client.organization_id}/clients/${client.id}`);
-            }} key={client.id}>
-              <AvatarFallback>{client.name.trim().at(0)}</AvatarFallback>
-            </Avatar>
-          </TooltipTrigger>
-          <TooltipContent>
-            <P>{client.name}</P>
-          </TooltipContent>
-        </Tooltip>
-      ))}
-      {links.length > 2 && (
-        <AvatarGroupCount>+{links.length - 2}</AvatarGroupCount>
-      )}
+      <Tooltip key={client.id}>
+        <TooltipTrigger key={client.id} className={"cursor-pointer"}>
+          <Avatar className={"hover:outline-accent-foreground hover:outline-1"} onClick={(e) => {
+            e.stopPropagation();
+            e.preventDefault();
+            router.navigate(`/organizations/${client.organization_id}/clients/${client.id}`);
+          }} key={client.id}>
+            <AvatarFallback>{client.name.trim().at(0)}</AvatarFallback>
+          </Avatar>
+        </TooltipTrigger>
+        <TooltipContent>
+          <P>{client.name}</P>
+        </TooltipContent>
+      </Tooltip>
     </AvatarGroup>
   );
 };
@@ -112,8 +105,8 @@ export const ProjectColumns = [
     enableSorting: true,
   }),
   column.accessor("display", { header: "Name" }),
-  column.accessor("links", {
-    header: "Projects",
+  column.accessor("client", {
+    header: "Client",
     cell: ClientsRow,
   }),
   column.accessor("created_at", {
