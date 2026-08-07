@@ -12,6 +12,7 @@ import { useLibrarySupabase } from "@packages/ui/lib/supabase-adapter";
 export const ProjectsTable = (props: {
   organizationID: string;
   filters?: Filters<"projects">;
+  select?: string;
 }) => {
   const router = useLibraryRouter();
   const supabase = useLibrarySupabase();
@@ -29,7 +30,7 @@ export const ProjectsTable = (props: {
         const res = await getSupabaseRows({
           supabase: () => supabase,
           table: "projects",
-          select: "*, favorites(*), client:clients(*)",
+          select: props.select ?? "*, favorites(*), client:clients(*)",
           filters: [
             {
               column: "organization_id",
