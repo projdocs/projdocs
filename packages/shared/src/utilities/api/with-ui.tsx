@@ -65,15 +65,18 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
   }): Promise<boolean> {
     const toastId = toast.loading(`Uploading ${file.name}...`);
 
-    const { error, data } = await super.uploadVersion(file, props.file, props.organization,  {
-      onProgress: (percent) => toast.loading(
-        <div className="flex flex-col gap-1 w-full min-w-[200px]">
-          <span className="text-sm">{file.name}</span>
-          <Progress value={percent} className="w-full" />
-          <span className="text-xs text-muted-foreground">{percent}%</span>
-        </div>,
-        { id: toastId },
-      ),
+    const { error, data } = await super.uploadVersion(file, props.file, props.organization, {
+      onProgress: (downloaded, total) => {
+        const percent = Math.floor(downloaded / total * 100);
+        toast.loading(
+          <div className="flex flex-col gap-1 w-full min-w-[200px]">
+            <span className="text-sm">{file.name}</span>
+            <Progress value={percent} className="w-full" />
+            <span className="text-xs text-muted-foreground">{percent}%</span>
+          </div>,
+          { id: toastId },
+        );
+      },
     });
 
     if (error !== null) {
