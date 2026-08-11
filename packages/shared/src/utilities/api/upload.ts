@@ -36,22 +36,46 @@ export class MultiPartUploadClient {
   }
 
   async upload(
-    file: File | Blob,
-    organization: Pick<Tables<"organizations">, "id">,
-    folder: Pick<Tables<"folders">, "id">,
+    props: {
+      file: File | Blob,
+      organization: Pick<Tables<"organizations">, "id">,
+      folder: Pick<Tables<"folders">, "id">,
+    } | {
+      file: File | Blob,
+      organization: Pick<Tables<"organizations">, "id">,
+      parent: Pick<Tables<"files">, "id" | "folder_id">,
+    },
     options: UploadOptions = {},
   ): Promise<StorageResponse<Tables<"files_versions">>> {
     try {
       const chunkSize = options.chunkSize ?? this.chunkSize;
 
       // create upload
-      const uploadID = await this.createUpload(file, organization, folder);
+      const uploadID = await this.createUpload(
+        props.file,
+        props.organization.id,
+        "parent" in props ? props.parent.folder_id : props.folder.id,
+        "parent" in props ? props.parent.id : null,
+      );
 
       // upload each chunk iteratively
-      await this.uploadChunks(file, organization, folder, chunkSize, uploadID, options.onProgress);
+      await this.uploadChunks(
+        props.file,
+        props.organization.id,
+        "parent" in props ? props.parent.folder_id : props.folder.id,
+        "parent" in props ? props.parent.id : null,
+        chunkSize,
+        uploadID,
+        options.onProgress,
+      );
 
       // complete the upload
-      return await this.completeUpload(organization, folder, uploadID);
+      return await this.completeUpload(
+        props.organization.id,
+        "parent" in props ? props.parent.folder_id : props.folder.id,
+        "parent" in props ? props.parent.id : null,
+        uploadID,
+      );
     } catch (e) {
       console.error(e);
       return StorageResponse.Error(new StorageError(
@@ -66,12 +90,13 @@ export class MultiPartUploadClient {
 
   private async createUpload(
     file: File | Blob,
-    organization: Pick<Tables<"organizations">, "id">,
-    folder: Pick<Tables<"folders">, "id">,
+    organizationID: string,
+    folderID: string,
+    fileID: string | null,
   ): Promise<string> {
 
     const res = await fetch(
-      `${this.baseUrl}/v1/organizations/${organization.id}/folders/${folder.id}/upload`,
+      `${this.baseUrl}/v1/organizations/${organizationID}/folders/${folderID}/${!fileID ? "upload" : `files/${fileID}/upload`}`,
       {
         method: "POST",
         headers: {
@@ -93,8 +118,9 @@ export class MultiPartUploadClient {
 
   private async uploadChunks(
     file: File | Blob,
-    organization: Pick<Tables<"organizations">, "id">,
-    folder: Pick<Tables<"folders">, "id">,
+    organizationID: string,
+    folderID: string,
+    fileID: string | null,
     chunkSize: number,
     uploadID: string,
     onProgress?: UploadOptions["onProgress"],
@@ -119,7 +145,7 @@ export class MultiPartUploadClient {
           const endingByte = startingByte + blob.size - 1;
 
           const res = await fetch(
-            `${this.baseUrl}/v1/organizations/${organization.id}/folders/${folder.id}/upload/${uploadID}`,
+            `${this.baseUrl}/v1/organizations/${organizationID}/folders/${folderID}/${!fileID ? "upload" : `files/${fileID}/upload`}/${uploadID}`,
             {
               method: "PATCH",
               headers: {
@@ -147,13 +173,14 @@ export class MultiPartUploadClient {
   }
 
   private async completeUpload(
-    organization: Pick<Tables<"organizations">, "id">,
-    folder: Pick<Tables<"folders">, "id">,
+    organizationID: string,
+    folderID: string,
+    fileID: string | null,
     uploadID: string,
   ): Promise<StorageResponse<Tables<"files_versions">>> {
 
     const res = await fetch(
-      `${this.baseUrl}/v1/organizations/${organization.id}/folders/${folder.id}/upload/${uploadID}/complete`,
+      `${this.baseUrl}/v1/organizations/${organizationID}/folders/${folderID}/${!fileID ? "upload" : `files/${fileID}/upload`}/${uploadID}/complete`,
       {
         method: "POST",
         headers: { ...await this.getHeaders() },

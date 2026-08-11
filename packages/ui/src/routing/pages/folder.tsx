@@ -65,13 +65,7 @@ export const FolderPage = (props: FolderPageProps) => {
     if (!file) return;
     e.target.value = "";
 
-    // const uploaded = await ProjDocsAPIClient.from(supabase, props.apiURL).uploadFile(file, {
-    //   router,
-    //   organization: { id: props.organizationID },
-    //   folder: props.folder,
-    // })
-
-    const uploaded = await ProjDocsAPIClient.from(supabase, props.apiURL).uploadFileV2(
+    const uploaded = await ProjDocsAPIClient.from(supabase, props.apiURL).UploadFile(
       file,
       { id: props.organizationID },
       props.folder,

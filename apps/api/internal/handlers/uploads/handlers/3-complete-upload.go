@@ -38,6 +38,17 @@ var CompleteUpload gin.HandlerFunc = func(c *gin.Context) {
 		return
 	}
 
+	// get the file-id (optional)
+	var fileID *uuid.UUID = nil
+	if fileIDstr := c.Param("file-id"); fileIDstr != "" {
+		if _fileID, err := uuid.Parse(fileIDstr); err != nil {
+			response.Error(c, http.StatusBadRequest, fmt.Sprintf("bad file-id: %v", err))
+			return
+		} else {
+			fileID = &_fileID
+		}
+	}
+
 	// get the uploadID
 	uploadID, err := uuid.Parse(c.Param("upload-id"))
 	if err != nil {
@@ -83,15 +94,17 @@ var CompleteUpload gin.HandlerFunc = func(c *gin.Context) {
 	}
 
 	// create the file
-	fileID := uuid.New()
-	if _, err := txn.Exec(
-		`insert into public.files (id, folder_id, name) values ($1, $2, $3)`,
-		fileID.String(),
-		folderID,
-		uploadInfo.Filename,
-	); err != nil {
-		response.Error(c, http.StatusInternalServerError, "failed to create file")
-		return
+	if fileID == nil {
+		fileID = new(uuid.New())
+		if _, err := txn.Exec(
+			`insert into public.files (id, folder_id, name) values ($1, $2, $3)`,
+			fileID.String(),
+			folderID,
+			uploadInfo.Filename,
+		); err != nil {
+			response.Error(c, http.StatusInternalServerError, "failed to create file")
+			return
+		}
 	}
 
 	// create the version

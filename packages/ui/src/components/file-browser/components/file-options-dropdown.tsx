@@ -50,7 +50,7 @@ export const FileOptionsDropdown = (props: {
           const file = e.target.files?.[0];
           if (!file) return;
           e.target.value = "";
-          await ProjDocsAPIClient.from(supabase, props.apiURL).uploadVersion(file, {
+          await ProjDocsAPIClient.from(supabase, props.apiURL).UploadVersion(file, {
             router,
             file: {
               id: props.viewable.id,

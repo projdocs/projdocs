@@ -58,16 +58,14 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
   }
 
 
-  async uploadVersion(file: File, props: {
+  async UploadVersion(file: File, props: {
     file: Pick<Tables<"files">, "id" | "folder_id">;
     organization: Pick<Tables<"organizations">, "id">;
     router: RouterAdapter;
   }): Promise<boolean> {
     const toastId = toast.loading(`Uploading ${file.name}...`);
 
-    const { error, data } = await super._uploadVersion(file, {
-      organization: props.organization,
-      file: props.file,
+    const { error, data } = await super.uploadVersion(file, props.file, props.organization,  {
       onProgress: (percent) => toast.loading(
         <div className="flex flex-col gap-1 w-full min-w-[200px]">
           <span className="text-sm">{file.name}</span>
@@ -79,7 +77,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
     });
 
     if (error !== null) {
-      toast.error(`Failed to upload!`, { description: error, id: toastId });
+      toast.error(`Failed to upload!`, { description: error.message, id: toastId });
       return false;
     }
 
@@ -90,7 +88,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
       action: {
         label: "View",
         onClick: () => {
-          props.router.navigate(`/organizations/${props.organization.id}/files/${data.file.id}?version-id=${data.version.id}`);
+          props.router.navigate(`/organizations/${props.organization.id}/files/${data!.files_id}?version-id=${data!.id}`);
           toast.dismiss(toastId);
         },
       },
@@ -98,7 +96,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
     return true;
   }
 
-  public async uploadFileV2(
+  public async UploadFile(
     file: File,
     organization: Pick<Tables<"organizations">, "id">,
     folder: Pick<Tables<"folders">, "id">,
@@ -107,7 +105,7 @@ export class ProjDocsAPIClient extends ProjDocsAPI {
   ) {
     const toastId = toast.loading(`Uploading ${file.name}...`);
 
-    const { error, data } = await super.upload(file, organization, folder, {
+    const { error, data } = await super.uploadFile(file, organization, folder, {
       ...options,
       onProgress: (downloaded, total) => {
         const percent = Math.floor(downloaded / total * 100);
