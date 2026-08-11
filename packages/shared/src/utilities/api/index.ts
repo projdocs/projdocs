@@ -3,6 +3,7 @@ import { DetailedError } from "tus-js-client";
 import { Database, Tables } from "@packages/supabase";
 import { DownloadOptions, MultiPartDownloadClient } from "@packages/shared/utilities/api/download";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { MultiPartUploadClient, UploadOptions } from "@packages/shared/utilities/api/upload";
 
 
 
@@ -25,14 +26,26 @@ export class ProjDocsAPI {
 
   private readonly origin: string;
   private readonly downloader: MultiPartDownloadClient;
+  private readonly uploader: MultiPartUploadClient;
   private readonly supabase: SupabaseClient<Database>;
 
   constructor(supabase: SupabaseClient<Database>, host: string, options?: {
-    download: DownloadOptions;
+    download?: DownloadOptions;
+    upload?: UploadOptions;
   }) {
     this.supabase = supabase;
     this.origin = (new URL(host)).origin;
     this.downloader = new MultiPartDownloadClient(supabase, this.origin, options?.download);
+    this.uploader = new MultiPartUploadClient(supabase, this.origin, options?.upload);
+  }
+
+  async upload(
+    file: File | Blob,
+    organization: Pick<Tables<"organizations">, "id">,
+    folder: Pick<Tables<"folders">, "id">,
+    options: UploadOptions = {},
+  ) {
+    return this.uploader.upload(file, organization, folder, options);
   }
 
   async download(organization: Pick<Tables<"organizations">, "id">,

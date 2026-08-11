@@ -55,7 +55,3 @@ func Load(id string) (*Upload, bool) {
 	}
 	return e.upload, true
 }
-
-func Delete(id string) {
-	uploads.Delete(id)
-}

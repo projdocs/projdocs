@@ -64,13 +64,21 @@ export const FolderPage = (props: FolderPageProps) => {
     const file = e.target.files?.[0];
     if (!file) return;
     e.target.value = "";
-    if (
-      await ProjDocsAPIClient.from(supabase, props.apiURL).uploadFile(file, {
-        router,
-        organization: { id: props.organizationID },
-        folder: props.folder,
-      })
-    ) useEventListener.RemoteDispatch(FileBrowserPrimitive.RefreshEvent, () => {});
+
+    // const uploaded = await ProjDocsAPIClient.from(supabase, props.apiURL).uploadFile(file, {
+    //   router,
+    //   organization: { id: props.organizationID },
+    //   folder: props.folder,
+    // })
+
+    const uploaded = await ProjDocsAPIClient.from(supabase, props.apiURL).uploadFileV2(
+      file,
+      { id: props.organizationID },
+      props.folder,
+      router,
+    );
+
+    if (uploaded) useEventListener.RemoteDispatch(FileBrowserPrimitive.RefreshEvent, () => {});
   };
 
   return (

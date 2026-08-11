@@ -4,7 +4,6 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"net/http"
 
@@ -75,16 +74,16 @@ func NewProvider(cfg *Config) (*Provider, error) {
 	}, nil
 }
 
-func (g *Provider) CreateFolder(ctx context.Context, parentID *string, name string, metadata map[string]string) (*string, error) {
+func (gd *Provider) CreateFolder(ctx context.Context, parentID *string, name string, metadata map[string]string) (*string, error) {
 
 	var parents []string
 	if parentID != nil {
 		parents = append(parents, *parentID)
 	} else {
-		parents = append(parents, g.cfg.ParentID)
+		parents = append(parents, gd.cfg.ParentID)
 	}
 
-	f, err := g.client.Files.Create(&drive.File{
+	f, err := gd.client.Files.Create(&drive.File{
 		Name:       name,
 		MimeType:   "application/vnd.google-apps.folder",
 		Parents:    parents,
@@ -105,7 +104,7 @@ func (g *Provider) CreateFolder(ctx context.Context, parentID *string, name stri
 	return &f.Id, nil
 }
 
-func (g *Provider) ToTusHandler(
+func (gd *Provider) ToTusHandler(
 	storageProviderId uuid.UUID,
 	basePath string,
 	uploadPrefix string,
@@ -115,7 +114,7 @@ func (g *Provider) ToTusHandler(
 	// custom composer
 	composer := handler.NewStoreComposer()
 	composer.UseCore(&Store{
-		g:        g,
+		g:        gd,
 		parentID: uploadPrefix,
 	})
 
@@ -149,7 +148,7 @@ func (g *Provider) ToTusHandler(
 			}
 
 			// fetch checksum from Drive
-			file, err := g.client.Files.Get(fileID).
+			file, err := gd.client.Files.Get(fileID).
 				Fields("md5Checksum").
 				SupportsAllDrives(true).
 				Context(context.Background()).
@@ -174,30 +173,4 @@ func (g *Provider) ToTusHandler(
 			return
 		},
 	})
-}
-
-func (g *Provider) GetContent(ctx context.Context, id string, start int64, end int64) ([]byte, error) {
-	req, err := http.NewRequestWithContext(
-		ctx,
-		http.MethodGet,
-		fmt.Sprintf("https://www.googleapis.com/drive/v3/files/%s?alt=media&supportsAllDrives=true", id),
-		nil,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("drive get content: build request: %w", err)
-	}
-	req.Header.Set("Range", fmt.Sprintf("bytes=%d-%d", start, end))
-
-	resp, err := g.http.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("drive get content: do request: %w", err)
-	}
-	defer resp.Body.Close()
-
-	if resp.StatusCode != http.StatusPartialContent && resp.StatusCode != http.StatusOK {
-		body, _ := io.ReadAll(resp.Body)
-		return nil, fmt.Errorf("drive get content: status %d: %s", resp.StatusCode, body)
-	}
-
-	return io.ReadAll(resp.Body)
 }

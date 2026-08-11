@@ -1,7 +1,6 @@
 package providers
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"strings"
@@ -9,6 +8,7 @@ import (
 	"github.com/google/uuid"
 	"github.com/projdocs/projdocs/apps/api/config"
 	"github.com/projdocs/projdocs/apps/api/internal/database"
+	"github.com/projdocs/projdocs/apps/api/internal/storage/models"
 	"github.com/projdocs/projdocs/apps/api/internal/storage/providers/gdrive"
 	"github.com/projdocs/projdocs/apps/api/internal/storage/providers/s3"
 	"github.com/projdocs/projdocs/apps/api/internal/storage/types"
@@ -16,21 +16,17 @@ import (
 )
 
 type Provider interface {
-	CreateFolder(ctx context.Context, parentID *string, name string, metadata map[string]string) (*string, error)
+	models.Uploader
+	models.Downloader
+	models.FileSystem
 
+	// Deprecated
 	ToTusHandler(
 		storageProviderID uuid.UUID,
 		basePath string,
 		parent string,
 		callback types.Callback,
 	) (*handler.Handler, error)
-
-	GetContent(
-		ctx context.Context,
-		id string,
-		start int64,
-		end int64,
-	) ([]byte, error)
 }
 
 func GetProvider(p *database.PublicStorageProvidersSelect) (Provider, error) {

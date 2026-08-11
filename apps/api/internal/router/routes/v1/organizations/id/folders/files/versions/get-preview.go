@@ -161,7 +161,7 @@ var getPreview = func(c *gin.Context) {
 		return
 	}
 
-	content, err := storage.GetContent(c, su.ProviderId, 0, fv.Size-1)
+	content, err := storage.Download(c, su.ProviderId, 0, fv.Size-1)
 	if err != nil {
 		response.Error(c, http.StatusInternalServerError, "unable to fetch file-version's content")
 		return

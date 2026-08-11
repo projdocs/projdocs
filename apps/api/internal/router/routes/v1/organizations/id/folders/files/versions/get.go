@@ -53,7 +53,7 @@ var get = func(c *gin.Context) {
 	}
 
 	// get the bytes
-	bytes, err := store.GetContent(c, su.ProviderId, rangeStart, rangeEnd)
+	bytes, err := store.Download(c, su.ProviderId, rangeStart, rangeEnd)
 	if err != nil {
 		log.Printf("unable to get content from storage: %v\n", err)
 		response.Error(c, http.StatusInternalServerError, "unable to get content")
