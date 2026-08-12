@@ -1599,7 +1599,7 @@ export type Database = {
       }
       storage_uploads: {
         Row: {
-          checksum: string | null
+          checksum: Database["public"]["CompositeTypes"]["checksum"] | null
           client_id: string | null
           created_at: string
           file_version_id: string | null
@@ -1611,7 +1611,7 @@ export type Database = {
           storage_provider_id: string
         }
         Insert: {
-          checksum?: string | null
+          checksum?: Database["public"]["CompositeTypes"]["checksum"] | null
           client_id?: string | null
           created_at?: string
           file_version_id?: string | null
@@ -1623,7 +1623,7 @@ export type Database = {
           storage_provider_id: string
         }
         Update: {
-          checksum?: string | null
+          checksum?: Database["public"]["CompositeTypes"]["checksum"] | null
           client_id?: string | null
           created_at?: string
           file_version_id?: string | null
@@ -1707,13 +1707,17 @@ export type Database = {
       }
     }
     Enums: {
+      hashing_algorithm: "md5" | "sha256"
       permission_levels: "NONE" | "VIEW" | "EDIT" | "DELETE"
       permission_scopes: "ORGANIZATION" | "CLIENTS" | "PROJECTS"
       searchable_tables: "CLIENTS" | "PROJECTS"
       settings_storage_type: "GOOGLE_DRIVE" | "BUILT_IN" | "S3"
     }
     CompositeTypes: {
-      [_ in never]: never
+      checksum: {
+        algorithm: Database["public"]["Enums"]["hashing_algorithm"] | null
+        hash: string | null
+      }
     }
   }
 }
@@ -1858,6 +1862,7 @@ export const Constants = {
   },
   public: {
     Enums: {
+      hashing_algorithm: ["md5", "sha256"],
       permission_levels: ["NONE", "VIEW", "EDIT", "DELETE"],
       permission_scopes: ["ORGANIZATION", "CLIENTS", "PROJECTS"],
       searchable_tables: ["CLIENTS", "PROJECTS"],

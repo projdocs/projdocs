@@ -15,7 +15,6 @@ func (p *Provider) Download(
 	start int64,
 	end int64,
 ) ([]byte, error) {
-
 	result, err := p.client.GetObject(ctx, &s3.GetObjectInput{
 		Bucket: aws.String(p.bucket),
 		Key:    aws.String(id),

@@ -1,4 +1,4 @@
-import { Database, Tables } from "@packages/supabase";
+import { CompositeTypes, Database, Tables } from "@packages/supabase";
 import { md5 } from 'js-md5';
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -6,7 +6,7 @@ import { SupabaseClient } from "@supabase/supabase-js";
 
 export interface FileVersionMeta {
   contentLength: number;
-  etag: string;
+  etag: CompositeTypes<"checksum">;
   mimeType: string;
   contentID: string;
 }
@@ -61,7 +61,6 @@ export class MultiPartDownloadClient {
           contentID,
           start,
           end,
-          etag,
         );
 
         chunks.push(chunk);
@@ -71,11 +70,22 @@ export class MultiPartDownloadClient {
 
       const blob = new Blob(chunks, { type: mimeType });
 
-      const hash = await this.md5(blob);
-      const expectedHash = etag.replace(/"/g, ""); // strip quotes
-      if (hash !== expectedHash) return ({
+
+      let hash: string;
+      switch (etag.algorithm) {
+        case "md5":
+          hash = await this.md5(blob);
+          break;
+        case "sha256":
+          hash = await this.sha256(blob);
+          break;
+        default:
+          throw new Error(`Unsupported hash: ${etag.algorithm}`)
+      }
+
+      if (hash !== etag.hash) return ({
         data: null,
-        error: `Checksum mismatch: expected ${expectedHash}, got ${hash}`
+        error: `Checksum mismatch: expected ${etag.hash}, got ${hash}`
       });
 
       return ({
@@ -118,9 +128,15 @@ export class MultiPartDownloadClient {
 
     if (!res.ok) throw new Error(`HEAD failed: ${res.status}`);
 
+    const etag = res.headers.get("ETag")?.replace(/^"|"$/g, "")?.split(":") ?? "";
+    const checksum: CompositeTypes<"checksum"> = {
+      algorithm: etag[0]! as any,
+      hash: etag[1]!
+    }
+
     return {
       contentLength: parseInt(res.headers.get("Content-Length") ?? "0", 10),
-      etag: res.headers.get("ETag") ?? "",
+      etag: checksum,
       mimeType: res.headers.get("Content-Type") ?? "application/octet-stream",
       contentID: res.headers.get("Content-ID") ?? ""
     };
@@ -134,7 +150,6 @@ export class MultiPartDownloadClient {
     contentId: string,
     start: number,
     end: number,
-    etag: string,
     retries = 4,
   ): Promise<BlobPart> {
     let lastError: Error | null = null;
@@ -153,7 +168,6 @@ export class MultiPartDownloadClient {
             headers: {
               ...await this.getHeaders(),
               "Range": `bytes=${start}-${end}`,
-              "If-Range": etag,
               "Content-ID": contentId,
             },
           },
@@ -177,6 +191,13 @@ export class MultiPartDownloadClient {
     }
 
     throw lastError ?? new Error(`Failed to fetch chunk ${start}-${end} after ${retries} attempts`);
+  }
+
+  private async sha256(blob: Blob): Promise<string> {
+    const buf = await crypto.subtle.digest("SHA-256", await blob.arrayBuffer());
+    return Array.from(new Uint8Array(buf))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("");
   }
 
   private async md5(blob: Blob): Promise<string> {

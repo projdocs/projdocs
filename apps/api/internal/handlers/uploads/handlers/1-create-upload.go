@@ -90,7 +90,9 @@ var NewUpload gin.HandlerFunc = func(c *gin.Context) {
 		return
 	}
 
+	uploadID := uuid.New()
 	info := models.Info{
+		UploadID:       uploadID.String(),
 		ID:             "", // does not exist yet
 		ParentPathOrID: parentPathOrID,
 		Filename:       fileName,
@@ -106,11 +108,11 @@ var NewUpload gin.HandlerFunc = func(c *gin.Context) {
 		// patch the id
 		info.ID = id
 
-		cacheID, cached := cache.Set(storageMeta, &info)
+		cached := cache.Set(uploadID, storageMeta, &info)
 
 		// done
 		c.Header("Expires", cached.ExpiresAt.UTC().Format(http.TimeFormat))
-		c.Header("Location", cacheID)
+		c.Header("Location", uploadID.String())
 		c.Status(http.StatusCreated)
 		return
 	}

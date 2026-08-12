@@ -1,5 +1,5 @@
-alter table "public"."projects" add column "client_id" uuid not null;
+alter table public.storage_uploads
+    drop column checksum;
 
-alter table "public"."projects" add constraint "projects_client_id_fkey" FOREIGN KEY (client_id) REFERENCES public.clients(id) ON UPDATE CASCADE ON DELETE CASCADE DEFERRABLE INITIALLY DEFERRED not valid;
-
-alter table "public"."projects" validate constraint "projects_client_id_fkey";
+alter table public.storage_uploads
+    add column checksum public.checksum;

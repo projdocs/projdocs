@@ -2,6 +2,7 @@ package versions
 
 import (
 	"fmt"
+	"log"
 	"net/http"
 	"strconv"
 
@@ -99,9 +100,11 @@ var head = func(c *gin.Context) {
 	}
 
 	var su database.PublicStorageUploadsSelect
+	var checksum database.PublicChecksum
 	if err := txn.QueryRowContext(c,
 		`select
-        checksum,
+        (checksum).algorithm, 
+        (checksum).hash,
         created_at,
         id,
         provider_id,
@@ -109,12 +112,14 @@ var head = func(c *gin.Context) {
     from public.storage_uploads where id=$1 limit 1`,
 		fv.StorageUploadsId,
 	).Scan(
-		&su.Checksum,
+		&checksum.Algorithm,
+		&checksum.Hash,
 		&su.CreatedAt,
 		&su.Id,
 		&su.ProviderId,
 		&su.StorageProviderId,
 	); err != nil {
+		log.Printf(err.Error())
 		c.Header("X-Error", "unable to fetch file-version's storage-upload record")
 		c.Status(http.StatusBadRequest)
 		return
@@ -161,7 +166,7 @@ var head = func(c *gin.Context) {
 	c.Header("Accept-Ranges", "bytes")
 	c.Header("Content-Type", fv.MimeType)
 	c.Header("Content-Length", strconv.FormatInt(fv.Size, 10))
-	c.Header("ETag", fmt.Sprintf(`"%s"`, *su.Checksum))
+	c.Header("ETag", fmt.Sprintf(`"%s:%s"`, checksum.Algorithm, checksum.Hash))
 	c.Header("Content-ID", cacheKey)
 	c.Status(http.StatusOK)
 	return

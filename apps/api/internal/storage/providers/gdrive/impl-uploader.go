@@ -7,10 +7,14 @@ import (
 	"fmt"
 	"net/http"
 	"net/url"
+	"slices"
 	"strconv"
 
+	"github.com/projdocs/projdocs/apps/api/internal/database"
 	"github.com/projdocs/projdocs/apps/api/internal/storage/models"
 )
+
+const BASE_URL = "https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true&fields=id,sha256Checksum"
 
 func (gd *Provider) CreateUpload(ctx context.Context, info models.Info) (id string, err error) {
 
@@ -26,7 +30,7 @@ func (gd *Provider) CreateUpload(ctx context.Context, info models.Info) (id stri
 	if req, err := http.NewRequestWithContext(
 		ctx,
 		http.MethodPost,
-		"https://www.googleapis.com/upload/drive/v3/files?uploadType=resumable&supportsAllDrives=true",
+		BASE_URL,
 		bytes.NewReader(metaBytes),
 	); err != nil {
 		return "", fmt.Errorf("new upload: create request: %w", err)
@@ -63,11 +67,69 @@ func (gd *Provider) CreateUpload(ctx context.Context, info models.Info) (id stri
 }
 
 func (gd *Provider) UploadPart(ctx context.Context, info models.Info, chunk *models.Chunk) error {
-	//TODO implement me
-	panic("implement me")
+	c := bytes.NewReader(*chunk.Data)
+	c.Len()
+	if req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPut,
+		fmt.Sprintf("%s&upload_id=%s", BASE_URL, info.ID),
+		c,
+	); err != nil {
+		return fmt.Errorf("upload chunk: create request: %w", err)
+	} else {
+		req.Header.Set("Content-Length", strconv.FormatUint(chunk.End-chunk.Start+1, 10))
+		req.Header.Set("Content-Range", chunk.Range)
+
+		if res, err := gd.http.Do(req); err != nil {
+			return fmt.Errorf("upload chunk: do request: %w", err)
+		} else {
+			defer res.Body.Close()
+			if !slices.Contains([]int{
+				http.StatusOK,
+				http.StatusCreated,
+				http.StatusPermanentRedirect,
+			}, res.StatusCode) {
+				return fmt.Errorf("new upload: bad status: %s", res.Status)
+			}
+			return nil
+		}
+	}
 }
 
-func (gd *Provider) CompleteUpload(ctx context.Context, info models.Info) (id string, checksum string, err error) {
-	//TODO implement me
-	panic("implement me")
+func (gd *Provider) CompleteUpload(ctx context.Context, info models.Info) (id string, checksum database.PublicChecksum, err error) {
+	if req, err := http.NewRequestWithContext(
+		ctx,
+		http.MethodPut,
+		fmt.Sprintf("%s&upload_id=%s", BASE_URL, info.ID),
+		nil,
+	); err != nil {
+		return "", database.PublicChecksum{}, fmt.Errorf("complete upload: create request: %w", err)
+	} else {
+		req.Header.Set("Content-Range", "*/*")
+
+		if res, err := gd.http.Do(req); err != nil {
+			return "", database.PublicChecksum{}, fmt.Errorf("complete chunk: do request: %w", err)
+		} else {
+			defer res.Body.Close()
+
+			if !slices.Contains([]int{
+				http.StatusOK,
+				http.StatusCreated,
+			}, res.StatusCode) {
+				return "", database.PublicChecksum{}, fmt.Errorf("complete upload: bad status: %s", res.Status)
+			}
+
+			var file struct {
+				Id             string `json:"id"`
+				Sha256Checksum string `json:"sha256Checksum"`
+			}
+			if err := json.NewDecoder(res.Body).Decode(&file); err != nil {
+				return "", database.PublicChecksum{}, fmt.Errorf("complete upload: bad response: %w", err)
+			}
+			return file.Id, database.PublicChecksum{
+				Hash:      file.Sha256Checksum,
+				Algorithm: "sha256",
+			}, nil
+		}
+	}
 }

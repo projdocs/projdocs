@@ -11,21 +11,24 @@ import (
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/service/s3"
 	"github.com/aws/aws-sdk-go-v2/service/s3/types"
+	"github.com/projdocs/projdocs/apps/api/internal/database"
 	"github.com/projdocs/projdocs/apps/api/internal/storage/models"
 )
 
 func getKey(info *models.Info) string {
-	return fmt.Sprintf("%s/%s",
+	return fmt.Sprintf("%s/%s+%s",
 		strings.TrimPrefix(strings.TrimSuffix(info.ParentPathOrID, "/"), "/"),
 		info.Filename,
+		info.UploadID,
 	)
 }
 
 func (p *Provider) CreateUpload(ctx context.Context, info models.Info) (id string, err error) {
 	if resp, err := p.client.CreateMultipartUpload(ctx, new(s3.CreateMultipartUploadInput{
-		Bucket:      aws.String(p.bucket),
-		Key:         aws.String(getKey(&info)),
-		ContentType: aws.String(info.MimeType),
+		Bucket:            aws.String(p.bucket),
+		Key:               aws.String(getKey(&info)),
+		ContentType:       aws.String(info.MimeType),
+		ChecksumAlgorithm: types.ChecksumAlgorithmSha256,
 	})); err != nil {
 		return "", fmt.Errorf("create upload: %w", err)
 	} else if resp == nil || resp.UploadId == nil {
@@ -36,7 +39,7 @@ func (p *Provider) CreateUpload(ctx context.Context, info models.Info) (id strin
 }
 
 func (p *Provider) UploadPart(ctx context.Context, info models.Info, chunk *models.Chunk) error {
-	part := int32(chunk.Start/chunk.Total) + 1
+	part := int32(chunk.Start/(chunk.End-chunk.Start+1)) + 1
 	if resp, err := p.client.UploadPart(ctx, &s3.UploadPartInput{
 		Bucket:            aws.String(p.bucket),
 		Key:               aws.String(getKey(&info)),
@@ -63,15 +66,15 @@ func (p *Provider) UploadPart(ctx context.Context, info models.Info, chunk *mode
 	return nil
 }
 
-func (p *Provider) CompleteUpload(ctx context.Context, info models.Info) (id string, checksum string, err error) {
+func (p *Provider) CompleteUpload(ctx context.Context, info models.Info) (id string, checksum database.PublicChecksum, err error) {
 
 	raw, ok := info.Meta.Get("parts")
 	if !ok {
-		return "", "", fmt.Errorf("no parts recorded for upload %s", info.ID)
+		return "", database.PublicChecksum{}, fmt.Errorf("no parts recorded for upload %s", info.ID)
 	}
 	stored, ok := raw.(map[int32]string)
 	if !ok {
-		return "", "", fmt.Errorf("parts: unexpected type %T", raw)
+		return "", database.PublicChecksum{}, fmt.Errorf("parts: unexpected type %T", raw)
 	}
 	parts := make([]types.CompletedPart, 0, len(stored))
 	for _, n := range slices.Sorted(maps.Keys(stored)) {
@@ -86,9 +89,15 @@ func (p *Provider) CompleteUpload(ctx context.Context, info models.Info) (id str
 		Key:             aws.String(getKey(&info)),
 		UploadId:        aws.String(info.ID),
 		MultipartUpload: &types.CompletedMultipartUpload{Parts: parts},
+		ChecksumType:    types.ChecksumTypeFullObject,
 	}); err != nil {
-		return "", "", fmt.Errorf("complete upload: %w", err)
+		return "", database.PublicChecksum{}, fmt.Errorf("complete upload: %w", err)
 	} else {
-		return getKey(&info), strings.Trim(*res.ETag, "\""), nil
+		return getKey(&info),
+			database.PublicChecksum{
+				Hash:      strings.Trim(*res.ETag, "\""),
+				Algorithm: "md5",
+			},
+			nil
 	}
 }

@@ -217,42 +217,42 @@ type PublicPermissionsUpdate struct {
 }
 
 type PublicStorageUploadsSelect struct {
-  Checksum          *string `json:"checksum"`
-  ClientId          *string `json:"client_id"`
-  CreatedAt         string  `json:"created_at"`
-  FileVersionId     *string `json:"file_version_id"`
-  FolderId          *string `json:"folder_id"`
-  Id                string  `json:"id"`
-  OrganizationId    *string `json:"organization_id"`
-  ProjectId         *string `json:"project_id"`
-  ProviderId        string  `json:"provider_id"`
-  StorageProviderId string  `json:"storage_provider_id"`
+  Checksum          map[string]interface{} `json:"checksum"`
+  ClientId          *string                `json:"client_id"`
+  CreatedAt         string                 `json:"created_at"`
+  FileVersionId     *string                `json:"file_version_id"`
+  FolderId          *string                `json:"folder_id"`
+  Id                string                 `json:"id"`
+  OrganizationId    *string                `json:"organization_id"`
+  ProjectId         *string                `json:"project_id"`
+  ProviderId        string                 `json:"provider_id"`
+  StorageProviderId string                 `json:"storage_provider_id"`
 }
 
 type PublicStorageUploadsInsert struct {
-  Checksum          *string `json:"checksum"`
-  ClientId          *string `json:"client_id"`
-  CreatedAt         *string `json:"created_at"`
-  FileVersionId     *string `json:"file_version_id"`
-  FolderId          *string `json:"folder_id"`
-  Id                *string `json:"id"`
-  OrganizationId    *string `json:"organization_id"`
-  ProjectId         *string `json:"project_id"`
-  ProviderId        string  `json:"provider_id"`
-  StorageProviderId string  `json:"storage_provider_id"`
+  Checksum          map[string]interface{} `json:"checksum"`
+  ClientId          *string                `json:"client_id"`
+  CreatedAt         *string                `json:"created_at"`
+  FileVersionId     *string                `json:"file_version_id"`
+  FolderId          *string                `json:"folder_id"`
+  Id                *string                `json:"id"`
+  OrganizationId    *string                `json:"organization_id"`
+  ProjectId         *string                `json:"project_id"`
+  ProviderId        string                 `json:"provider_id"`
+  StorageProviderId string                 `json:"storage_provider_id"`
 }
 
 type PublicStorageUploadsUpdate struct {
-  Checksum          *string `json:"checksum"`
-  ClientId          *string `json:"client_id"`
-  CreatedAt         *string `json:"created_at"`
-  FileVersionId     *string `json:"file_version_id"`
-  FolderId          *string `json:"folder_id"`
-  Id                *string `json:"id"`
-  OrganizationId    *string `json:"organization_id"`
-  ProjectId         *string `json:"project_id"`
-  ProviderId        *string `json:"provider_id"`
-  StorageProviderId *string `json:"storage_provider_id"`
+  Checksum          map[string]interface{} `json:"checksum"`
+  ClientId          *string                `json:"client_id"`
+  CreatedAt         *string                `json:"created_at"`
+  FileVersionId     *string                `json:"file_version_id"`
+  FolderId          *string                `json:"folder_id"`
+  Id                *string                `json:"id"`
+  OrganizationId    *string                `json:"organization_id"`
+  ProjectId         *string                `json:"project_id"`
+  ProviderId        *string                `json:"provider_id"`
+  StorageProviderId *string                `json:"storage_provider_id"`
 }
 
 type PublicFilesSelect struct {
@@ -349,4 +349,13 @@ type PublicFoldersUpdate struct {
   OrganizationId  *string `json:"organization_id"`
   ProjectId       *string `json:"project_id"`
   StorageUploadId *string `json:"storage_upload_id"`
+}
+
+
+
+
+
+type PublicChecksum struct {
+  Algorithm interface{} `json:"algorithm"`
+  Hash      string      `json:"hash"`
 }

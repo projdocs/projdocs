@@ -27,6 +27,7 @@ major_version = 17
 [db.vault]
 GOOGLE_OAUTH_CLIENT_ID = "env(GOOGLE_OAUTH_CLIENT_ID)"
 GOOGLE_OAUTH_CLIENT_SECRET = "env(GOOGLE_OAUTH_CLIENT_SECRET)"
+GOOGLE_API_KEY = "env(GOOGLE_API_KEY)"
 
 [db.seed]
 enabled = true

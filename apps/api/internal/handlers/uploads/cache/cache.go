@@ -40,17 +40,16 @@ func (c *Instance) Get(uploadID string) *Entry {
 	return &e
 }
 
-func (c *Instance) Set(cfg *database.PublicStorageProvidersSelect, info *models.Info) (string, *Entry) {
+func (c *Instance) Set(id uuid.UUID, cfg *database.PublicStorageProvidersSelect, info *models.Info) *Entry {
 	c.mu.Lock()
 	defer c.mu.Unlock()
-	id := uuid.New()
 	entry := Entry{
 		cfg:       cfg,
 		ExpiresAt: time.Now().Add(c.ttl),
 		info:      info,
 	}
 	c.entries[id.String()] = entry
-	return id.String(), &entry
+	return &entry
 }
 
 func (c *Instance) Delete(uploadID string) {

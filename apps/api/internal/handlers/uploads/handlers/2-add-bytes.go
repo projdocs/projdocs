@@ -20,7 +20,8 @@ var UploadBytes gin.HandlerFunc = func(c *gin.Context) {
 
 	// parse headers
 	var start, end, total uint64
-	_, err := fmt.Sscanf(c.GetHeader("Content-Range"), "bytes %d-%d/%d", &start, &end, &total)
+	contentRange := c.GetHeader("Content-Range")
+	_, err := fmt.Sscanf(contentRange, "bytes %d-%d/%d", &start, &end, &total)
 	if err != nil {
 		response.Error(c, http.StatusBadRequest, "malformed Content-Range")
 		return
@@ -89,6 +90,7 @@ var UploadBytes gin.HandlerFunc = func(c *gin.Context) {
 		Start:  start,
 		End:    end,
 		Total:  total,
+		Range:  contentRange,
 		Data:   &data,
 		Sha256: eTag,
 	}

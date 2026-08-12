@@ -52,6 +52,7 @@ jobs:
         env:
           GOOGLE_OAUTH_CLIENT_ID: not-set
           GOOGLE_OAUTH_CLIENT_SECRET: not-set
+          GOOGLE_API_KEY: not-set
 
       - run: supabase test db
         if: steps.migrations.outputs.changed == 'true'

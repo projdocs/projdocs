@@ -146,12 +146,13 @@ var CompleteUpload gin.HandlerFunc = func(c *gin.Context) {
 		response.Error(c, http.StatusInternalServerError, "failed to complete upload on backend storage-provider")
 		return
 	} else if _, err := txn.Exec(
-		`INSERT INTO public.storage_uploads (id, storage_provider_id, file_version_id, provider_id, checksum) VALUES ($1, $2, $3, $4, $5)`,
+		`INSERT INTO public.storage_uploads (id, storage_provider_id, file_version_id, provider_id, checksum) VALUES ($1, $2, $3, $4, row($5, $6)::public.checksum)`,
 		uploadID.String(),
 		cached.ProviderMeta().Id,
 		versionID.String(),
 		storageProviderID,
-		checksum,
+		checksum.Algorithm,
+		checksum.Hash,
 	); err != nil {
 		response.Error(c, http.StatusInternalServerError, "failed to create storage-upload record")
 		return
